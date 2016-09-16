@@ -488,7 +488,7 @@ class MultinomialLogisticRegressionModel private[spark] (
    * Predict label for the given feature vector.
    * The behavior of this can be adjusted using [[thresholds]].
    */
-  override protected def predict(features: Vector): Double = {
+  override def predict(features: Vector): Double = {
     if (isDefined(thresholds)) {
       val thresholds: Array[Double] = getThresholds
       val probabilities = scores(features).toArray
@@ -554,7 +554,7 @@ class MultinomialLogisticRegressionModel private[spark] (
     }
   }
 
-  override protected def predictRaw(features: Vector): Vector = margins(features)
+  override def predictRaw(features: Vector): Vector = margins(features)
 
   @Since("2.1.0")
   override def copy(extra: ParamMap): MultinomialLogisticRegressionModel = {

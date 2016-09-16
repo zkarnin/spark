@@ -25,7 +25,7 @@ import scala.collection.JavaConverters._
 import org.apache.hadoop.fs.Path
 
 import org.apache.spark.annotation.Since
-import org.apache.spark.ml.{Estimator, Model}
+import org.apache.spark.ml.{UnaryModel, Estimator, Model}
 import org.apache.spark.ml.attribute._
 import org.apache.spark.ml.linalg.{DenseVector, SparseVector, Vector, VectorUDT}
 import org.apache.spark.ml.param._
@@ -33,7 +33,7 @@ import org.apache.spark.ml.param.shared._
 import org.apache.spark.ml.util._
 import org.apache.spark.sql.{DataFrame, Dataset, Row}
 import org.apache.spark.sql.functions.udf
-import org.apache.spark.sql.types.{StructField, StructType}
+import org.apache.spark.sql.types.{DataType, StructField, StructType}
 import org.apache.spark.util.collection.OpenHashSet
 
 /** Private trait for params for VectorIndexer and VectorIndexerModel */
@@ -45,6 +45,7 @@ private[ml] trait VectorIndexerParams extends Params with HasInputCol with HasOu
    * Must be >= 2.
    *
    * (default = 20)
+ *
    * @group param
    */
   val maxCategories = new IntParam(this, "maxCategories",
@@ -265,7 +266,8 @@ class VectorIndexerModel private[ml] (
     @Since("1.4.0") override val uid: String,
     @Since("1.4.0") val numFeatures: Int,
     @Since("1.4.0") val categoryMaps: Map[Int, Map[Double, Int]])
-  extends Model[VectorIndexerModel] with VectorIndexerParams with MLWritable {
+  extends Model[VectorIndexerModel] with UnaryModel[Vector,Vector,VectorIndexerModel]
+    with VectorIndexerParams with MLWritable {
 
   import VectorIndexerModel._
 
@@ -347,14 +349,6 @@ class VectorIndexerModel private[ml] (
     f
   }
 
-  /** @group setParam */
-  @Since("1.4.0")
-  def setInputCol(value: String): this.type = set(inputCol, value)
-
-  /** @group setParam */
-  @Since("1.4.0")
-  def setOutputCol(value: String): this.type = set(outputCol, value)
-
   @Since("2.0.0")
   override def transform(dataset: Dataset[_]): DataFrame = {
     transformSchema(dataset.schema, logging = true)
@@ -391,6 +385,7 @@ class VectorIndexerModel private[ml] (
 
   /**
    * Prepare the output column field, including per-feature metadata.
+ *
    * @param schema  Input schema
    * @return  Output column field.  This field does not contain non-ML metadata.
    */
@@ -432,6 +427,18 @@ class VectorIndexerModel private[ml] (
 
   @Since("1.6.0")
   override def write: MLWriter = new VectorIndexerModelWriter(this)
+  
+  /**
+    * Creates the transform function using the given param map. The input param map already takes
+    * account of the embedded param map. So the param values should be determined solely by the input
+    * param map.
+    */
+  override protected def createTransformFunc: (Vector) => Vector = transformFunc
+
+  /**
+    * Returns the data type of the output column.
+    */
+  override protected def outputDataType: DataType = new VectorUDT()
 }
 
 @Since("1.6.0")

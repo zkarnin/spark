@@ -18,17 +18,16 @@
 package org.apache.spark.ml.feature
 
 import org.apache.hadoop.fs.Path
-
 import org.apache.spark.SparkException
 import org.apache.spark.annotation.Since
-import org.apache.spark.ml.{Estimator, Model, Transformer}
 import org.apache.spark.ml.attribute.{Attribute, NominalAttribute}
 import org.apache.spark.ml.param._
 import org.apache.spark.ml.param.shared._
 import org.apache.spark.ml.util._
-import org.apache.spark.sql.{DataFrame, Dataset}
+import org.apache.spark.ml.{Model, Estimator, Transformer, UnaryModel}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.{DataFrame, Dataset}
 import org.apache.spark.util.collection.OpenHashMap
 
 /**
@@ -124,6 +123,7 @@ class StringIndexerModel (
     @Since("1.4.0") override val uid: String,
     @Since("1.5.0") val labels: Array[String])
   extends Model[StringIndexerModel] with StringIndexerBase with MLWritable {
+  //with UnaryModel[String, Double, StringIndexerModel]
 
   import StringIndexerModel._
 
@@ -145,14 +145,6 @@ class StringIndexerModel (
   @Since("1.6.0")
   def setHandleInvalid(value: String): this.type = set(handleInvalid, value)
   setDefault(handleInvalid, "error")
-
-  /** @group setParam */
-  @Since("1.4.0")
-  def setInputCol(value: String): this.type = set(inputCol, value)
-
-  /** @group setParam */
-  @Since("1.4.0")
-  def setOutputCol(value: String): this.type = set(outputCol, value)
 
   @Since("2.0.0")
   override def transform(dataset: Dataset[_]): DataFrame = {
@@ -186,6 +178,15 @@ class StringIndexerModel (
       indexer(dataset($(inputCol)).cast(StringType)).as($(outputCol), metadata))
   }
 
+//  @Since("2.1.0")
+//  override def validInputFunc : String => Boolean = getHandleInvalid match {
+//    case "skip" =>
+//      label  => labelToIndex.contains(label)
+//    case _ => label => true
+//  }
+
+
+
   @Since("1.4.0")
   override def transformSchema(schema: StructType): StructType = {
     if (schema.fieldNames.contains($(inputCol))) {
@@ -195,6 +196,10 @@ class StringIndexerModel (
       schema
     }
   }
+
+  def setOutputCol(value: String): this.type = set(outputCol, value)
+
+  def setInputCol(value: String): this.type = set(inputCol, value)
 
   @Since("1.4.1")
   override def copy(extra: ParamMap): StringIndexerModel = {
@@ -256,7 +261,8 @@ object StringIndexerModel extends MLReadable[StringIndexerModel] {
  */
 @Since("1.5.0")
 class IndexToString private[ml] (@Since("1.5.0") override val uid: String)
-  extends Transformer with HasInputCol with HasOutputCol with DefaultParamsWritable {
+  extends Model[IndexToString] with UnaryModel[Double,String,IndexToString]
+    with HasInputCol with HasOutputCol with DefaultParamsWritable {
 
   @Since("1.5.0")
   def this() =
@@ -278,6 +284,7 @@ class IndexToString private[ml] (@Since("1.5.0") override val uid: String)
    * Optional param for array of labels specifying index-string mapping.
    *
    * Default: Not specified, in which case [[inputCol]] metadata is used for labels.
+ *
    * @group param
    */
   @Since("1.5.0")
@@ -332,6 +339,53 @@ class IndexToString private[ml] (@Since("1.5.0") override val uid: String)
   override def copy(extra: ParamMap): IndexToString = {
     defaultCopy(extra)
   }
+
+  override protected def validInputFunc: (Double) => Boolean = _ => true
+
+  def setLabelsFromInputData(dataset: Dataset[_]): this.type = {
+    val inputColSchema = dataset.schema($(inputCol))
+    // If the labels array is empty use column metadata
+    if (!isDefined(labels) || $(labels).isEmpty) {
+      val newLabels = Attribute.fromStructField(inputColSchema)
+        .asInstanceOf[NominalAttribute].values.get
+      setLabels(newLabels)
+    } else {
+      this
+    }
+  }
+
+  /**
+    * Creates the transform function using the given param map. The input param map already takes
+    * account of the embedded param map. So the param values should be determined solely by the input
+    * param map.
+ *
+    * @note if labels are not defined, outputs the number as a string
+    */
+  override protected def createTransformFunc: (Double) => String = {
+    if (!isDefined(labels) || $(labels).isEmpty) {
+      {index: Double =>
+        index.toInt.toString
+      }
+    } else {
+      val values = $(labels)
+      val numOfLabels = values.length
+
+      {index: Double =>
+        val idx = index.toInt
+        if (0 <= idx && idx < numOfLabels) {
+          values(idx)
+        } else {
+          throw new SparkException(s"Unseen index: $index ??")
+        }
+      }
+    }
+  }
+
+
+  /**
+    * Returns the data type of the output column.
+    */
+  override protected def outputDataType: DataType = StringType
 }
 
 @Since("1.6.0")

@@ -24,9 +24,11 @@ import org.apache.spark.ml.param._
 import org.apache.spark.ml.param.shared._
 import org.apache.spark.ml.util.SchemaUtils
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Dataset, Row}
+import org.apache.spark.sql.{Column, DataFrame, Dataset, Row}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DataType, DoubleType, StructType}
+
+import scala.reflect.ClassTag
 
 /**
  * (private[ml])  Trait for parameters for prediction (regression and classification).
@@ -138,7 +140,7 @@ abstract class Predictor[
  */
 @DeveloperApi
 abstract class PredictionModel[FeaturesType, M <: PredictionModel[FeaturesType, M]]
-  extends Model[M] with PredictorParams {
+  extends Model[M] with MapRowTransformer with PredictorParams {
 
   /** @group setParam */
   def setFeaturesCol(value: String): M = set(featuresCol, value).asInstanceOf[M]
@@ -149,6 +151,8 @@ abstract class PredictionModel[FeaturesType, M <: PredictionModel[FeaturesType, 
   /** Returns the number of features the model was trained on. If unknown, returns -1 */
   @Since("1.6.0")
   def numFeatures: Int = -1
+
+
 
   /**
    * Returns the SQL DataType corresponding to the FeaturesType type parameter.
@@ -193,5 +197,61 @@ abstract class PredictionModel[FeaturesType, M <: PredictionModel[FeaturesType, 
    * Predict label for the given features.
    * This internal method is used to implement [[transform()]] and output [[predictionCol]].
    */
-  protected def predict(features: FeaturesType): Double
+  def predict(features: FeaturesType): Double
+
+  /**
+    * For a predictor there is a single input hence the input row is assumed to
+    * be a row with a single object of type FeaturesType
+    */
+  def transformRow(row: Row) : Option[Row] = {
+    try {
+      val features = row.getAs[FeaturesType](0)
+      Some(Row(predict(features)))
+    } catch {
+      case e : Exception => None: Option[Row]
+    }
+  }
 }
+
+
+class PipeLinePredictor[FeaturesType](private val pipelineModel: PipelineModel) extends
+  MapPipelineModel[FeaturesType](pipelineModel) {
+  /**
+    * Predict label for the given features.
+    */
+  def predict(features: FeaturesType): Option[Double] = {
+    val row = transformRow(features)
+    if (row.isEmpty) {
+      None: Option[Double]
+    } else {
+      Some(row.get.getDouble(0))
+    }
+  }
+}
+
+//
+//class PipeLinePredictor[FeaturesType, PredictionModelType <: PredictionModel[_,PredictionModelType] : ClassTag
+//  ](override val firstStage: Transformer with MapTransformer[FeaturesType],
+//    val middleStages: Array[Transformer with MapRowTransformer],
+//    val lastStage: PredictionModelType)
+//  extends MapPipelineModel[FeaturesType](
+//    firstStage,
+//    if(lastStage==firstStage) Array[Transformer with MapRowTransformer]() else middleStages++Array(lastStage)) {
+//
+//  /**
+//    * Gives access to the last stage, that is a predictor
+//    */
+//  def getPredictor : PredictionModelType = lastStage
+//
+//  /**
+//    * Predict label for the given features.
+//    */
+//  def predict(features: FeaturesType): Option[Double] = {
+//    val row = transformRow(features)
+//    if (row.isEmpty) {
+//      None: Option[Double]
+//    } else {
+//      Some(row.get.getDouble(0))
+//    }
+//  }
+//}

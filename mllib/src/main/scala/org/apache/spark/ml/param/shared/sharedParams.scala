@@ -233,6 +233,21 @@ private[ml] trait HasOutputCol extends Params {
 }
 
 /**
+  * Trait for shared param outputColumns
+  * for transformoers having a fixed number of output columns, larger than 1
+  */
+private[ml] trait HasOutputCols extends Params {
+  /**
+    * Param for output column name.
+    * @group param
+    */
+  final val outputCols: StringArrayParam = new StringArrayParam(this, "outputCols", "output column names")
+
+  /** @group getParam */
+  final def getOutputCols: Array[String] = $(outputCols)
+}
+
+/**
  * Trait for shared param checkpointInterval.
  */
 private[ml] trait HasCheckpointInterval extends Params {

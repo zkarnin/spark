@@ -23,7 +23,7 @@ import org.apache.spark.annotation.{DeveloperApi, Since}
 import org.apache.spark.internal.Logging
 import org.apache.spark.ml.param._
 import org.apache.spark.ml.param.shared._
-import org.apache.spark.sql.{DataFrame, Dataset}
+import org.apache.spark.sql.{Column, Row, DataFrame, Dataset}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 
@@ -36,7 +36,8 @@ abstract class Transformer extends PipelineStage {
 
   /**
    * Transforms the dataset with optional parameters
-   * @param dataset input dataset
+    *
+    * @param dataset input dataset
    * @param firstParamPair the first param pair, overwrite embedded params
    * @param otherParamPairs other param pairs, overwrite embedded params
    * @return transformed dataset
@@ -55,7 +56,8 @@ abstract class Transformer extends PipelineStage {
 
   /**
    * Transforms the dataset with provided parameter map as additional parameters.
-   * @param dataset input dataset
+    *
+    * @param dataset input dataset
    * @param paramMap additional parameters, overwrite embedded params
    * @return transformed dataset
    */
@@ -72,6 +74,30 @@ abstract class Transformer extends PipelineStage {
 
   override def copy(extra: ParamMap): Transformer
 }
+
+/**
+  * :: DeveloperApi ::
+  * Abstract class for transformers whose transformation can be applied as a map
+  * operation
+  */
+trait MapTransformer[T] extends Transformer with HasOutputCols {
+  /**
+    * Transforms a single object into a row. Returns Option
+    * to handle invalid inputs
+    * (this can be used in flatMap to convert the dataset)
+    */
+  def transformRow(row: T) : Option[Row]
+}
+
+/**
+  * :: DeveloperApi ::
+  * Abstract class for transformers whose transformation can be applied as a map
+  * operation, with a DataFrame as input
+  */
+trait MapRowTransformer extends MapTransformer[Row] with HasInputCols {
+
+}
+
 
 /**
  * :: DeveloperApi ::

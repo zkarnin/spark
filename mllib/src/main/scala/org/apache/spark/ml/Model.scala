@@ -18,7 +18,9 @@
 package org.apache.spark.ml
 
 import org.apache.spark.annotation.DeveloperApi
-import org.apache.spark.ml.param.ParamMap
+import org.apache.spark.ml.feature.IndexToString
+import org.apache.spark.ml.param.{ParamPair, ParamMap}
+import org.apache.spark.sql.types.DataType
 
 /**
  * :: DeveloperApi ::
@@ -46,4 +48,36 @@ abstract class Model[M <: Model[M]] extends Transformer {
   def hasParent: Boolean = parent != null
 
   override def copy(extra: ParamMap): M
+}
+
+/**
+  * :: DeveloperApi ::
+  * A fitted model, i.e., a [[Transformer]] produced by an [[Estimator]]
+  * with a single input and output column
+  *
+  * @tparam M model type
+  */
+@DeveloperApi
+trait UnaryModel[IN, OUT, M <: Model[M] with UnaryModel[IN, OUT, M]] {
+
+  def createSoftTransformFunc: IN => Option[OUT] = {
+    val transformFunc = createTransformFunc
+    val validInput = validInputFunc
+    in => if (validInput(in)) Some(transformFunc(in)) else None
+  }
+  protected def validInputFunc: IN => Boolean = _ => true
+
+  /**
+    * Creates the transform function using the given param map. The input param map already takes
+    * account of the embedded param map. So the param values should be determined solely by the input
+    * param map.
+    */
+  protected def createTransformFunc: (IN) => OUT
+
+  /**
+    * Returns the data type of the output column.
+    */
+  protected def outputDataType: DataType
+
+  val uid: String
 }

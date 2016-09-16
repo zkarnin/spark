@@ -197,7 +197,7 @@ abstract class ClassificationModel[FeaturesType, M <: ClassificationModel[Featur
    * This default implementation for classification predicts the index of the maximum value
    * from [[predictRaw()]].
    */
-  override protected def predict(features: FeaturesType): Double = {
+  override def predict(features: FeaturesType): Double = {
     raw2prediction(predictRaw(features))
   }
 
@@ -205,13 +205,27 @@ abstract class ClassificationModel[FeaturesType, M <: ClassificationModel[Featur
    * Raw prediction for each possible label.
    * The meaning of a "raw" prediction may vary between algorithms, but it intuitively gives
    * a measure of confidence in each possible label (where larger = more confident).
-   * This internal method is used to implement [[transform()]] and output [[rawPredictionCol]].
+   * This method is used to implement [[transform()]] and output [[rawPredictionCol]].
    *
    * @return  vector where element i is the raw prediction for label i.
    *          This raw prediction may be any real number, where a larger value indicates greater
    *          confidence for that label.
    */
-  protected def predictRaw(features: FeaturesType): Vector
+  def predictRaw(features: FeaturesType): Vector
+
+  /**
+    * Raw prediction for label #1.
+    * Suited mostly for binary classification
+    * The meaning of a "raw" prediction may vary between algorithms, but it intuitively gives
+    * a measure of confidence in each possible label (where larger = more confident).
+    * This method is used to implement [[transform()]] and output [[rawPredictionCol]].
+    *
+    * @param features features vector
+    * @return raw prediction for label #1 (in binary classification, positive class)
+    */
+  def predictRawLabel1(features: FeaturesType) : Double=  {
+    predictRaw(features).apply(1)
+  }
 
   /**
    * Given a vector of raw predictions, select the predicted label.

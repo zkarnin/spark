@@ -60,6 +60,21 @@ class BinaryClassificationEvaluator @Since("1.4.0") (@Since("1.4.0") override va
   @Since("1.2.0")
   def setMetricName(value: String): this.type = set(metricName, value)
 
+  /** @group getParam */
+  val recallAt: Param[Double] = new Param(
+    this, "recallAt", "value for precision",(x:Double) => x > 0.0 && x < 1.0)
+  def getRecallAt: Double = $(recallAt)
+  setDefault(recallAt -> 0.9)
+  def setRecallAt(value: Double): this.type = set(recallAt, value)
+
+  /** @group getParam */
+  val precisionAt: Param[Double] = new Param(
+    this, "precisionAt", "value for recall",(x:Double) => x > 0.0 && x < 1.0)
+  def getPrecisionAt: Double = $(precisionAt)
+  setDefault(precisionAt -> 0.9)
+  def setPrecisionAt(value: Double): this.type = set(precisionAt, value)
+
+
   /** @group setParam */
   @Since("1.5.0")
   def setRawPredictionCol(value: String): this.type = set(rawPredictionCol, value)
@@ -86,6 +101,8 @@ class BinaryClassificationEvaluator @Since("1.4.0") (@Since("1.4.0") override va
     val metric = $(metricName) match {
       case "areaUnderROC" => metrics.areaUnderROC()
       case "areaUnderPR" => metrics.areaUnderPR()
+      case "recallAt" => metrics.pr().filter(_._1 >= getRecallAt).map(_._2).max
+      case "precisionAt" => metrics.pr().filter(_._2 >= getPrecisionAt).map(_._1).max
     }
     metrics.unpersist()
     metric

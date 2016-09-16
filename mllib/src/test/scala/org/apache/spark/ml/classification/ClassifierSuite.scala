@@ -130,7 +130,7 @@ object ClassifierSuite {
 
     def this() = this(Identifiable.randomUID("mockclassificationmodel"))
 
-    protected def predictRaw(features: Vector): Vector = throw new NotImplementedError()
+    def predictRaw(features: Vector): Vector = throw new NotImplementedError()
 
     override def copy(extra: ParamMap): MockClassificationModel = throw new NotImplementedError()
 

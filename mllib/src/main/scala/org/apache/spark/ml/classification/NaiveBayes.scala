@@ -186,7 +186,7 @@ class NaiveBayesModel private[ml] (
     prob
   }
 
-  override protected def predictRaw(features: Vector): Vector = {
+  override def predictRaw(features: Vector): Vector = {
     $(modelType) match {
       case Multinomial =>
         multinomialCalculation(features)
