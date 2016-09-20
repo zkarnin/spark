@@ -130,6 +130,12 @@ private[ml] object ValidatorParams {
         List("numFolds" -> parse(cv.numFolds.jsonEncode(cv.getNumFolds)))
       case tvs: TrainValidationSplitParams =>
         List("trainRatio" -> parse(tvs.trainRatio.jsonEncode(tvs.getTrainRatio)))
+      case tv: TrainValidationParams =>
+        List("seqIterNum" -> parse(tv.seqIterNum.jsonEncode(tv.getSeqIterNum)),
+          "modelsInOneIter" -> parse(tv.modelsInOneIter.jsonEncode(tv.getModelsInOneIter)),
+          "trainIndicatorCol" -> parse(tv.trainIndicatorCol.jsonEncode(tv.getTrainIndicatorCol)),
+          "optimizationMethod" -> parse(tv.optimizationMethod.jsonEncode(tv.getOptimizationMethod))
+        )
       case _ =>
         // This should not happen.
         throw new NotImplementedError("ValidatorParams.saveImpl does not handle type: " +

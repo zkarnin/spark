@@ -2,8 +2,10 @@ package org.apache.spark.ml.tuning
 
 import org.apache.spark.ml.param._
 import org.apache.spark.ml.tuning.ParamMapAdaptiveExplore.{SampleType, ParamTransformer}
-
 import scala.collection.mutable
+
+import org.json4s._
+import org.json4s.jackson.JsonMethods._
 
 /**
   * Created by zkarnin on 6/15/16.
@@ -54,10 +56,6 @@ class ParamMapAdaptiveExploreBuilder extends Serializable {
   private def put(paramAndTransformer: (Param[_], ParamTransformer[_])): Unit = {
     map.put(paramAndTransformer._1.asInstanceOf[Param[Any]],
       paramAndTransformer._2.asInstanceOf[ParamTransformer[Any]])
-  }
-
-  private def get[T](param: Param[T]): Option[ParamTransformer[T]] = {
-    map.get(param.asInstanceOf[Param[Any]]).asInstanceOf[Option[ParamTransformer[T]]]
   }
 
   def addParam(param: IntParam, intRange: (Int, Int),
@@ -213,6 +211,18 @@ class ParamMapAdaptiveExploreBuilder extends Serializable {
   }
 
   /**
+    * Adds parameter ranges from another builder.
+    * Useful for adding default parameters from existing Evaluators
+    */
+  def addParamsFromOther(other:ParamMapAdaptiveExploreBuilder) = {
+    other.map.foreach{case (param, transformer) =>
+      put(param,transformer)
+      lossLengthScaleMap.put(param,other.lossLengthScaleMap.get(param).get)
+      logCostLengthScaleMap.put(param,other.logCostLengthScaleMap.get(param).get)
+    }
+  }
+
+  /**
     * Set a prior for the loss (or gain) of the training given the
     * hyperparameters since we are working with a distance based kernel,
     * the prior's values should be given as a function (mu) from a parameter
@@ -335,6 +345,7 @@ class ParamMapAdaptiveExplore(val map: Map[Param[Any],ParamTransformer[Any]],
       paramFunc.valueToDouble(value)
     }.toArray
   }
+
 }
 
 
@@ -351,3 +362,4 @@ object ParamMapAdaptiveExplore {
   }
 
 }
+

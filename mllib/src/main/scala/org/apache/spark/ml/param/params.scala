@@ -513,7 +513,7 @@ class IntArrayParam(parent: Params, name: String, doc: String, isValid: Array[In
  * A param and its value.
  */
 @Since("1.2.0")
-case class ParamPair[T] @Since("1.2.0") (
+case class ParamPair[T]  (
     @Since("1.2.0") param: Param[T],
     @Since("1.2.0") value: T) {
   // This is *the* place Param.validate is called.  Whenever a parameter is specified, we should

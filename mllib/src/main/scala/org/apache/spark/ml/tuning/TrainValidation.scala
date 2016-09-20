@@ -20,71 +20,23 @@ package org.apache.spark.ml.tuning
 import java.util.{List => JList}
 
 import org.apache.hadoop.fs.Path
+import org.apache.spark.SparkContext
 import org.apache.spark.annotation.Since
 import org.apache.spark.internal.Logging
 import org.apache.spark.ml.evaluation.Evaluator
-import org.apache.spark.ml.param.{ParamValidators, IntParam, Param, ParamMap}
+import org.apache.spark.ml.param._
+import org.apache.spark.ml.util.DefaultParamsReader.Metadata
 import org.apache.spark.ml.util._
 import org.apache.spark.ml.{Estimator, Model}
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, Dataset}
-import org.json4s.DefaultFormats
+import org.json4s._
 
 import scala.collection.JavaConverters._
 import scala.language.existentials
 
 
-/**
-  * Params for [[TrainValidation]] and [[TrainValidationModel]].
-  */
-private[ml] trait TrainValidationParams extends ValidatorParams {
-  /**
-    * Budget of iterations. In each iteration a model (or several) is trained
-    * Default: 30
-    *
-    * @group param
-    */
-  val seqIterNum: IntParam = new IntParam(this, "seqIterNum",
-    "Budget of iterations. In each iteration a model (or several) is trained", ParamValidators.inRange(1, 10000))
-  /** @group getParam */
-  def getSeqIterNum: Int = $(seqIterNum)
-  setDefault(seqIterNum -> 30)
 
-  /**
-    * Number of models trained in each iteration
-    * Default: 1
-    *
-    * @group param
-    */
-  val modelsInOneIter: IntParam = new IntParam(this, "modelsInOneIter",
-    "Number of models trained in each iteration", ParamValidators.inRange(1, 10000))
-  /** @group getParam */
-  def getModelsInOneIter: Int = $(modelsInOneIter)
-  setDefault(modelsInOneIter -> 1)
-
-  val paramMapAdaptiveExplore: Param[ParamMapAdaptiveExplore] =
-    new Param[ParamMapAdaptiveExplore](this,
-      "paramMapGPExplore",
-      "object used for hyper-parameter choosing based on gaussian processes"
-    )
-  def getParamMapAdaptiveExplore: ParamMapAdaptiveExplore = $(paramMapAdaptiveExplore)
-
-
-  /**
-    * Name of column with data about original of instance, train or validation
-    *
-    * @group param
-    */
-  val trainIndicatorCol: Param[String] = new Param[String](this, "trainIndicatorCol",
-    "name of column with boolean indicating whether the instance is a train instance (otherwise validation)")
-  /** @group getParam */
-  def getTrainIndicatorCol: String = $(trainIndicatorCol)
-
-  val optimizationMethod: Param[String] = new Param[String](this,"optimizationMethod",
-  "method for optimization. Either use a fixed array of parameters or explore adaptively",
-    Array("fixedArray", "adaptiveGP").contains(_ : String))
-  def getOptimizationMethod : String = $(optimizationMethod)
-}
 
 /**
  * Validation for hyper-parameter tuning.
@@ -110,6 +62,7 @@ class TrainValidation @Since("1.5.0")(@Since("1.5.0") override val uid: String)
   /** @group setParam */
   def setSeed(value: Long): this.type = set(seed, value)
 
+  /** @group setParam */
   def setTrainIndicatorCol(value: String) : this.type = set(trainIndicatorCol, value)
 
   /** @group setParam */
@@ -120,6 +73,9 @@ class TrainValidation @Since("1.5.0")(@Since("1.5.0") override val uid: String)
 
   /** @group setParam */
   def setSeqIterNum(value: Int): this.type = set(seqIterNum, value)
+
+  /** @group setParam */
+  def setOptimizationMethod(value: String) : this.type = set(optimizationMethod,value)
 
   protected def fitWithAdaptiveExplore(trainingDataset: Dataset[_], validationDataset: Dataset[_],
                     schema: StructType): TrainValidationModel = {
@@ -235,7 +191,7 @@ object TrainValidation extends MLReadable[TrainValidation] {
     ValidatorParams.validateParams(instance)
 
     override protected def saveImpl(path: String): Unit =
-      ValidatorParams.saveImpl(path, instance, sc)
+      TrainValidationParams.saveImpl(path, instance, sc)
   }
 
   private class TrainValidationReader extends MLReader[TrainValidation] {
@@ -246,8 +202,8 @@ object TrainValidation extends MLReadable[TrainValidation] {
     override def load(path: String): TrainValidation = {
       implicit val format = DefaultFormats
 
-      val (metadata, estimator, evaluator, estimatorParamMaps) =
-        ValidatorParams.loadImpl(path, sc, className)
+      val (metadata, estimator, evaluator, estimatorParamMaps,paramMapAdaptiveExplore) =
+        TrainValidationParams.loadImpl(path, sc, className)
       val trainIndicatorCol = (metadata.params \ "trainIndicatorCol").extract[String]
       val seed = (metadata.params \ "seed").extract[Long]
       new TrainValidation(metadata.uid)
@@ -256,6 +212,7 @@ object TrainValidation extends MLReadable[TrainValidation] {
         .setEstimatorParamMaps(estimatorParamMaps)
         .setTrainIndicatorCol(trainIndicatorCol)
         .setSeed(seed)
+        .setParamMapAdaptiveExplore(paramMapAdaptiveExplore)
     }
   }
 }
@@ -312,7 +269,7 @@ object TrainValidationModel extends MLReadable[TrainValidationModel] {
     override protected def saveImpl(path: String): Unit = {
       import org.json4s.JsonDSL._
       val extraMetadata = "validationMetrics" -> instance.validationMetrics.toSeq
-      ValidatorParams.saveImpl(path, instance, sc, Some(extraMetadata))
+      TrainValidationParams.saveImpl(path, instance, sc, Some(extraMetadata))
       val bestModelPath = new Path(path, "bestModel").toString
       instance.bestModel.asInstanceOf[MLWritable].save(bestModelPath)
     }
@@ -326,8 +283,8 @@ object TrainValidationModel extends MLReadable[TrainValidationModel] {
     override def load(path: String): TrainValidationModel = {
       implicit val format = DefaultFormats
 
-      val (metadata, estimator, evaluator, estimatorParamMaps) =
-        ValidatorParams.loadImpl(path, sc, className)
+      val (metadata, estimator, evaluator, estimatorParamMaps,paramMapAdaptiveExplore) =
+        TrainValidationParams.loadImpl(path, sc, className)
       val trainIndicatorCol = (metadata.params \ "trainIndicatorCol").extract[String]
       val seed = (metadata.params \ "seed").extract[Long]
       val bestModelPath = new Path(path, "bestModel").toString
@@ -339,6 +296,7 @@ object TrainValidationModel extends MLReadable[TrainValidationModel] {
         .set(model.estimatorParamMaps, estimatorParamMaps)
         .set(model.trainIndicatorCol, trainIndicatorCol)
         .set(model.seed, seed)
+        .set(model.paramMapAdaptiveExplore,paramMapAdaptiveExplore)
     }
   }
 }
