@@ -67,7 +67,10 @@ public class JavaVectorSlicerExample {
     Dataset<Row> output = vectorSlicer.transform(dataset);
     output.show(false);
     // $example off$
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     spark.stop();
   }
 }

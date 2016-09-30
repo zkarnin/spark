@@ -19,7 +19,11 @@ package org.apache.spark.sql.hive.execution
 
 import java.sql.{Date, Timestamp}
 
+<<<<<<< HEAD
 import scala.sys.process.{Process, ProcessLogger}
+=======
+import scala.sys.process.Process
+>>>>>>> tuning_adaptive
 import scala.util.Try
 
 import org.apache.hadoop.fs.Path
@@ -29,6 +33,7 @@ import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.analysis.{EliminateSubqueryAliases, FunctionRegistry}
 import org.apache.spark.sql.catalyst.catalog.CatalogTableType
 import org.apache.spark.sql.catalyst.parser.ParseException
+import org.apache.spark.sql.execution.command.CreateDataSourceTableUtils
 import org.apache.spark.sql.execution.datasources.{HadoopFsRelation, LogicalRelation}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.hive.{HiveUtils, MetastoreRelation}
@@ -435,7 +440,12 @@ class SQLQuerySuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
             assert(r.options("path") === location)
           case None => // OK.
         }
+<<<<<<< HEAD
         assert(catalogTable.provider.get === format)
+=======
+        assert(
+          catalogTable.properties(CreateDataSourceTableUtils.DATASOURCE_PROVIDER) === format)
+>>>>>>> tuning_adaptive
 
       case r: MetastoreRelation =>
         if (isDataSourceParquet) {
@@ -461,12 +471,21 @@ class SQLQuerySuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
         assert(actualTableType === CatalogTableType.MANAGED)
     }
   }
+<<<<<<< HEAD
 
   test("CTAS without serde without location") {
     val originalConf = sessionState.conf.convertCTAS
 
     setConf(SQLConf.CONVERT_CTAS, true)
 
+=======
+
+  test("CTAS without serde without location") {
+    val originalConf = sessionState.conf.convertCTAS
+
+    setConf(SQLConf.CONVERT_CTAS, true)
+
+>>>>>>> tuning_adaptive
     val defaultDataSource = sessionState.conf.defaultDataSourceName
     try {
       sql("CREATE TABLE ctas1 AS SELECT key k, value FROM src ORDER BY k, value")
@@ -1698,6 +1717,7 @@ class SQLQuerySuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
     }
   }
 
+<<<<<<< HEAD
   test("SPARK-15752 optimize metadata only query for hive table") {
     withSQLConf(SQLConf.OPTIMIZER_METADATA_ONLY.key -> "true") {
       withTable("data_15752", "srcpart_15752", "srctext_15752") {
@@ -1787,6 +1807,8 @@ class SQLQuerySuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
     }
   }
 
+=======
+>>>>>>> tuning_adaptive
   test("SPARK-17354: Partitioning by dates/timestamps works with Parquet vectorized reader") {
     withSQLConf(SQLConf.PARQUET_VECTORIZED_READER_ENABLED.key -> "true") {
       sql(
@@ -1809,7 +1831,11 @@ class SQLQuerySuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
   }
 
   def testCommandAvailable(command: String): Boolean = {
+<<<<<<< HEAD
     val attempt = Try(Process(command).run(ProcessLogger(_ => ())).exitValue())
     attempt.isSuccess && attempt.get == 0
+=======
+    Try(Process(command) !!).isSuccess
+>>>>>>> tuning_adaptive
   }
 }

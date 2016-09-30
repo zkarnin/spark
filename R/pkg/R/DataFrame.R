@@ -181,9 +181,13 @@ setMethod("isLocal",
 #' @param x a SparkDataFrame.
 #' @param numRows the number of rows to print. Defaults to 20.
 #' @param truncate whether truncate long strings. If \code{TRUE}, strings more than
+<<<<<<< HEAD
 #'                 20 characters will be truncated. However, if set greater than zero,
 #'                 truncates strings longer than \code{truncate} characters and all cells
 #'                 will be aligned right.
+=======
+#'                 20 characters will be truncated and all cells will be aligned right.
+>>>>>>> tuning_adaptive
 #' @param ... further arguments to be passed to or from other methods.
 #' @family SparkDataFrame functions
 #' @aliases showDF,SparkDataFrame-method
@@ -464,10 +468,42 @@ setMethod("coltypes<-",
           })
 
 #' Creates a temporary view using the given name.
+<<<<<<< HEAD
+#'
+#' Creates a new temporary view using a SparkDataFrame in the Spark Session. If a
+#' temporary view with the same name already exists, replaces it.
+=======
 #'
 #' Creates a new temporary view using a SparkDataFrame in the Spark Session. If a
 #' temporary view with the same name already exists, replaces it.
 #'
+#' @param x A SparkDataFrame
+#' @param viewName A character vector containing the name of the table
+#'
+#' @family SparkDataFrame functions
+#' @rdname createOrReplaceTempView
+#' @name createOrReplaceTempView
+#' @aliases createOrReplaceTempView,SparkDataFrame,character-method
+#' @export
+#' @examples
+#'\dontrun{
+#' sparkR.session()
+#' path <- "path/to/file.json"
+#' df <- read.json(path)
+#' createOrReplaceTempView(df, "json_df")
+#' new_df <- sql("SELECT * FROM json_df")
+#'}
+#' @note createOrReplaceTempView since 2.0.0
+setMethod("createOrReplaceTempView",
+          signature(x = "SparkDataFrame", viewName = "character"),
+          function(x, viewName) {
+              invisible(callJMethod(x@sdf, "createOrReplaceTempView", viewName))
+          })
+
+#' (Deprecated) Register Temporary Table
+>>>>>>> tuning_adaptive
+#'
+#' Registers a SparkDataFrame as a Temporary Table in the SparkSession
 #' @param x A SparkDataFrame
 #' @param viewName A character vector containing the name of the table
 #'

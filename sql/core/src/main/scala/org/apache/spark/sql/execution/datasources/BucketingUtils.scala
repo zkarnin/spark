@@ -17,6 +17,23 @@
 
 package org.apache.spark.sql.execution.datasources
 
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/BucketingUtils.scala
+=======
+/**
+ * A container for bucketing information.
+ * Bucketing is a technology for decomposing data sets into more manageable parts, and the number
+ * of buckets is fixed so it does not fluctuate with data.
+ *
+ * @param numBuckets number of buckets.
+ * @param bucketColumnNames the names of the columns that used to generate the bucket id.
+ * @param sortColumnNames the names of the columns that used to sort data in each bucket.
+ */
+private[sql] case class BucketSpec(
+    numBuckets: Int,
+    bucketColumnNames: Seq[String],
+    sortColumnNames: Seq[String])
+
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/bucket.scala
 object BucketingUtils {
   // The file name of bucketed data should have 3 parts:
   //   1. some other information in the head of file name

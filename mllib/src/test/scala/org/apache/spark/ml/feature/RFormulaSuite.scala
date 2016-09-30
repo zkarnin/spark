@@ -51,6 +51,12 @@ class RFormulaSuite extends SparkFunSuite with MLlibTestSparkContext with Defaul
   test("features column already exists") {
     val formula = new RFormula().setFormula("y ~ x").setFeaturesCol("x")
     val original = spark.createDataFrame(Seq((0, 1.0), (2, 2.0))).toDF("x", "y")
+<<<<<<< HEAD
+=======
+    intercept[IllegalArgumentException] {
+      formula.fit(original)
+    }
+>>>>>>> tuning_adaptive
     intercept[IllegalArgumentException] {
       formula.fit(original)
     }

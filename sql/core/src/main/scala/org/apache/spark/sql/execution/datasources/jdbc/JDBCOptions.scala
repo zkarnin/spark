@@ -20,6 +20,7 @@ package org.apache.spark.sql.execution.datasources.jdbc
 /**
  * Options for the JDBC data source.
  */
+<<<<<<< HEAD
 class JDBCOptions(
     @transient private val parameters: Map[String, String])
   extends Serializable {
@@ -27,14 +28,23 @@ class JDBCOptions(
   // ------------------------------------------------------------
   // Required parameters
   // ------------------------------------------------------------
+=======
+private[jdbc] class JDBCOptions(
+    @transient private val parameters: Map[String, String])
+  extends Serializable {
+
+>>>>>>> tuning_adaptive
   // a JDBC URL
   val url = parameters.getOrElse("url", sys.error("Option 'url' not specified"))
   // name of table
   val table = parameters.getOrElse("dbtable", sys.error("Option 'dbtable' not specified"))
+<<<<<<< HEAD
 
   // ------------------------------------------------------------
   // Optional parameter list
   // ------------------------------------------------------------
+=======
+>>>>>>> tuning_adaptive
   // the column used to partition
   val partitionColumn = parameters.getOrElse("partitionColumn", null)
   // the lower bound of partition column
@@ -43,6 +53,7 @@ class JDBCOptions(
   val upperBound = parameters.getOrElse("upperBound", null)
   // the number of partitions
   val numPartitions = parameters.getOrElse("numPartitions", null)
+<<<<<<< HEAD
 
   // ------------------------------------------------------------
   // The options for DataFrameWriter
@@ -53,4 +64,6 @@ class JDBCOptions(
   // E.g., "CREATE TABLE t (name string) ENGINE=InnoDB DEFAULT CHARSET=utf8"
   // TODO: to reuse the existing partition parameters for those partition specific options
   val createTableOptions = parameters.getOrElse("createTableOptions", "")
+=======
+>>>>>>> tuning_adaptive
 }

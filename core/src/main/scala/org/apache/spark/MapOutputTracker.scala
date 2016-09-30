@@ -45,8 +45,11 @@ private[spark] case class GetMapOutputMessage(shuffleId: Int, context: RpcCallCo
 private[spark] class MapOutputTrackerMasterEndpoint(
     override val rpcEnv: RpcEnv, tracker: MapOutputTrackerMaster, conf: SparkConf)
   extends RpcEndpoint with Logging {
+<<<<<<< HEAD
 
   logDebug("init") // force eager creation of logger
+=======
+>>>>>>> tuning_adaptive
 
   override def receiveAndReply(context: RpcCallContext): PartialFunction[Any, Unit] = {
     case GetMapOutputStatuses(shuffleId: Int) =>
@@ -535,7 +538,11 @@ private[spark] class MapOutputTrackerMaster(conf: SparkConf,
             true
           case None =>
             logDebug("cached status not found for : " + shuffleId)
+<<<<<<< HEAD
             statuses = mapStatuses.getOrElse(shuffleId, Array.empty[MapStatus])
+=======
+            statuses = mapStatuses.getOrElse(shuffleId, Array[MapStatus]())
+>>>>>>> tuning_adaptive
             epochGotten = epoch
             false
         }

@@ -64,8 +64,11 @@ object TypedAggregateExpression {
 case class TypedAggregateExpression(
     aggregator: Aggregator[Any, Any, Any],
     inputDeserializer: Option[Expression],
+<<<<<<< HEAD
     inputClass: Option[Class[_]],
     inputSchema: Option[StructType],
+=======
+>>>>>>> tuning_adaptive
     bufferSerializer: Seq[NamedExpression],
     bufferDeserializer: Expression,
     outputSerializer: Seq[Expression],

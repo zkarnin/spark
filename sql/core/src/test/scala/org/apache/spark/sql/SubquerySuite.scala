@@ -571,6 +571,7 @@ class SubquerySuite extends QueryTest with SharedSQLContext {
       Row(1.0, false) :: Row(1.0, false) :: Row(2.0, true) :: Row(2.0, true) ::
         Row(3.0, false) :: Row(5.0, true) :: Row(null, false) :: Row(null, true) :: Nil)
   }
+<<<<<<< HEAD
 
   test("SPARK-16804: Correlated subqueries containing LIMIT - 1") {
     withTempView("onerow") {
@@ -600,4 +601,6 @@ class SubquerySuite extends QueryTest with SharedSQLContext {
         Row(1) :: Nil)
      }
    }
+=======
+>>>>>>> tuning_adaptive
 }

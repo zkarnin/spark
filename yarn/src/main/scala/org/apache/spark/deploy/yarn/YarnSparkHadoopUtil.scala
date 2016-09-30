@@ -22,7 +22,13 @@ import java.nio.charset.StandardCharsets.UTF_8
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+<<<<<<< HEAD
 import scala.collection.mutable.{HashMap, ListBuffer}
+=======
+import scala.collection.JavaConverters._
+import scala.collection.mutable.{HashMap, ListBuffer}
+import scala.reflect.runtime._
+>>>>>>> tuning_adaptive
 import scala.util.Try
 
 import org.apache.hadoop.conf.Configuration

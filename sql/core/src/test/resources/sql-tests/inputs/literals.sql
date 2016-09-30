@@ -96,6 +96,7 @@ select 90912830918230182310293801923652346786BD, 123.0E-28BD, 123.08BD;
 
 -- out of range big decimal
 select 1.20E-38BD;
+<<<<<<< HEAD
 
 -- hexadecimal binary literal
 select x'2379ACFe';
@@ -103,3 +104,5 @@ select x'2379ACFe';
 -- invalid hexadecimal binary literal
 select X'XuZ';
 
+=======
+>>>>>>> tuning_adaptive

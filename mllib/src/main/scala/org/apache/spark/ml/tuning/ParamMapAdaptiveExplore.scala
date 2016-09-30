@@ -2,7 +2,6 @@ package org.apache.spark.ml.tuning
 
 import org.apache.spark.ml.param._
 import org.apache.spark.ml.tuning.ParamMapAdaptiveExplore.{SampleType, ParamTransformer}
-
 import scala.collection.mutable
 
 /**
@@ -16,20 +15,40 @@ class ParamMapAdaptiveExploreBuilder extends Serializable {
   private var logCostPriorMean :Array[Double]=> Double = null
   private var logCostLambda : Double = -1.0
 
+  /*
+      The kernel is not fixed but
+      rather determined by the lengthScales: it is defined as
+      K(x,y) = exp(-|transpose(x-y) * D_{lengthScales} * (x-y)|)
+      with D being a diagonal matrix determined by the lengthScales values.
+      Intuitively, the more sensitive a hyperparameter should be, the larger
+      its lengthScale should be
+   */
   private val defaultLossLengthScale = 1.0
-  private val defaultLogCostLengthScale = 10.0
+  private val defaultLogCostLengthScale = 1.0
 
   /**
+    * add categorical paramater for the exploration grid.
     * Note: Currently supports only two possible categories
     *
-    * @param param  spark.ml param, should be categorical
-    * @param values possible values
-    * @tparam T type of object inside
+    * @param param the parameter to be explored
+    * @param values possible values of the parameter
     */
   def addParam[T](param: Param[T],
                   values: Array[T]): Unit = {
     addParam(param,values,defaultLossLengthScale,defaultLogCostLengthScale)
   }
+
+  /**
+    * add categorical paramater for the exploration grid.
+    * Note: Currently supports only two possible categories
+    *
+    * @param param the parameter to be explored
+    * @param values possible values of the parameter
+    * @param lossLengthScale Determine the strength of the prior and the previous
+    *                        examples on the estimate for the loss.
+    *                        large means strong, small means weak.
+    * @param logCostLengthScale same as lossLengthScale but for the computation time
+    */
   def addParam[T](param: Param[T],
                   values: Array[T],
                   lossLengthScale : Double,
@@ -56,15 +75,32 @@ class ParamMapAdaptiveExploreBuilder extends Serializable {
       paramAndTransformer._2.asInstanceOf[ParamTransformer[Any]])
   }
 
-  private def get[T](param: Param[T]): Option[ParamTransformer[T]] = {
-    map.get(param.asInstanceOf[Param[Any]]).asInstanceOf[Option[ParamTransformer[T]]]
-  }
-
+  /**
+    * add an integer paramater for the exploration grid.
+    *
+    * @param param the parameter to be explored
+    * @param intRange range for its possible values (both ends are included)
+    * @param sampleType manner in which sample is made. Supported values are
+    *                   Uniform and log-scale
+    */
   def addParam(param: IntParam, intRange: (Int, Int),
                sampleType: SampleType.Value): Unit = {
     addParam(param,intRange,sampleType,defaultLossLengthScale,defaultLogCostLengthScale)
   }
 
+  /**
+    * add an integer paramater for the exploration grid.
+    *
+    * @param param the parameter to be explored
+    * @param intRange range for its possible values (both ends are included)
+    * @param sampleType manner in which sample is made. Supported values are
+    *                   Uniform and log-scale
+    * @param lossLengthScale Determine the strength of the prior and the previous
+    *                        examples on the estimate for the loss.
+    *                        large value means its a linear function (strong prior).
+    *                        small value means its an unknown function (weak prior).
+    * @param logCostLengthScale same as lossLengthScale but for the computation time
+    */
   def addParam(param: IntParam, intRange: (Int, Int),
                sampleType: SampleType.Value,
                lossLengthScale : Double,
@@ -111,11 +147,32 @@ class ParamMapAdaptiveExploreBuilder extends Serializable {
     logCostLengthScaleMap.put(param.asInstanceOf[Param[Any]],logCostLengthScale)
   }
 
-
+  /**
+    * add a double paramater for the exploration grid.
+    *
+    * @param param the parameter to be explored
+    * @param range range for its possible values (both ends are included)
+    * @param sampleType manner in which sample is made. Supported values are
+    *                   Uniform and log-scale
+    */
   def addParam(param: DoubleParam, range: (Double, Double),
                sampleType: SampleType.Value): Unit = {
     addParam(param,range,sampleType,defaultLossLengthScale,defaultLogCostLengthScale)
   }
+
+  /**
+    * add a Double paramater for the exploration grid.
+    *
+    * @param param the parameter to be explored
+    * @param range range for its possible values (both ends are included)
+    * @param sampleType manner in which sample is made. Supported values are
+    *                   Uniform and log-scale
+    * @param lossLengthScale Determine the strength of the prior and the previous
+    *                        examples on the estimate for the loss.
+    *                        large value means its a linear function (strong prior).
+    *                        small value means its an unknown function (weak prior).
+    * @param logCostLengthScale same as lossLengthScale but for the computation time
+    */
   def addParam(param: DoubleParam, range: (Double, Double),
                sampleType: SampleType.Value,
                lossLengthScale : Double,
@@ -163,11 +220,32 @@ class ParamMapAdaptiveExploreBuilder extends Serializable {
     logCostLengthScaleMap.put(param.asInstanceOf[Param[Any]],logCostLengthScale)
   }
 
-
+  /**
+    * add an integer (Long) paramater for the exploration grid.
+    *
+    * @param param the parameter to be explored
+    * @param range range for its possible values (both ends are included)
+    * @param sampleType manner in which sample is made. Supported values are
+    *                   Uniform and log-scale
+    */
   def addParam(param: LongParam, range: (Long, Long),
                sampleType: SampleType.Value): Unit = {
     addParam(param,range,sampleType,defaultLossLengthScale,defaultLogCostLengthScale)
   }
+
+  /**
+    * add an integer (Long) paramater for the exploration grid.
+    *
+    * @param param the parameter to be explored
+    * @param range range for its possible values (both ends are included)
+    * @param sampleType manner in which sample is made. Supported values are
+    *                   Uniform and log-scale
+    * @param lossLengthScale Determine the strength of the prior and the previous
+    *                        examples on the estimate for the loss.
+    *                        large value means its a linear function (strong prior).
+    *                        small value means its an unknown function (weak prior).
+    * @param logCostLengthScale same as lossLengthScale but for the computation time
+    */
   def addParam(param: LongParam, range: (Long, Long),
                sampleType: SampleType.Value,
                lossLengthScale : Double,
@@ -213,15 +291,22 @@ class ParamMapAdaptiveExploreBuilder extends Serializable {
   }
 
   /**
-    * Set a prior for the loss (or gain) of the training given the
+    * Adds parameter ranges from another builder.
+    * Useful for adding default parameters from existing Evaluators
+    */
+  def addParamsFromOther(other:ParamMapAdaptiveExploreBuilder) = {
+    other.map.foreach{case (param, transformer) =>
+      put(param,transformer)
+      lossLengthScaleMap.put(param,other.lossLengthScaleMap.get(param).get)
+      logCostLengthScaleMap.put(param,other.logCostLengthScaleMap.get(param).get)
+    }
+  }
+
+  /**
+    * Set a prior for the loss of the training given the
     * hyperparameters since we are working with a distance based kernel,
     * the prior's values should be given as a function (mu) from a parameter
-    * map to the loss values. Additionally, the kernel is not fixed but
-    * rather determined by the lengthScales: it is defined as
-    * K(x,y) = exp(-|transpose(x-y) * D_{lengthScales} * (x-y)|)
-    * with D being a diagonal matrix determined by the lengthScales values.
-    * Intuitively, the more sensitive a hyperparameter should be, the larger
-    * its lengthScale should be
+    * map to the loss values.
     *
     * @param mu           function reflecting the prior values
     */
@@ -262,6 +347,9 @@ class ParamMapAdaptiveExploreBuilder extends Serializable {
     }.toArray
   }
 
+  /**
+    * Build the ParamMapAdaptiveExplore object
+    */
   def build() : ParamMapAdaptiveExplore = {
     val gpOptimizer: BayesOptimize = new BayesOptimize(map.size)
     gpOptimizer.setPrior(

@@ -22,11 +22,18 @@ import java.io.File
 import org.scalatest.BeforeAndAfterEach
 
 import org.apache.spark.SparkException
+<<<<<<< HEAD
 import org.apache.spark.sql.AnalysisException
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.catalog.BucketSpec
 import org.apache.spark.sql.catalyst.parser.ParseException
 import org.apache.spark.sql.execution.command.DDLUtils
+=======
+import org.apache.spark.sql.catalyst.TableIdentifier
+import org.apache.spark.sql.catalyst.parser.ParseException
+import org.apache.spark.sql.execution.command.DDLUtils
+import org.apache.spark.sql.execution.datasources.BucketSpec
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.util.Utils
 
@@ -119,6 +126,7 @@ class CreateTableAsSelectSuite
       checkAnswer(
         sql("SELECT a, b FROM jsonTable"),
         sql("SELECT a, b FROM jt"))
+<<<<<<< HEAD
 
       // Creates a table of the same name with flag "if not exists", nothing happens
       sql(
@@ -141,6 +149,30 @@ class CreateTableAsSelectSuite
       // Creates a table of the same name again, this time we succeed.
       sql(
         s"""
+=======
+
+      // Creates a table of the same name with flag "if not exists", nothing happens
+      sql(
+        s"""
+           |CREATE TABLE IF NOT EXISTS jsonTable
+           |USING json
+           |OPTIONS (
+           |  path '${path.toString}'
+           |) AS
+           |SELECT a * 4 FROM jt
+         """.stripMargin)
+      checkAnswer(
+        sql("SELECT * FROM jsonTable"),
+        sql("SELECT a, b FROM jt"))
+
+      // Explicitly drops the table and deletes the underlying data.
+      sql("DROP TABLE jsonTable")
+      if (path.exists()) Utils.deleteRecursively(path)
+
+      // Creates a table of the same name again, this time we succeed.
+      sql(
+        s"""
+>>>>>>> tuning_adaptive
            |CREATE TABLE jsonTable
            |USING json
            |OPTIONS (
@@ -201,11 +233,19 @@ class CreateTableAsSelectSuite
          """.stripMargin
       )
       val table = catalog.getTableMetadata(TableIdentifier("t"))
+<<<<<<< HEAD
       assert(table.partitionColumnNames == Seq("a"))
     }
   }
 
   test("create table using as select - with non-zero buckets") {
+=======
+      assert(DDLUtils.getPartitionColumnsFromTableProperties(table) == Seq("a"))
+    }
+  }
+
+  test("create table using as select - with bucket") {
+>>>>>>> tuning_adaptive
     val catalog = spark.sessionState.catalog
     withTable("t") {
       sql(
@@ -217,6 +257,7 @@ class CreateTableAsSelectSuite
          """.stripMargin
       )
       val table = catalog.getTableMetadata(TableIdentifier("t"))
+<<<<<<< HEAD
       assert(table.bucketSpec == Option(BucketSpec(5, Seq("a"), Seq("b"))))
     }
   }
@@ -234,6 +275,10 @@ class CreateTableAsSelectSuite
         )
       }.getMessage
       assert(e.contains("Expected positive number of buckets, but got `0`"))
+=======
+      assert(DDLUtils.getBucketSpecFromTableProperties(table) ==
+        Some(BucketSpec(5, Seq("a"), Seq("b"))))
+>>>>>>> tuning_adaptive
     }
   }
 }

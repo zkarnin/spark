@@ -42,9 +42,15 @@ public class JavaNGramExample {
 
     // $example on$
     List<Row> data = Arrays.asList(
+<<<<<<< HEAD
       RowFactory.create(0, Arrays.asList("Hi", "I", "heard", "about", "Spark")),
       RowFactory.create(1, Arrays.asList("I", "wish", "Java", "could", "use", "case", "classes")),
       RowFactory.create(2, Arrays.asList("Logistic", "regression", "models", "are", "neat"))
+=======
+      RowFactory.create(0.0, Arrays.asList("Hi", "I", "heard", "about", "Spark")),
+      RowFactory.create(1.0, Arrays.asList("I", "wish", "Java", "could", "use", "case", "classes")),
+      RowFactory.create(2.0, Arrays.asList("Logistic", "regression", "models", "are", "neat"))
+>>>>>>> tuning_adaptive
     );
 
     StructType schema = new StructType(new StructField[]{
@@ -60,7 +66,10 @@ public class JavaNGramExample {
     Dataset<Row> ngramDataFrame = ngramTransformer.transform(wordDataFrame);
     ngramDataFrame.select("ngrams").show(false);
     // $example off$
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     spark.stop();
   }
 }

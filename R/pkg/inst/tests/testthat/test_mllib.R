@@ -20,12 +20,16 @@ library(testthat)
 context("MLlib functions")
 
 # Tests for MLlib functions in SparkR
+<<<<<<< HEAD
 sparkSession <- sparkR.session(enableHiveSupport = FALSE)
 
 absoluteSparkPath <- function(x) {
   sparkHome <- sparkR.conf("spark.home")
   file.path(sparkHome, x)
 }
+=======
+sparkSession <- sparkR.session()
+>>>>>>> tuning_adaptive
 
 test_that("formula of spark.glm", {
   training <- suppressWarnings(createDataFrame(iris))

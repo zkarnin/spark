@@ -18,7 +18,10 @@
 package org.apache.spark.sql
 
 import org.apache.spark.sql.catalyst.plans.logical.{GlobalLimit, Join, LocalLimit}
+<<<<<<< HEAD
 import org.apache.spark.sql.execution.datasources.LogicalRelation
+=======
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 
@@ -76,6 +79,7 @@ class StatisticsSuite extends QueryTest with SharedSQLContext {
     }
   }
 
+<<<<<<< HEAD
   test("test table-level statistics for data source table created in InMemoryCatalog") {
     def checkTableStats(tableName: String, expectedRowCount: Option[BigInt]): Unit = {
       val df = sql(s"SELECT * FROM $tableName")
@@ -101,4 +105,6 @@ class StatisticsSuite extends QueryTest with SharedSQLContext {
       checkTableStats(tableName, expectedRowCount = Some(2))
     }
   }
+=======
+>>>>>>> tuning_adaptive
 }

@@ -22,6 +22,10 @@ import org.scalatest.PrivateMethodTester
 import org.apache.spark.internal.Logging
 import org.apache.spark.scheduler.{SchedulerBackend, TaskScheduler, TaskSchedulerImpl}
 import org.apache.spark.scheduler.cluster.StandaloneSchedulerBackend
+<<<<<<< HEAD
+=======
+import org.apache.spark.scheduler.cluster.mesos.{MesosCoarseGrainedSchedulerBackend, MesosFineGrainedSchedulerBackend}
+>>>>>>> tuning_adaptive
 import org.apache.spark.scheduler.local.LocalSchedulerBackend
 
 
@@ -129,4 +133,34 @@ class SparkContextSchedulerCreationSuite
       case _ => fail()
     }
   }
+<<<<<<< HEAD
+=======
+
+  def testMesos(master: String, expectedClass: Class[_], coarse: Boolean) {
+    val conf = new SparkConf().set("spark.mesos.coarse", coarse.toString)
+    try {
+      val sched = createTaskScheduler(master, "client", conf)
+      assert(sched.backend.getClass === expectedClass)
+    } catch {
+      case e: UnsatisfiedLinkError =>
+        assert(e.getMessage.contains("mesos"))
+        logWarning("Mesos not available, could not test actual Mesos scheduler creation")
+      case e: Throwable => fail(e)
+    }
+  }
+
+  test("mesos fine-grained") {
+    testMesos("mesos://localhost:1234", classOf[MesosFineGrainedSchedulerBackend], coarse = false)
+  }
+
+  test("mesos coarse-grained") {
+    testMesos("mesos://localhost:1234", classOf[MesosCoarseGrainedSchedulerBackend], coarse = true)
+  }
+
+  test("mesos with zookeeper") {
+    testMesos("mesos://zk://localhost:1234,localhost:2345",
+      classOf[MesosFineGrainedSchedulerBackend], coarse = false)
+  }
+
+>>>>>>> tuning_adaptive
 }

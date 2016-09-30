@@ -42,7 +42,11 @@ import org.apache.spark.network.server.RpcHandler;
 import org.apache.spark.network.server.StreamManager;
 import org.apache.spark.network.shuffle.ExternalShuffleBlockResolver.AppExecId;
 import org.apache.spark.network.shuffle.protocol.*;
+<<<<<<< HEAD
 import static org.apache.spark.network.util.NettyUtils.getRemoteAddress;
+=======
+import org.apache.spark.network.util.NettyUtils;
+>>>>>>> tuning_adaptive
 import org.apache.spark.network.util.TransportConf;
 
 
@@ -113,6 +117,16 @@ public class ExternalShuffleBlockHandler extends RpcHandler {
       } finally {
         responseDelayContext.stop();
       }
+<<<<<<< HEAD
+=======
+      long streamId = streamManager.registerStream(client.getClientId(), blocks.iterator());
+      logger.trace("Registered streamId {} with {} buffers for client {} from host {}",
+          streamId,
+          msg.blockIds.length,
+          client.getClientId(),
+          NettyUtils.getRemoteAddress(client.getChannel()));
+      callback.onSuccess(new StreamHandle(streamId, msg.blockIds.length).toByteBuffer());
+>>>>>>> tuning_adaptive
 
     } else if (msgObj instanceof RegisterExecutor) {
       final Timer.Context responseDelayContext =

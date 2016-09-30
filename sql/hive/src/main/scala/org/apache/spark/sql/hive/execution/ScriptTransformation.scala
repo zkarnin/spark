@@ -126,9 +126,12 @@ case class ScriptTransformation(
         }
         val mutableRow = new SpecificMutableRow(output.map(_.dataType))
 
+<<<<<<< HEAD
         @transient
         lazy val unwrappers = outputSoi.getAllStructFieldRefs.asScala.map(unwrapperFor)
 
+=======
+>>>>>>> tuning_adaptive
         private def checkFailureAndPropagate(cause: Throwable = null): Unit = {
           if (writerThread.exception.isDefined) {
             throw writerThread.exception.get

@@ -553,6 +553,7 @@ class HiveCompatibilitySuite extends HiveQueryFileTest with BeforeAndAfter {
     "union31",
     "union_date",
     "varchar_2",
+<<<<<<< HEAD
     "varchar_join1",
 
     // These tests are duplicates of joinXYZ
@@ -579,6 +580,9 @@ class HiveCompatibilitySuite extends HiveQueryFileTest with BeforeAndAfter {
     "auto_join7",
     "auto_join8",
     "auto_join9"
+=======
+    "varchar_join1"
+>>>>>>> tuning_adaptive
   )
 
   /**

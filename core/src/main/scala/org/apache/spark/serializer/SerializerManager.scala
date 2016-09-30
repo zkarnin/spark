@@ -172,7 +172,11 @@ private[spark] class SerializerManager(defaultSerializer: Serializer, conf: Spar
     val bbos = new ChunkedByteBufferOutputStream(1024 * 1024 * 4, ByteBuffer.allocate)
     val byteStream = new BufferedOutputStream(bbos)
     val ser = getSerializer(classTag).newInstance()
+<<<<<<< HEAD
     ser.serializeStream(wrapStream(blockId, byteStream)).writeAll(values).close()
+=======
+    ser.serializeStream(wrapForCompression(blockId, byteStream)).writeAll(values).close()
+>>>>>>> tuning_adaptive
     bbos.toChunkedByteBuffer
   }
 

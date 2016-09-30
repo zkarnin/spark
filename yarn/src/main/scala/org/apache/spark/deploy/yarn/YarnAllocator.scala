@@ -492,7 +492,11 @@ private[yarn] class YarnAllocator(
       val containerId = container.getId
       val executorId = executorIdCounter.toString
       assert(container.getResource.getMemory >= resource.getMemory)
+<<<<<<< HEAD
       logInfo(s"Launching container $containerId on host $executorHostname")
+=======
+      logInfo("Launching container %s for on host %s".format(containerId, executorHostname))
+>>>>>>> tuning_adaptive
 
       def updateInternalState(): Unit = synchronized {
         numExecutorsRunning += 1
@@ -507,11 +511,21 @@ private[yarn] class YarnAllocator(
       }
 
       if (launchContainers) {
+<<<<<<< HEAD
+=======
+        logInfo("Launching ExecutorRunnable. driverUrl: %s,  executorHostname: %s".format(
+          driverUrl, executorHostname))
+
+>>>>>>> tuning_adaptive
         launcherPool.execute(new Runnable {
           override def run(): Unit = {
             try {
               new ExecutorRunnable(
+<<<<<<< HEAD
                 Some(container),
+=======
+                container,
+>>>>>>> tuning_adaptive
                 conf,
                 sparkConf,
                 driverUrl,

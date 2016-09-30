@@ -1062,6 +1062,10 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
       catalystSchema: StructType,
       expectedSchema: MessageType): Unit = {
     test(s"Clipping - $testName") {
+<<<<<<< HEAD
+=======
+      val expected = MessageTypeParser.parseMessageType(expectedSchema)
+>>>>>>> tuning_adaptive
       val actual = ParquetReadSupport.clipParquetSchema(
         MessageTypeParser.parseMessageType(parquetSchema), catalystSchema)
 

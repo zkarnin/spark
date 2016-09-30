@@ -20,6 +20,10 @@ package org.apache.spark.sql.hive.client
 import java.io.{ByteArrayOutputStream, File, PrintStream}
 
 import org.apache.hadoop.conf.Configuration
+<<<<<<< HEAD
+=======
+import org.apache.hadoop.fs.Path
+>>>>>>> tuning_adaptive
 import org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
 import org.apache.hadoop.hive.serde2.`lazy`.LazySimpleSerDe
 import org.apache.hadoop.mapred.TextInputFormat
@@ -146,14 +150,22 @@ class VersionsSuite extends SparkFunSuite with Logging {
       CatalogTable(
         identifier = TableIdentifier(tableName, Some(database)),
         tableType = CatalogTableType.MANAGED,
+<<<<<<< HEAD
         schema = new StructType().add("key", "int"),
+=======
+        schema = Seq(CatalogColumn("key", "int")),
+>>>>>>> tuning_adaptive
         storage = CatalogStorageFormat(
           locationUri = None,
           inputFormat = Some(classOf[TextInputFormat].getName),
           outputFormat = Some(classOf[HiveIgnoreKeyTextOutputFormat[_, _]].getName),
           serde = Some(classOf[LazySimpleSerDe].getName()),
           compressed = false,
+<<<<<<< HEAD
           properties = Map.empty
+=======
+          serdeProperties = Map.empty
+>>>>>>> tuning_adaptive
         ))
     }
 
@@ -216,12 +228,15 @@ class VersionsSuite extends SparkFunSuite with Logging {
         tableName = "src",
         replace = false,
         holdDDLTime = false)
+<<<<<<< HEAD
     }
 
     test(s"$version: tableExists") {
       // No exception should be thrown
       assert(client.tableExists("default", "src"))
       assert(!client.tableExists("default", "nonexistent"))
+=======
+>>>>>>> tuning_adaptive
     }
 
     test(s"$version: getTable") {
@@ -247,6 +262,7 @@ class VersionsSuite extends SparkFunSuite with Logging {
 
     test(s"$version: listTables(database)") {
       assert(client.listTables("default") === Seq("src", "temporary"))
+<<<<<<< HEAD
     }
 
     test(s"$version: listTables(database, pattern)") {
@@ -287,6 +303,36 @@ class VersionsSuite extends SparkFunSuite with Logging {
       client.runSqlHive("CREATE TABLE src_part (value INT) PARTITIONED BY (key1 INT, key2 INT)")
     }
 
+=======
+    }
+
+    test(s"$version: listTables(database, pattern)") {
+      assert(client.listTables("default", pattern = "src") === Seq("src"))
+      assert(client.listTables("default", pattern = "nonexist").isEmpty)
+    }
+
+    test(s"$version: dropTable") {
+      client.dropTable("default", tableName = "temporary", ignoreIfNotExists = false)
+      assert(client.listTables("default") === Seq("src"))
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Partition related API
+    ///////////////////////////////////////////////////////////////////////////
+
+    val storageFormat = CatalogStorageFormat(
+      locationUri = None,
+      inputFormat = None,
+      outputFormat = None,
+      serde = None,
+      compressed = false,
+      serdeProperties = Map.empty)
+
+    test(s"$version: sql create partitioned table") {
+      client.runSqlHive("CREATE TABLE src_part (value INT) PARTITIONED BY (key1 INT, key2 INT)")
+    }
+
+>>>>>>> tuning_adaptive
     test(s"$version: createPartitions") {
       val partition1 = CatalogTablePartition(Map("key1" -> "1", "key2" -> "1"), storageFormat)
       val partition2 = CatalogTablePartition(Map("key1" -> "1", "key2" -> "2"), storageFormat)
@@ -342,7 +388,12 @@ class VersionsSuite extends SparkFunSuite with Logging {
         partSpec,
         replace = false,
         holdDDLTime = false,
+<<<<<<< HEAD
         inheritTableSpecs = false)
+=======
+        inheritTableSpecs = false,
+        isSkewedStoreAsSubdir = false)
+>>>>>>> tuning_adaptive
     }
 
     test(s"$version: loadDynamicPartitions") {
@@ -357,6 +408,7 @@ class VersionsSuite extends SparkFunSuite with Logging {
         partSpec,
         replace = false,
         numDP = 1,
+<<<<<<< HEAD
         holdDDLTime = false)
     }
 
@@ -431,6 +483,70 @@ class VersionsSuite extends SparkFunSuite with Logging {
       }
     }
 
+=======
+        false,
+        false)
+    }
+
+    test(s"$version: renamePartitions") {
+      val oldSpec = Map("key1" -> "1", "key2" -> "1")
+      val newSpec = Map("key1" -> "1", "key2" -> "3")
+      client.renamePartitions("default", "src_part", Seq(oldSpec), Seq(newSpec))
+
+      // Checks the existence of the new partition (key1 = 1, key2 = 3)
+      assert(client.getPartitionOption("default", "src_part", newSpec).isDefined)
+    }
+
+    test(s"$version: alterPartitions") {
+      val spec = Map("key1" -> "1", "key2" -> "2")
+      val newLocation = Utils.createTempDir().getPath()
+      val storage = storageFormat.copy(
+        locationUri = Some(newLocation),
+        // needed for 0.12 alter partitions
+        serde = Some("org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"))
+      val partition = CatalogTablePartition(spec, storage)
+      client.alterPartitions("default", "src_part", Seq(partition))
+      assert(client.getPartition("default", "src_part", spec)
+        .storage.locationUri == Some(newLocation))
+    }
+
+    test(s"$version: dropPartitions") {
+      val spec = Map("key1" -> "1", "key2" -> "3")
+      client.dropPartitions("default", "src_part", Seq(spec), ignoreIfNotExists = true)
+      assert(client.getPartitionOption("default", "src_part", spec).isEmpty)
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Function related API
+    ///////////////////////////////////////////////////////////////////////////
+
+    def function(name: String, className: String): CatalogFunction = {
+      CatalogFunction(
+        FunctionIdentifier(name, Some("default")), className, Seq.empty[FunctionResource])
+    }
+
+    test(s"$version: createFunction") {
+      val functionClass = "org.apache.spark.MyFunc1"
+      if (version == "0.12") {
+        // Hive 0.12 doesn't support creating permanent functions
+        intercept[AnalysisException] {
+          client.createFunction("default", function("func1", functionClass))
+        }
+      } else {
+        client.createFunction("default", function("func1", functionClass))
+      }
+    }
+
+    test(s"$version: functionExists") {
+      if (version == "0.12") {
+        // Hive 0.12 doesn't allow customized permanent functions
+        assert(client.functionExists("default", "func1") == false)
+      } else {
+        assert(client.functionExists("default", "func1") == true)
+      }
+    }
+
+>>>>>>> tuning_adaptive
     test(s"$version: renameFunction") {
       if (version == "0.12") {
         // Hive 0.12 doesn't allow customized permanent functions

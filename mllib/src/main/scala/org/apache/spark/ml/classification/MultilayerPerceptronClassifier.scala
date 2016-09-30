@@ -100,8 +100,9 @@ private[classification] trait MultilayerPerceptronParams extends PredictorParams
   @Since("2.0.0")
   final def getInitialWeights: Vector = $(initialWeights)
 
+
   setDefault(maxIter -> 100, tol -> 1e-6, blockSize -> 128,
-    solver -> MultilayerPerceptronClassifier.LBFGS, stepSize -> 0.03)
+  solver -> MultilayerPerceptronClassifier.LBFGS, stepSize -> 0.03)
 }
 
 /** Label to vector converter. */

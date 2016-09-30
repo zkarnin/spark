@@ -101,8 +101,12 @@ class DataFrameReader(OptionUtils):
         from pyspark.sql import SparkSession
         if not isinstance(schema, StructType):
             raise TypeError("schema should be StructType")
+<<<<<<< HEAD
         spark = SparkSession.builder.getOrCreate()
         jschema = spark._jsparkSession.parseDataType(schema.json())
+=======
+        jschema = self._spark._ssql_ctx.parseDataType(schema.json())
+>>>>>>> tuning_adaptive
         self._jreader = self._jreader.schema(jschema)
         return self
 

@@ -222,19 +222,31 @@ public class VectorizedColumnReader {
             DecimalType.is32BitDecimalType(column.dataType())) {
           for (int i = rowId; i < rowId + num; ++i) {
             if (!column.isNullAt(i)) {
+<<<<<<< HEAD
               column.putInt(i, dictionary.decodeToInt(dictionaryIds.getDictId(i)));
+=======
+              column.putInt(i, dictionary.decodeToInt(dictionaryIds.getInt(i)));
+>>>>>>> tuning_adaptive
             }
           }
         } else if (column.dataType() == DataTypes.ByteType) {
           for (int i = rowId; i < rowId + num; ++i) {
             if (!column.isNullAt(i)) {
+<<<<<<< HEAD
               column.putByte(i, (byte) dictionary.decodeToInt(dictionaryIds.getDictId(i)));
+=======
+              column.putByte(i, (byte) dictionary.decodeToInt(dictionaryIds.getInt(i)));
+>>>>>>> tuning_adaptive
             }
           }
         } else if (column.dataType() == DataTypes.ShortType) {
           for (int i = rowId; i < rowId + num; ++i) {
             if (!column.isNullAt(i)) {
+<<<<<<< HEAD
               column.putShort(i, (short) dictionary.decodeToInt(dictionaryIds.getDictId(i)));
+=======
+              column.putShort(i, (short) dictionary.decodeToInt(dictionaryIds.getInt(i)));
+>>>>>>> tuning_adaptive
             }
           }
         } else {
@@ -247,7 +259,11 @@ public class VectorizedColumnReader {
             DecimalType.is64BitDecimalType(column.dataType())) {
           for (int i = rowId; i < rowId + num; ++i) {
             if (!column.isNullAt(i)) {
+<<<<<<< HEAD
               column.putLong(i, dictionary.decodeToLong(dictionaryIds.getDictId(i)));
+=======
+              column.putLong(i, dictionary.decodeToLong(dictionaryIds.getInt(i)));
+>>>>>>> tuning_adaptive
             }
           }
         } else {
@@ -258,7 +274,11 @@ public class VectorizedColumnReader {
       case FLOAT:
         for (int i = rowId; i < rowId + num; ++i) {
           if (!column.isNullAt(i)) {
+<<<<<<< HEAD
             column.putFloat(i, dictionary.decodeToFloat(dictionaryIds.getDictId(i)));
+=======
+            column.putFloat(i, dictionary.decodeToFloat(dictionaryIds.getInt(i)));
+>>>>>>> tuning_adaptive
           }
         }
         break;
@@ -266,7 +286,11 @@ public class VectorizedColumnReader {
       case DOUBLE:
         for (int i = rowId; i < rowId + num; ++i) {
           if (!column.isNullAt(i)) {
+<<<<<<< HEAD
             column.putDouble(i, dictionary.decodeToDouble(dictionaryIds.getDictId(i)));
+=======
+            column.putDouble(i, dictionary.decodeToDouble(dictionaryIds.getInt(i)));
+>>>>>>> tuning_adaptive
           }
         }
         break;
@@ -275,7 +299,11 @@ public class VectorizedColumnReader {
           for (int i = rowId; i < rowId + num; ++i) {
             // TODO: Convert dictionary of Binaries to dictionary of Longs
             if (!column.isNullAt(i)) {
+<<<<<<< HEAD
               Binary v = dictionary.decodeToBinary(dictionaryIds.getDictId(i));
+=======
+              Binary v = dictionary.decodeToBinary(dictionaryIds.getInt(i));
+>>>>>>> tuning_adaptive
               column.putLong(i, ParquetRowConverter.binaryToSQLTimestamp(v));
             }
           }
@@ -290,7 +318,11 @@ public class VectorizedColumnReader {
         // the length and offset.
         for (int i = rowId; i < rowId + num; ++i) {
           if (!column.isNullAt(i)) {
+<<<<<<< HEAD
             Binary v = dictionary.decodeToBinary(dictionaryIds.getDictId(i));
+=======
+            Binary v = dictionary.decodeToBinary(dictionaryIds.getInt(i));
+>>>>>>> tuning_adaptive
             column.putByteArray(i, v.getBytes());
           }
         }
@@ -300,21 +332,33 @@ public class VectorizedColumnReader {
         if (DecimalType.is32BitDecimalType(column.dataType())) {
           for (int i = rowId; i < rowId + num; ++i) {
             if (!column.isNullAt(i)) {
+<<<<<<< HEAD
               Binary v = dictionary.decodeToBinary(dictionaryIds.getDictId(i));
+=======
+              Binary v = dictionary.decodeToBinary(dictionaryIds.getInt(i));
+>>>>>>> tuning_adaptive
               column.putInt(i, (int) ParquetRowConverter.binaryToUnscaledLong(v));
             }
           }
         } else if (DecimalType.is64BitDecimalType(column.dataType())) {
           for (int i = rowId; i < rowId + num; ++i) {
             if (!column.isNullAt(i)) {
+<<<<<<< HEAD
               Binary v = dictionary.decodeToBinary(dictionaryIds.getDictId(i));
+=======
+              Binary v = dictionary.decodeToBinary(dictionaryIds.getInt(i));
+>>>>>>> tuning_adaptive
               column.putLong(i, ParquetRowConverter.binaryToUnscaledLong(v));
             }
           }
         } else if (DecimalType.isByteArrayDecimalType(column.dataType())) {
           for (int i = rowId; i < rowId + num; ++i) {
             if (!column.isNullAt(i)) {
+<<<<<<< HEAD
               Binary v = dictionary.decodeToBinary(dictionaryIds.getDictId(i));
+=======
+              Binary v = dictionary.decodeToBinary(dictionaryIds.getInt(i));
+>>>>>>> tuning_adaptive
               column.putByteArray(i, v.getBytes());
             }
           }

@@ -51,6 +51,7 @@ public class JavaNaiveBayesExample {
 
     // train the model
     NaiveBayesModel model = nb.fit(train);
+<<<<<<< HEAD
 
     // Select example rows to display.
     Dataset<Row> predictions = model.transform(test);
@@ -63,6 +64,14 @@ public class JavaNaiveBayesExample {
       .setMetricName("accuracy");
     double accuracy = evaluator.evaluate(predictions);
     System.out.println("Test set accuracy = " + accuracy);
+=======
+    // compute accuracy on the test set
+    Dataset<Row> result = model.transform(test);
+    Dataset<Row> predictionAndLabels = result.select("prediction", "label");
+    MulticlassClassificationEvaluator evaluator = new MulticlassClassificationEvaluator()
+      .setMetricName("accuracy");
+    System.out.println("Accuracy = " + evaluator.evaluate(predictionAndLabels));
+>>>>>>> tuning_adaptive
     // $example off$
 
     spark.stop();

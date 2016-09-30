@@ -49,7 +49,10 @@ except TypeError:
     spark = SparkSession.builder.getOrCreate()
 
 sc = spark.sparkContext
+<<<<<<< HEAD
 sql = spark.sql
+=======
+>>>>>>> tuning_adaptive
 atexit.register(lambda: sc.stop())
 
 # for compatibility

@@ -17,7 +17,14 @@
 
 package org.apache.spark.sql.execution.datasources
 
+<<<<<<< HEAD
 import scala.collection.mutable
+=======
+import java.io.FileNotFoundException
+
+import scala.collection.mutable
+import scala.util.Try
+>>>>>>> tuning_adaptive
 
 import org.apache.hadoop.fs.{FileStatus, LocatedFileStatus, Path}
 import org.apache.hadoop.mapred.{FileInputFormat, JobConf}
@@ -34,12 +41,23 @@ import org.apache.spark.sql.types.StructType
  * @param paths a list of paths to scan
  * @param partitionSchema an optional partition schema that will be use to provide types for the
  *                        discovered partitions
+<<<<<<< HEAD
+=======
+ * @param ignoreFileNotFound if true, return empty file list when encountering a
+ *                           [[FileNotFoundException]] in file listing. Note that this is a hack
+ *                           for SPARK-16313. We should get rid of this flag in the future.
+>>>>>>> tuning_adaptive
  */
 class ListingFileCatalog(
     sparkSession: SparkSession,
     override val paths: Seq[Path],
     parameters: Map[String, String],
+<<<<<<< HEAD
     partitionSchema: Option[StructType])
+=======
+    partitionSchema: Option[StructType],
+    ignoreFileNotFound: Boolean = false)
+>>>>>>> tuning_adaptive
   extends PartitioningAwareFileCatalog(sparkSession, parameters, partitionSchema) {
 
   @volatile private var cachedLeafFiles: mutable.LinkedHashMap[Path, FileStatus] = _
@@ -81,7 +99,11 @@ class ListingFileCatalog(
    */
   def listLeafFiles(paths: Seq[Path]): mutable.LinkedHashSet[FileStatus] = {
     if (paths.length >= sparkSession.sessionState.conf.parallelPartitionDiscoveryThreshold) {
+<<<<<<< HEAD
       HadoopFsRelation.listLeafFilesInParallel(paths, hadoopConf, sparkSession)
+=======
+      HadoopFsRelation.listLeafFilesInParallel(paths, hadoopConf, sparkSession, ignoreFileNotFound)
+>>>>>>> tuning_adaptive
     } else {
       // Right now, the number of paths is less than the value of
       // parallelPartitionDiscoveryThreshold. So, we will list file statues at the driver.
@@ -97,7 +119,16 @@ class ListingFileCatalog(
         logTrace(s"Listing $path on driver")
 
         val childStatuses = {
+<<<<<<< HEAD
           val stats = fs.listStatus(path)
+=======
+          val stats =
+            try {
+              fs.listStatus(path)
+            } catch {
+              case e: FileNotFoundException if ignoreFileNotFound => Array.empty[FileStatus]
+            }
+>>>>>>> tuning_adaptive
           if (pathFilter != null) stats.filter(f => pathFilter.accept(f.getPath)) else stats
         }
 

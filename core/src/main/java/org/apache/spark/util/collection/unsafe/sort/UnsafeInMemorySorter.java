@@ -94,6 +94,7 @@ public final class UnsafeInMemorySorter {
   private int pos = 0;
 
   /**
+<<<<<<< HEAD
    * If sorting with radix sort, specifies the starting position in the sort buffer where records
    * with non-null prefixes are kept. Positions [0..nullBoundaryPos) will contain null-prefixed
    * records, and positions [nullBoundaryPos..pos) non-null prefixed records. This lets us avoid
@@ -102,6 +103,8 @@ public final class UnsafeInMemorySorter {
   private int nullBoundaryPos = 0;
 
   /*
+=======
+>>>>>>> tuning_adaptive
    * How many records could be inserted, because part of the array should be left for sorting.
    */
   private int usableCapacity = 0;
@@ -330,6 +333,7 @@ public final class UnsafeInMemorySorter {
       }
     }
     totalSortTimeNanos += System.nanoTime() - start;
+<<<<<<< HEAD
     if (nullBoundaryPos > 0) {
       assert radixSortSupport != null : "Nulls are only stored separately with radix sort";
       LinkedList<UnsafeSorterIterator> queue = new LinkedList<>();
@@ -345,5 +349,8 @@ public final class UnsafeInMemorySorter {
     } else {
       return new SortedIterator(pos / 2, offset);
     }
+=======
+    return new SortedIterator(pos / 2, offset);
+>>>>>>> tuning_adaptive
   }
 }

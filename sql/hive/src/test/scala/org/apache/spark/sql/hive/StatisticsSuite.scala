@@ -23,14 +23,21 @@ import scala.reflect.ClassTag
 
 import org.apache.spark.sql.{AnalysisException, QueryTest, Row}
 import org.apache.spark.sql.catalyst.TableIdentifier
+<<<<<<< HEAD
 import org.apache.spark.sql.catalyst.plans.logical.Statistics
 import org.apache.spark.sql.execution.command.{AnalyzeTableCommand, DDLUtils}
 import org.apache.spark.sql.execution.datasources.LogicalRelation
+=======
+import org.apache.spark.sql.execution.command.AnalyzeTableCommand
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.execution.joins._
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SQLTestUtils
+<<<<<<< HEAD
 import org.apache.spark.sql.types.StructType
+=======
+>>>>>>> tuning_adaptive
 
 class StatisticsSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
 
@@ -166,6 +173,7 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton with SQLTestUtils
     sql("""SELECT * FROM src""").createOrReplaceTempView("tempTable")
     intercept[AnalysisException] {
       sql("ANALYZE TABLE tempTable COMPUTE STATISTICS")
+<<<<<<< HEAD
     }
     spark.sessionState.catalog.dropTable(
       TableIdentifier("tempTable"), ignoreIfNotExists = true, purge = false)
@@ -336,6 +344,11 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton with SQLTestUtils
         hasSizeInBytes = true,
         expectedRowCounts = Some(10))
     }
+=======
+    }
+    spark.sessionState.catalog.dropTable(
+      TableIdentifier("tempTable"), ignoreIfNotExists = true)
+>>>>>>> tuning_adaptive
   }
 
   test("estimates the size of a test MetastoreRelation") {

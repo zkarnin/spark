@@ -31,7 +31,11 @@ from pyspark.sql import SparkSession
 if __name__ == "__main__":
     spark = SparkSession\
         .builder\
+<<<<<<< HEAD
         .appName("RandomForestRegressorExample")\
+=======
+        .appName("random_forest_regressor_example")\
+>>>>>>> tuning_adaptive
         .getOrCreate()
 
     # $example on$

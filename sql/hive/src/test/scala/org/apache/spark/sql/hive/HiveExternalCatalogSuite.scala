@@ -36,7 +36,12 @@ class HiveExternalCatalogSuite extends ExternalCatalogSuite {
   protected override val utils: CatalogTestUtils = new CatalogTestUtils {
     override val tableInputFormat: String = "org.apache.hadoop.mapred.SequenceFileInputFormat"
     override val tableOutputFormat: String = "org.apache.hadoop.mapred.SequenceFileOutputFormat"
+<<<<<<< HEAD
     override def newEmptyCatalog(): ExternalCatalog = externalCatalog
+=======
+    override def newEmptyCatalog(): ExternalCatalog =
+      new HiveExternalCatalog(client, new Configuration())
+>>>>>>> tuning_adaptive
   }
 
   protected override def resetState(): Unit = {

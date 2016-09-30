@@ -225,8 +225,13 @@ private[json] trait TestJsonData {
   def datesRecords: RDD[String] =
     spark.sparkContext.parallelize(
       """{"date": "26/08/2015 18:00"}""" ::
+<<<<<<< HEAD
       """{"date": "27/10/2014 18:30"}""" ::
       """{"date": "28/01/2016 20:00"}""" :: Nil)
+=======
+        """{"date": "27/10/2014 18:30"}""" ::
+        """{"date": "28/01/2016 20:00"}""" :: Nil)
+>>>>>>> tuning_adaptive
 
   lazy val singleRow: RDD[String] = spark.sparkContext.parallelize("""{"a":123}""" :: Nil)
 

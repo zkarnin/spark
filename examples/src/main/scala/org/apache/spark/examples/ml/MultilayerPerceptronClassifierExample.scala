@@ -59,14 +59,21 @@ object MultilayerPerceptronClassifierExample {
 
     // train the model
     val model = trainer.fit(train)
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     // compute accuracy on the test set
     val result = model.transform(test)
     val predictionAndLabels = result.select("prediction", "label")
     val evaluator = new MulticlassClassificationEvaluator()
       .setMetricName("accuracy")
+<<<<<<< HEAD
 
     println("Test set accuracy = " + evaluator.evaluate(predictionAndLabels))
+=======
+    println("Accuracy: " + evaluator.evaluate(predictionAndLabels))
+>>>>>>> tuning_adaptive
     // $example off$
 
     spark.stop()

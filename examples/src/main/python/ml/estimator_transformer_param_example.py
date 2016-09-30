@@ -18,7 +18,10 @@
 """
 Estimator Transformer Param Example.
 """
+<<<<<<< HEAD
 from __future__ import print_function
+=======
+>>>>>>> tuning_adaptive
 
 # $example on$
 from pyspark.ml.linalg import Vectors

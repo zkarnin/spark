@@ -83,7 +83,11 @@ private[orc] object OrcFilters extends Logging {
       // Only the values in the Spark types below can be recognized by
       // the `SearchArgumentImpl.BuilderImpl.boxLiteral()` method.
       case ByteType | ShortType | FloatType | DoubleType => true
+<<<<<<< HEAD
       case IntegerType | LongType | StringType | BooleanType => true
+=======
+      case IntegerType | LongType | StringType => true
+>>>>>>> tuning_adaptive
       case _ => false
     }
 

@@ -266,8 +266,12 @@ final class DataStreamReader private[sql](sparkSession: SparkSession) extends Lo
    * <li>`maxFilesPerTrigger` (default: no max limit): sets the maximum number of new files to be
    * considered in every trigger.</li>
    * <li>`mergeSchema` (default is the value specified in `spark.sql.parquet.mergeSchema`): sets
+<<<<<<< HEAD
    * whether we should merge schemas collected from all
    * Parquet part-files. This will override
+=======
+   * whether we should merge schemas collected from all Parquet part-files. This will override
+>>>>>>> tuning_adaptive
    * `spark.sql.parquet.mergeSchema`.</li>
    *
    * @since 2.0.0

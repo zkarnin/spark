@@ -36,7 +36,11 @@ object StopWordsRemoverExample {
       .setOutputCol("filtered")
 
     val dataSet = spark.createDataFrame(Seq(
+<<<<<<< HEAD
       (0, Seq("I", "saw", "the", "red", "balloon")),
+=======
+      (0, Seq("I", "saw", "the", "red", "baloon")),
+>>>>>>> tuning_adaptive
       (1, Seq("Mary", "had", "a", "little", "lamb"))
     )).toDF("id", "raw")
 

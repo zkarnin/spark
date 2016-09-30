@@ -207,7 +207,11 @@ class KeyValueGroupedDataset[K, V] private[sql](
   protected def aggUntyped(columns: TypedColumn[_, _]*): Dataset[_] = {
     val encoders = columns.map(_.encoder)
     val namedColumns =
+<<<<<<< HEAD
       columns.map(_.withInputType(vExprEnc, dataAttributes).named)
+=======
+      columns.map(_.withInputType(vExprEnc.deserializer, dataAttributes).named)
+>>>>>>> tuning_adaptive
     val keyColumn = if (kExprEnc.flat) {
       assert(groupingAttributes.length == 1)
       groupingAttributes.head

@@ -27,9 +27,15 @@ import org.apache.spark.sql.catalyst.plans.logical.SubqueryAlias
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.{ExamplePointUDT, SQLTestUtils}
+<<<<<<< HEAD
 import org.apache.spark.sql.types.{DecimalType, IntegerType, StringType, StructField, StructType}
 
 class HiveMetastoreCatalogSuite extends TestHiveSingleton with SQLTestUtils {
+=======
+import org.apache.spark.sql.types.{DecimalType, StringType, StructField, StructType}
+
+class HiveMetastoreCatalogSuite extends TestHiveSingleton {
+>>>>>>> tuning_adaptive
   import spark.implicits._
 
   test("struct field should accept underscore in sub-column name") {
@@ -58,6 +64,7 @@ class HiveMetastoreCatalogSuite extends TestHiveSingleton with SQLTestUtils {
     val dataType = StructType((1 to 100).map(field))
     assert(CatalystSqlParser.parseDataType(dataType.catalogString) == dataType)
   }
+<<<<<<< HEAD
 
   test("view relation") {
     withView("vw1") {
@@ -69,6 +76,8 @@ class HiveMetastoreCatalogSuite extends TestHiveSingleton with SQLTestUtils {
       assert(aliases.size == 1)
     }
   }
+=======
+>>>>>>> tuning_adaptive
 }
 
 class DataSourceWithHiveMetastoreCatalogSuite

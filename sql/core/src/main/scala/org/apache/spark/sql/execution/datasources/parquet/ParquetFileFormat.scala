@@ -44,6 +44,7 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.codegen.GenerateUnsafeProjection
 import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
+import org.apache.spark.sql.execution.command.CreateDataSourceTableUtils
 import org.apache.spark.sql.execution.datasources._
 import org.apache.spark.sql.execution.metric.SQLMetric
 import org.apache.spark.sql.internal.SQLConf
@@ -129,8 +130,11 @@ class ParquetFileFormat
       conf.setBoolean(ParquetOutputFormat.ENABLE_JOB_SUMMARY, false)
     }
 
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetFileFormat.scala
     ParquetFileFormat.redirectParquetLogs()
 
+=======
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetFileFormat.scala
     new OutputWriterFactory {
       override def newInstance(
           path: String,
@@ -377,11 +381,19 @@ class ParquetFileFormat
         // ParquetRecordReader returns UnsafeRow
         val reader = pushed match {
           case Some(filter) =>
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetFileFormat.scala
             new ParquetRecordReader[UnsafeRow](
               new ParquetReadSupport,
               FilterCompat.get(filter, null))
           case _ =>
             new ParquetRecordReader[UnsafeRow](new ParquetReadSupport)
+=======
+            new ParquetRecordReader[InternalRow](
+              new ParquetReadSupport,
+              FilterCompat.get(filter, null))
+          case _ =>
+            new ParquetRecordReader[InternalRow](new ParquetReadSupport)
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetFileFormat.scala
         }
         reader.initialize(split, hadoopAttemptContext)
         reader
@@ -482,9 +494,15 @@ private[parquet] class ParquetOutputWriterFactory(
   override def newWriter(path: String): OutputWriter = new OutputWriter {
 
     // Create TaskAttemptContext that is used to pass on Configuration to the ParquetRecordWriter
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetFileFormat.scala
     private val hadoopTaskAttemptId = new TaskAttemptID(new TaskID(new JobID, TaskType.MAP, 0), 0)
     private val hadoopAttemptContext = new TaskAttemptContextImpl(
       serializableConf.value, hadoopTaskAttemptId)
+=======
+    private val hadoopTaskAttempId = new TaskAttemptID(new TaskID(new JobID, TaskType.MAP, 0), 0)
+    private val hadoopAttemptContext = new TaskAttemptContextImpl(
+      serializableConf.value, hadoopTaskAttempId)
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetFileFormat.scala
 
     // Instance of ParquetRecordWriter that does not use OutputCommitter
     private val recordWriter = createNoCommitterRecordWriter(path, hadoopAttemptContext)
@@ -519,7 +537,11 @@ private[parquet] class ParquetOutputWriterFactory(
       dataSchema: StructType,
       context: TaskAttemptContext): OutputWriter = {
     throw new UnsupportedOperationException(
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetFileFormat.scala
       "this version of newInstance not supported for " +
+=======
+      "this verison of newInstance not supported for " +
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetFileFormat.scala
         "ParquetOutputWriterFactory")
   }
 }
@@ -546,7 +568,12 @@ private[parquet] class ParquetOutputWriter(
         //     partitions in the case of dynamic partitioning.
         override def getDefaultWorkFile(context: TaskAttemptContext, extension: String): Path = {
           val configuration = context.getConfiguration
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetFileFormat.scala
           val uniqueWriteJobId = configuration.get(WriterContainer.DATASOURCE_WRITEJOBUUID)
+=======
+          val uniqueWriteJobId = configuration.get(
+            CreateDataSourceTableUtils.DATASOURCE_WRITEJOBUUID)
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetFileFormat.scala
           val taskAttemptId = context.getTaskAttemptID
           val split = taskAttemptId.getTaskID.getId
           val bucketString = bucketId.map(BucketingUtils.bucketIdToString).getOrElse("")
@@ -568,7 +595,91 @@ private[parquet] class ParquetOutputWriter(
   override def close(): Unit = recordWriter.close(context)
 }
 
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetFileFormat.scala
 object ParquetFileFormat extends Logging {
+=======
+
+object ParquetFileFormat extends Logging {
+  /**
+   * If parquet's block size (row group size) setting is larger than the min split size,
+   * we use parquet's block size setting as the min split size. Otherwise, we will create
+   * tasks processing nothing (because a split does not cover the starting point of a
+   * parquet block). See https://issues.apache.org/jira/browse/SPARK-10143 for more information.
+   */
+  private def overrideMinSplitSize(parquetBlockSize: Long, conf: Configuration): Unit = {
+    val minSplitSize =
+      math.max(
+        conf.getLong("mapred.min.split.size", 0L),
+        conf.getLong("mapreduce.input.fileinputformat.split.minsize", 0L))
+    if (parquetBlockSize > minSplitSize) {
+      val message =
+        s"Parquet's block size (row group size) is larger than " +
+          s"mapred.min.split.size/mapreduce.input.fileinputformat.split.minsize. Setting " +
+          s"mapred.min.split.size and mapreduce.input.fileinputformat.split.minsize to " +
+          s"$parquetBlockSize."
+      logDebug(message)
+      conf.set("mapred.min.split.size", parquetBlockSize.toString)
+      conf.set("mapreduce.input.fileinputformat.split.minsize", parquetBlockSize.toString)
+    }
+  }
+
+  /** This closure sets various Parquet configurations at both driver side and executor side. */
+  private[parquet] def initializeLocalJobFunc(
+      requiredColumns: Array[String],
+      filters: Array[Filter],
+      dataSchema: StructType,
+      parquetBlockSize: Long,
+      useMetadataCache: Boolean,
+      parquetFilterPushDown: Boolean,
+      assumeBinaryIsString: Boolean,
+      assumeInt96IsTimestamp: Boolean)(job: Job): Unit = {
+    val conf = job.getConfiguration
+    conf.set(ParquetInputFormat.READ_SUPPORT_CLASS, classOf[ParquetReadSupport].getName)
+
+    // Try to push down filters when filter push-down is enabled.
+    if (parquetFilterPushDown) {
+      filters
+        // Collects all converted Parquet filter predicates. Notice that not all predicates can be
+        // converted (`ParquetFilters.createFilter` returns an `Option`). That's why a `flatMap`
+        // is used here.
+        .flatMap(ParquetFilters.createFilter(dataSchema, _))
+        .reduceOption(FilterApi.and)
+        .foreach(ParquetInputFormat.setFilterPredicate(conf, _))
+    }
+
+    conf.set(ParquetReadSupport.SPARK_ROW_REQUESTED_SCHEMA, {
+      val requestedSchema = StructType(requiredColumns.map(dataSchema(_)))
+      ParquetSchemaConverter.checkFieldNames(requestedSchema).json
+    })
+
+    conf.set(
+      ParquetWriteSupport.SPARK_ROW_SCHEMA,
+      ParquetSchemaConverter.checkFieldNames(dataSchema).json)
+
+    // Tell FilteringParquetRowInputFormat whether it's okay to cache Parquet and FS metadata
+    conf.setBoolean(SQLConf.PARQUET_CACHE_METADATA.key, useMetadataCache)
+
+    // Sets flags for `CatalystSchemaConverter`
+    conf.setBoolean(SQLConf.PARQUET_BINARY_AS_STRING.key, assumeBinaryIsString)
+    conf.setBoolean(SQLConf.PARQUET_INT96_AS_TIMESTAMP.key, assumeInt96IsTimestamp)
+
+    overrideMinSplitSize(parquetBlockSize, conf)
+  }
+
+  /** This closure sets input paths at the driver side. */
+  private[parquet] def initializeDriverSideJobFunc(
+      inputFiles: Array[FileStatus],
+      parquetBlockSize: Long)(job: Job): Unit = {
+    // We side the input paths at the driver side.
+    logInfo(s"Reading Parquet file(s) from ${inputFiles.map(_.getPath).mkString(", ")}")
+    if (inputFiles.nonEmpty) {
+      FileInputFormat.setInputPaths(job, inputFiles.map(_.getPath): _*)
+    }
+
+    overrideMinSplitSize(parquetBlockSize, job.getConfiguration)
+  }
+
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetFileFormat.scala
   private[parquet] def readSchema(
       footers: Seq[Footer], sparkSession: SparkSession): Option[StructType] = {
 

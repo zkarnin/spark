@@ -695,6 +695,7 @@ class TrainValidationSplitTests(SparkSessionTestCase):
             (100, 100.0),
             (500, 500.0)] * 10,
             ["feature", "label"])
+<<<<<<< HEAD
 
         iee = InducedErrorEstimator()
         evaluator = RegressionEvaluator(metricName="r2")
@@ -719,6 +720,32 @@ class TrainValidationSplitTests(SparkSessionTestCase):
                              tvsModelCopied.validationMetrics[index])
 
 
+=======
+
+        iee = InducedErrorEstimator()
+        evaluator = RegressionEvaluator(metricName="r2")
+
+        grid = ParamGridBuilder() \
+            .addGrid(iee.inducedError, [100.0, 0.0, 10000.0]) \
+            .build()
+        tvs = TrainValidationSplit(estimator=iee, estimatorParamMaps=grid, evaluator=evaluator)
+        tvsModel = tvs.fit(dataset)
+        tvsCopied = tvs.copy()
+        tvsModelCopied = tvsModel.copy()
+
+        self.assertEqual(tvs.getEstimator().uid, tvsCopied.getEstimator().uid,
+                         "Copied TrainValidationSplit has the same uid of Estimator")
+
+        self.assertEqual(tvsModel.bestModel.uid, tvsModelCopied.bestModel.uid)
+        self.assertEqual(len(tvsModel.validationMetrics),
+                         len(tvsModelCopied.validationMetrics),
+                         "Copied validationMetrics has the same size of the original")
+        for index in range(len(tvsModel.validationMetrics)):
+            self.assertEqual(tvsModel.validationMetrics[index],
+                             tvsModelCopied.validationMetrics[index])
+
+
+>>>>>>> tuning_adaptive
 class PersistenceTest(SparkSessionTestCase):
 
     def test_linear_regression(self):

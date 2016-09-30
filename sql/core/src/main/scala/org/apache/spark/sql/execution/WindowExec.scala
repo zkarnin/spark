@@ -595,6 +595,7 @@ private[execution] final class OffsetWindowFunctionFrame(
     newMutableProjection(boundExpressions, Nil).target(target)
   }
 
+<<<<<<< HEAD
   /** Create the projection used when the offset row DOES NOT exists. */
   private[this] val fillDefaultValue = {
     // Collect the expressions and bind them.
@@ -607,6 +608,48 @@ private[execution] final class OffsetWindowFunctionFrame(
         // The default value is an expression.
         BindReferences.bindReference(e.default, inputAttrs)
       }
+=======
+  /**
+   * Create the projection used when the offset row exists.
+   * Please note that this project always respect null input values (like PostgreSQL).
+   */
+  private[this] val projection = {
+    // Collect the expressions and bind them.
+    val inputAttrs = inputSchema.map(_.withNullability(true))
+    val boundExpressions = Seq.fill(ordinal)(NoOp) ++ expressions.toSeq.map {
+      case e: OffsetWindowFunction =>
+        val input = BindReferences.bindReference(e.input, inputAttrs)
+        input
+      case e =>
+        BindReferences.bindReference(e, inputAttrs)
+    }
+
+    // Create the projection.
+    newMutableProjection(boundExpressions, Nil).target(target)
+  }
+
+  /** Create the projection used when the offset row DOES NOT exists. */
+  private[this] val fillDefaultValue = {
+    // Collect the expressions and bind them.
+    val inputAttrs = inputSchema.map(_.withNullability(true))
+    val numInputAttributes = inputAttrs.size
+    val boundExpressions = Seq.fill(ordinal)(NoOp) ++ expressions.toSeq.map {
+      case e: OffsetWindowFunction =>
+        if (e.default == null || e.default.foldable && e.default.eval() == null) {
+          // The default value is null.
+          Literal.create(null, e.dataType)
+        } else {
+          // The default value is an expression.
+          val default = BindReferences.bindReference(e.default, inputAttrs).transform {
+            // Shift the input reference to its default version.
+            case BoundReference(o, dataType, nullable) =>
+              BoundReference(o + numInputAttributes, dataType, nullable)
+          }
+          default
+        }
+      case e =>
+        BindReferences.bindReference(e, inputAttrs)
+>>>>>>> tuning_adaptive
     }
 
     // Create the projection.
@@ -627,10 +670,19 @@ private[execution] final class OffsetWindowFunctionFrame(
   override def write(index: Int, current: InternalRow): Unit = {
     if (inputIndex >= 0 && inputIndex < input.size) {
       val r = input.next()
+<<<<<<< HEAD
       projection(r)
     } else {
       // Use default values since the offset row does not exist.
       fillDefaultValue(current)
+=======
+      join(r, current)
+      projection(join)
+    } else {
+      join(emptyRow, current)
+      // Use default values since the offset row does not exist.
+      fillDefaultValue(join)
+>>>>>>> tuning_adaptive
     }
     inputIndex += 1
   }

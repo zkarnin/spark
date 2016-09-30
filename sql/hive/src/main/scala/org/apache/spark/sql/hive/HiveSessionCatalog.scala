@@ -80,6 +80,10 @@ private[sql] class HiveSessionCatalog(
 
   val ParquetConversions: Rule[LogicalPlan] = metastoreCatalog.ParquetConversions
   val OrcConversions: Rule[LogicalPlan] = metastoreCatalog.OrcConversions
+<<<<<<< HEAD
+=======
+  val CreateTables: Rule[LogicalPlan] = metastoreCatalog.CreateTables
+>>>>>>> tuning_adaptive
 
   override def refreshTable(name: TableIdentifier): Unit = {
     super.refreshTable(name)
@@ -227,6 +231,11 @@ private[sql] class HiveSessionCatalog(
   private val hiveFunctions = Seq(
     "hash",
     "histogram_numeric",
+<<<<<<< HEAD
     "percentile"
+=======
+    "percentile",
+    "percentile_approx"
+>>>>>>> tuning_adaptive
   )
 }

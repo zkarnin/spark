@@ -804,6 +804,7 @@ class TaskSetManagerSuite extends SparkFunSuite with LocalSparkContext with Logg
     assert(TaskLocation("executor_host1_3") === ExecutorCacheTaskLocation("host1", "3"))
     assert(TaskLocation("executor_some.host1_executor_task_3") ===
       ExecutorCacheTaskLocation("some.host1", "executor_task_3"))
+<<<<<<< HEAD
   }
 
   test("Kill other task attempts when one attempt belonging to the same task succeeds") {
@@ -857,6 +858,8 @@ class TaskSetManagerSuite extends SparkFunSuite with LocalSparkContext with Logg
     // killed, so the FakeTaskScheduler is only told about the successful completion
     // of the speculated task.
     assert(sched.endedTasks(3) === Success)
+=======
+>>>>>>> tuning_adaptive
   }
 
   private def createTaskResult(

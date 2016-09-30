@@ -47,12 +47,19 @@ if __name__ == "__main__":
 
     # train the model
     model = trainer.fit(train)
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     # compute accuracy on the test set
     result = model.transform(test)
     predictionAndLabels = result.select("prediction", "label")
     evaluator = MulticlassClassificationEvaluator(metricName="accuracy")
+<<<<<<< HEAD
     print("Test set accuracy = " + str(evaluator.evaluate(predictionAndLabels)))
+=======
+    print("Accuracy: " + str(evaluator.evaluate(predictionAndLabels)))
+>>>>>>> tuning_adaptive
     # $example off$
 
     spark.stop()

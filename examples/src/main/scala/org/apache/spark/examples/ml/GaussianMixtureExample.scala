@@ -33,10 +33,15 @@ import org.apache.spark.sql.SparkSession
  */
 object GaussianMixtureExample {
   def main(args: Array[String]): Unit = {
+<<<<<<< HEAD
     val spark = SparkSession
         .builder
         .appName(s"${this.getClass.getSimpleName}")
         .getOrCreate()
+=======
+    // Creates a SparkSession
+    val spark = SparkSession.builder.appName(s"${this.getClass.getSimpleName}").getOrCreate()
+>>>>>>> tuning_adaptive
 
     // $example on$
     // Loads data
@@ -49,8 +54,13 @@ object GaussianMixtureExample {
 
     // output parameters of mixture model model
     for (i <- 0 until model.getK) {
+<<<<<<< HEAD
       println(s"Gaussian $i:\nweight=${model.weights(i)}\n" +
           s"mu=${model.gaussians(i).mean}\nsigma=\n${model.gaussians(i).cov}\n")
+=======
+      println("weight=%f\nmu=%s\nsigma=\n%s\n" format
+        (model.weights(i), model.gaussians(i).mean, model.gaussians(i).cov))
+>>>>>>> tuning_adaptive
     }
     // $example off$
 

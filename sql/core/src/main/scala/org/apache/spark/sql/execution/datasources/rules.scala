@@ -17,14 +17,21 @@
 
 package org.apache.spark.sql.execution.datasources
 
+<<<<<<< HEAD
 import java.util.regex.Pattern
 
+=======
+>>>>>>> tuning_adaptive
 import scala.util.control.NonFatal
 
 import org.apache.spark.sql.{AnalysisException, SaveMode, SparkSession}
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.analysis._
+<<<<<<< HEAD
 import org.apache.spark.sql.catalyst.catalog.{BucketSpec, CatalogRelation, CatalogTable, SessionCatalog}
+=======
+import org.apache.spark.sql.catalyst.catalog.{CatalogRelation, SessionCatalog}
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.catalyst.expressions.{Alias, Attribute, Cast, RowOrdering}
 import org.apache.spark.sql.catalyst.plans.logical
 import org.apache.spark.sql.catalyst.plans.logical._
@@ -66,6 +73,7 @@ class ResolveDataSource(sparkSession: SparkSession) extends Rule[LogicalPlan] {
 }
 
 /**
+<<<<<<< HEAD
  * Preprocess some DDL plans, e.g. [[CreateTable]], to do some normalization and checking.
  */
 case class PreprocessDDL(conf: SQLConf) extends Rule[LogicalPlan] {
@@ -231,6 +239,53 @@ case class PreprocessTableInsertion(conf: SQLConf) extends Rule[LogicalPlan] {
     }
   }
 
+=======
+ * Preprocess the [[InsertIntoTable]] plan. Throws exception if the number of columns mismatch, or
+ * specified partition columns are different from the existing partition columns in the target
+ * table. It also does data type casting and field renaming, to make sure that the columns to be
+ * inserted have the correct data type and fields have the correct names.
+ */
+case class PreprocessTableInsertion(conf: SQLConf) extends Rule[LogicalPlan] {
+  private def preprocess(
+      insert: InsertIntoTable,
+      tblName: String,
+      partColNames: Seq[String]): InsertIntoTable = {
+
+    val expectedColumns = insert.expectedColumns
+    if (expectedColumns.isDefined && expectedColumns.get.length != insert.child.schema.length) {
+      throw new AnalysisException(
+        s"Cannot insert into table $tblName because the number of columns are different: " +
+          s"need ${expectedColumns.get.length} columns, " +
+          s"but query has ${insert.child.schema.length} columns.")
+    }
+
+    if (insert.partition.nonEmpty) {
+      // the query's partitioning must match the table's partitioning
+      // this is set for queries like: insert into ... partition (one = "a", two = <expr>)
+      val samePartitionColumns =
+        if (conf.caseSensitiveAnalysis) {
+          insert.partition.keySet == partColNames.toSet
+        } else {
+          insert.partition.keySet.map(_.toLowerCase) == partColNames.map(_.toLowerCase).toSet
+        }
+      if (!samePartitionColumns) {
+        throw new AnalysisException(
+          s"""
+             |Requested partitioning does not match the table $tblName:
+             |Requested partitions: ${insert.partition.keys.mkString(",")}
+             |Table partitions: ${partColNames.mkString(",")}
+           """.stripMargin)
+      }
+      expectedColumns.map(castAndRenameChildOutput(insert, _)).getOrElse(insert)
+    } else {
+      // All partition columns are dynamic because because the InsertIntoTable command does
+      // not explicitly specify partitioning columns.
+      expectedColumns.map(castAndRenameChildOutput(insert, _)).getOrElse(insert)
+        .copy(partition = partColNames.map(_ -> None).toMap)
+    }
+  }
+
+>>>>>>> tuning_adaptive
   // TODO: do we really need to rename?
   def castAndRenameChildOutput(
       insert: InsertIntoTable,
@@ -248,6 +303,7 @@ case class PreprocessTableInsertion(conf: SQLConf) extends Rule[LogicalPlan] {
       insert
     } else {
       insert.copy(child = Project(newChildOutput, insert.child))
+<<<<<<< HEAD
     }
   }
 
@@ -279,7 +335,25 @@ object HiveOnlyCheck extends (LogicalPlan => Unit) {
         throw new AnalysisException("Hive support is required to use CREATE Hive TABLE AS SELECT")
 
       case _ => // OK
+=======
+>>>>>>> tuning_adaptive
     }
+  }
+
+  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+    case i @ InsertIntoTable(table, partition, child, _, _) if table.resolved && child.resolved =>
+      table match {
+        case relation: CatalogRelation =>
+          val metadata = relation.catalogTable
+          preprocess(i, metadata.identifier.quotedString, metadata.partitionColumnNames)
+        case LogicalRelation(h: HadoopFsRelation, _, identifier) =>
+          val tblName = identifier.map(_.quotedString).getOrElse("unknown")
+          preprocess(i, tblName, h.partitionSchema.map(_.name))
+        case LogicalRelation(_: InsertableRelation, _, identifier) =>
+          val tblName = identifier.map(_.quotedString).getOrElse("unknown")
+          preprocess(i, tblName, Nil)
+        case other => i
+      }
   }
 }
 
@@ -381,6 +455,48 @@ case class PreWriteCheck(conf: SQLConf, catalog: SessionCatalog)
         // The relation in l is not an InsertableRelation.
         failAnalysis(s"$l does not allow insertion.")
 
+<<<<<<< HEAD
+=======
+      case c: CreateTableUsingAsSelect =>
+        // When the SaveMode is Overwrite, we need to check if the table is an input table of
+        // the query. If so, we will throw an AnalysisException to let users know it is not allowed.
+        if (c.mode == SaveMode.Overwrite && catalog.tableExists(c.tableIdent)) {
+          // Need to remove SubQuery operator.
+          EliminateSubqueryAliases(catalog.lookupRelation(c.tableIdent)) match {
+            // Only do the check if the table is a data source table
+            // (the relation is a BaseRelation).
+            case l @ LogicalRelation(dest: BaseRelation, _, _) =>
+              // Get all input data source relations of the query.
+              val srcRelations = c.child.collect {
+                case LogicalRelation(src: BaseRelation, _, _) => src
+              }
+              if (srcRelations.contains(dest)) {
+                failAnalysis(
+                  s"Cannot overwrite table ${c.tableIdent} that is also being read from.")
+              } else {
+                // OK
+              }
+
+            case _ => // OK
+          }
+        } else {
+          // OK
+        }
+
+        PartitioningUtils.validatePartitionColumn(
+          c.child.schema, c.partitionColumns, conf.caseSensitiveAnalysis)
+
+        for {
+          spec <- c.bucketSpec
+          sortColumnName <- spec.sortColumnNames
+          sortColumn <- c.child.schema.find(_.name == sortColumnName)
+        } {
+          if (!RowOrdering.isOrderable(sortColumn.dataType)) {
+            failAnalysis(s"Cannot use ${sortColumn.dataType.simpleString} for sorting column.")
+          }
+        }
+
+>>>>>>> tuning_adaptive
       case _ => // OK
     }
   }

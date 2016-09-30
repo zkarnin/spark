@@ -66,7 +66,11 @@ private[sql] object InferSchema {
         }
       }
     }.fold(StructType(Seq()))(
+<<<<<<< HEAD
       compatibleRootType(columnNameOfCorruptRecord, shouldHandleCorruptRecord))
+=======
+      compatibleRootType(columnNameOfCorruptRecords, shouldHandleCorruptRecord))
+>>>>>>> tuning_adaptive
 
     canonicalizeType(rootType) match {
       case Some(st: StructType) => st

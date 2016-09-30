@@ -27,9 +27,13 @@ private[ui] class EnvironmentPage(parent: EnvironmentTab) extends WebUIPage("") 
   private val listener = parent.listener
 
   private def removePass(kv: (String, String)): (String, String) = {
+<<<<<<< HEAD
     if (kv._1.toLowerCase.contains("password") || kv._1.toLowerCase.contains("secret")) {
       (kv._1, "******")
     } else kv
+=======
+    if (kv._1.toLowerCase.contains("password")) (kv._1, "******") else kv
+>>>>>>> tuning_adaptive
   }
 
   def render(request: HttpServletRequest): Seq[Node] = {

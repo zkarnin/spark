@@ -37,6 +37,15 @@ abstract class PlanExpression[T <: QueryPlan[_]] extends Expression {
   protected def conditionString: String = children.mkString("[", " && ", "]")
 }
 
+object SubqueryExpression {
+  def hasCorrelatedSubquery(e: Expression): Boolean = {
+    e.find {
+      case e: SubqueryExpression if e.children.nonEmpty => true
+      case _ => false
+    }.isDefined
+  }
+}
+
 /**
  * A base interface for expressions that contain a [[LogicalPlan]].
  */
@@ -64,6 +73,7 @@ case class ScalarSubquery(
     children: Seq[Expression] = Seq.empty,
     exprId: ExprId = NamedExpression.newExprId)
   extends SubqueryExpression with Unevaluable {
+<<<<<<< HEAD
   override lazy val resolved: Boolean = childrenResolved && plan.resolved
   override lazy val references: AttributeSet = {
     if (plan.resolved) super.references -- plan.outputSet
@@ -73,6 +83,18 @@ case class ScalarSubquery(
   override def foldable: Boolean = false
   override def nullable: Boolean = true
   override def withNewPlan(plan: LogicalPlan): ScalarSubquery = copy(plan = plan)
+=======
+  override lazy val resolved: Boolean = childrenResolved && query.resolved
+  override lazy val references: AttributeSet = {
+    if (query.resolved) super.references -- query.outputSet
+    else super.references
+  }
+  override def dataType: DataType = query.schema.fields.head.dataType
+  override def foldable: Boolean = false
+  override def nullable: Boolean = true
+  override def plan: LogicalPlan = SubqueryAlias(toString, query)
+  override def withNewPlan(plan: LogicalPlan): ScalarSubquery = copy(query = plan)
+>>>>>>> tuning_adaptive
   override def toString: String = s"scalar-subquery#${exprId.id} $conditionString"
 }
 
@@ -96,6 +118,7 @@ case class PredicateSubquery(
     nullAware: Boolean = false,
     exprId: ExprId = NamedExpression.newExprId)
   extends SubqueryExpression with Predicate with Unevaluable {
+<<<<<<< HEAD
   override lazy val resolved = childrenResolved && plan.resolved
   override lazy val references: AttributeSet = super.references -- plan.outputSet
   override def nullable: Boolean = nullAware
@@ -107,6 +130,13 @@ case class PredicateSubquery(
         children.zip(p.children).forall(p => p._1.semanticEquals(p._2))
     case _ => false
   }
+=======
+  override lazy val resolved = childrenResolved && query.resolved
+  override lazy val references: AttributeSet = super.references -- query.outputSet
+  override def nullable: Boolean = nullAware
+  override def plan: LogicalPlan = SubqueryAlias(toString, query)
+  override def withNewPlan(plan: LogicalPlan): PredicateSubquery = copy(query = plan)
+>>>>>>> tuning_adaptive
   override def toString: String = s"predicate-subquery#${exprId.id} $conditionString"
 }
 

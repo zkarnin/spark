@@ -120,7 +120,10 @@ private[parquet] class ParquetPrimitiveConverter(val updater: ParentContainerUpd
  * @param updater An updater which propagates converted field values to the parent container
  */
 private[parquet] class ParquetRowConverter(
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetRowConverter.scala
     schemaConverter: ParquetSchemaConverter,
+=======
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetRowConverter.scala
     parquetType: GroupType,
     catalystType: StructType,
     updater: ParentContainerUpdater)
@@ -294,10 +297,16 @@ private[parquet] class ParquetRowConverter(
         new ParquetMapConverter(parquetType.asGroupType(), t, updater)
 
       case t: StructType =>
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetRowConverter.scala
         new ParquetRowConverter(
           schemaConverter, parquetType.asGroupType(), t, new ParentContainerUpdater {
             override def set(value: Any): Unit = updater.set(value.asInstanceOf[InternalRow].copy())
           })
+=======
+        new ParquetRowConverter(parquetType.asGroupType(), t, new ParentContainerUpdater {
+          override def set(value: Any): Unit = updater.set(value.asInstanceOf[InternalRow].copy())
+        })
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetRowConverter.scala
 
       case t =>
         throw new RuntimeException(

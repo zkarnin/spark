@@ -102,6 +102,7 @@ class FileStreamSinkWriter(
   // Get the actual partition columns as attributes after matching them by name with
   // the given columns names.
   private val partitionColumns = partitionColumnNames.map { col =>
+<<<<<<< HEAD
     val nameEquality = data.sparkSession.sessionState.conf.resolver
     data.logicalPlan.output.find(f => nameEquality(f.name, col)).getOrElse {
       throw new RuntimeException(s"Partition column $col not found in schema $dataSchema")
@@ -115,6 +116,25 @@ class FileStreamSinkWriter(
     dataColumns.filterNot(partitionSet.contains)
   }
 
+=======
+    val nameEquality = if (data.sparkSession.sessionState.conf.caseSensitiveAnalysis) {
+      org.apache.spark.sql.catalyst.analysis.caseSensitiveResolution
+    } else {
+      org.apache.spark.sql.catalyst.analysis.caseInsensitiveResolution
+    }
+    data.logicalPlan.output.find(f => nameEquality(f.name, col)).getOrElse {
+      throw new RuntimeException(s"Partition column $col not found in schema $dataSchema")
+    }
+  }
+
+  // Columns that are to be written to the files. If there are partitioning columns, then
+  // those will not be written to the files.
+  private val writeColumns = {
+    val partitionSet = AttributeSet(partitionColumns)
+    dataColumns.filterNot(partitionSet.contains)
+  }
+
+>>>>>>> tuning_adaptive
   // An OutputWriterFactory for generating writers in the executors for writing the files.
   private val outputWriterFactory =
     fileFormat.buildWriter(data.sqlContext, writeColumns.toStructType, options)

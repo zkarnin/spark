@@ -67,9 +67,9 @@ class BayesOptimize(val Dim : Int)
 
   def getNextN(N: Int, tune_lscales: Boolean): Array[Array[Double]] = {
     var samples = new ArrayBuffer[Array[Double]]
-    val T0 = System.currentTimeMillis
+//    val T0 = System.currentTimeMillis
     if (tune_lscales) {
-//      println("tune_lscales: "+tune_lscales.toString)
+      //      println("tune_lscales: "+tune_lscales.toString)
       val lScales_oNoise = tuneHyperparams(pastSamples.toArray,
         pastLosses.toArray,
         SEKernel,
@@ -89,13 +89,13 @@ class BayesOptimize(val Dim : Int)
         logCostObsNoise = lScales_oNoise._2
       }
     }
-    val tT = System.currentTimeMillis
+//    val tT = System.currentTimeMillis
     samples += MaximizeSurrogate(optimizationBudget,
       lossLengthScales,lossObsNoise,
       logCostLengthScales,logCostObsNoise,
       SEKernel, updatePastSurrogateSamples = true)
-    val tO = System.currentTimeMillis
-//    println("Tuning time="+(tT-T0).toString+"ms,   Optimization time="+(tO-tT).toString+"ms")
+//    val tO = System.currentTimeMillis
+    //    println("Tuning time="+(tT-T0).toString+"ms,   Optimization time="+(tO-tT).toString+"ms")
     for (ind <- 2 to N) {
       val losslScales_oNoise = tuneHyperparams(pastSamples.toArray,
         pastLosses.toArray,
@@ -203,9 +203,9 @@ class BayesOptimize(val Dim : Int)
     // Return the point with the max surrogate value
     val dvValues = DenseVector(values.toArray)
     val best_ind = argmax(dvValues)
-    val m = values.min
-    val M = values.max
-//    println("EI(x)="+values(best_ind).toString+"  min/max EI=("+f"$m%1.5f"+","+f"$M%1.5f"+")")
+//    val m = values.min
+//    val M = values.max
+    //    println("EI(x)="+values(best_ind).toString+"  min/max EI=("+f"$m%1.5f"+","+f"$M%1.5f"+")")
     samples(best_ind)
   }
 
@@ -251,7 +251,7 @@ class BayesOptimize(val Dim : Int)
     }
 
     bestPastSurrogateSamples = newBestSurrogateSamples.clone
-//        println("bestPastSurrogateSamples.length="+bestPastSurrogateSamples.length.toString)
+    //        println("bestPastSurrogateSamples.length="+bestPastSurrogateSamples.length.toString)
     //    println("values.length="+values.length.toString)
   }
 
@@ -394,14 +394,14 @@ class BayesOptimize(val Dim : Int)
     }
     if (sum(winsForNew) >= nTrials) {
       if (nTrials == 1) {
-//        println("Updated the length scales: *******************")
+        //        println("Updated the length scales: *******************")
       } else {
-//        println("Updated the length scales:")
+        //        println("Updated the length scales:")
       }
-//      println("old hyperparams:" + BayesOptimize.Array2String(oldLScales))
-//      println("new hyperparams:" + BayesOptimize.Array2String(newLScales))
-//      println("old LLs:" + BayesOptimize.Array2String(oldLLs.toArray))
-//      println("new LLs:" + BayesOptimize.Array2String(newLLs.toArray))
+      //      println("old hyperparams:" + BayesOptimize.Array2String(oldLScales))
+      //      println("new hyperparams:" + BayesOptimize.Array2String(newLScales))
+      //      println("old LLs:" + BayesOptimize.Array2String(oldLLs.toArray))
+      //      println("new LLs:" + BayesOptimize.Array2String(newLLs.toArray))
     }
     if (sum(winsForNew) >= nTrials) (newLScales, newObsNoise) else (oldLScales, oldObsNoise)
   }
@@ -418,14 +418,6 @@ class BayesOptimize(val Dim : Int)
     newLScales(ind) = exp(newLogLS)
     (newLScales,newObsNoise)
   }
-
-  private def getRandnMtx(R: Int, C: Int): DenseMatrix[Double] = {
-    val normal01 = breeze.stats.distributions.Gaussian(0, 1)
-    val samples = normal01.sample(R*C)
-    val X = new DenseMatrix[Double](R, C, samples.toArray)
-    X
-  }
-
 
   private def subSampleArrays(A: Array[Array[Double]], b: Array[Double], n: Int): (Array[Array[Double]],Array[Double]) = {
     val N = A.length
@@ -457,7 +449,7 @@ class BayesOptimize(val Dim : Int)
   private def getLL(K: DenseMatrix[Double],
                     f: DenseMatrix[Double]): Double = {
 
-    val fKinvf: Double = sum(f.t * inv(K) * f)
+    val fKinvf: Double = sum((f.t * inv(K): DenseMatrix[Double]) * f)
     -0.5 * log(det(K)) - fKinvf
   }
 
@@ -487,10 +479,10 @@ class BayesOptimize(val Dim : Int)
     for (ind <- 0 until f.rows)
       m(ind,0) = priorMean(pastSamples(ind))
 
-    val Kinvk = Kinv * k
+    val Kinvk : DenseMatrix[Double]= Kinv * k
 
     // posterior mean and std deviation
-    val mu_x = sum((f.t-m.t) * Kinvk)+priorMean(x)
+    val mu_x = sum((f.t-m.t) * Kinvk : DenseMatrix[Double])+priorMean(x)
     val sigma_x = sqrt(kernel(x,x,lossLengthScales)) - sum(k.t * Kinvk)
 
     (mu_x,sigma_x)
@@ -569,3 +561,5 @@ object BayesOptimize {
     tbpA + ")"
   }
 }
+
+

@@ -18,7 +18,10 @@
 package org.apache.spark.sql.hive.execution
 
 import org.apache.spark.sql.Row
+<<<<<<< HEAD
 import org.apache.spark.sql.hive.MetastoreRelation
+=======
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.hive.test.{TestHive, TestHiveSingleton}
 import org.apache.spark.sql.hive.test.TestHive._
 import org.apache.spark.sql.hive.test.TestHive.implicits._
@@ -144,6 +147,7 @@ class HiveTableScanSuite extends HiveComparisonTest with SQLTestUtils with TestH
       }
     }
   }
+<<<<<<< HEAD
 
   test("SPARK-16926: number of table and partition columns match for new partitioned table") {
     val view = "src"
@@ -178,4 +182,6 @@ class HiveTableScanSuite extends HiveComparisonTest with SQLTestUtils with TestH
       }
     }
   }
+=======
+>>>>>>> tuning_adaptive
 }

@@ -30,11 +30,15 @@ if __name__ == "__main__":
         .getOrCreate()
 
     # $example on$
+<<<<<<< HEAD
     dataFrame = spark.createDataFrame([
         (0, Vectors.dense([1.0, 0.1, -1.0]),),
         (1, Vectors.dense([2.0, 1.1, 1.0]),),
         (2, Vectors.dense([3.0, 10.1, 3.0]),)
     ], ["id", "features"])
+=======
+    dataFrame = spark.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
+>>>>>>> tuning_adaptive
 
     scaler = MinMaxScaler(inputCol="features", outputCol="scaledFeatures")
 

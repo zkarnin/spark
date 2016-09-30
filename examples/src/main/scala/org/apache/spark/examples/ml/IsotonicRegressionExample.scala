@@ -33,6 +33,11 @@ import org.apache.spark.sql.SparkSession
 object IsotonicRegressionExample {
 
   def main(args: Array[String]): Unit = {
+<<<<<<< HEAD
+=======
+
+    // Creates a SparkSession.
+>>>>>>> tuning_adaptive
     val spark = SparkSession
       .builder
       .appName(s"${this.getClass.getSimpleName}")
@@ -47,8 +52,13 @@ object IsotonicRegressionExample {
     val ir = new IsotonicRegression()
     val model = ir.fit(dataset)
 
+<<<<<<< HEAD
     println(s"Boundaries in increasing order: ${model.boundaries}\n")
     println(s"Predictions associated with the boundaries: ${model.predictions}\n")
+=======
+    println(s"Boundaries in increasing order: ${model.boundaries}")
+    println(s"Predictions associated with the boundaries: ${model.predictions}")
+>>>>>>> tuning_adaptive
 
     // Makes predictions.
     model.transform(dataset).show()

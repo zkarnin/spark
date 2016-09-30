@@ -60,7 +60,11 @@ private[yarn] class ExecutorRunnable(
   var nmClient: NMClient = _
 
   def run(): Unit = {
+<<<<<<< HEAD
     logDebug("Starting Executor Container")
+=======
+    logInfo("Starting Executor Container")
+>>>>>>> tuning_adaptive
     nmClient = NMClient.createNMClient()
     nmClient.init(conf)
     nmClient.start()

@@ -121,6 +121,7 @@ class DataFrame(object):
 
         >>> df.registerTempTable("people")
         >>> df2 = spark.sql("select * from people")
+<<<<<<< HEAD
         >>> sorted(df.collect()) == sorted(df2.collect())
         True
         >>> spark.catalog.dropTempView("people")
@@ -168,6 +169,55 @@ class DataFrame(object):
 
         """
         self._jdf.createOrReplaceTempView(name)
+=======
+        >>> sorted(df.collect()) == sorted(df2.collect())
+        True
+        >>> spark.catalog.dropTempView("people")
+
+        .. note:: Deprecated in 2.0, use createOrReplaceTempView instead.
+        """
+        self._jdf.createOrReplaceTempView(name)
+
+    @since(2.0)
+    def createTempView(self, name):
+        """Creates a temporary view with this DataFrame.
+
+        The lifetime of this temporary table is tied to the :class:`SparkSession`
+        that was used to create this :class:`DataFrame`.
+        throws :class:`TempTableAlreadyExistsException`, if the view name already exists in the
+        catalog.
+
+        >>> df.createTempView("people")
+        >>> df2 = spark.sql("select * from people")
+        >>> sorted(df.collect()) == sorted(df2.collect())
+        True
+        >>> df.createTempView("people")  # doctest: +IGNORE_EXCEPTION_DETAIL
+        Traceback (most recent call last):
+        ...
+        AnalysisException: u"Temporary table 'people' already exists;"
+        >>> spark.catalog.dropTempView("people")
+
+        """
+        self._jdf.createTempView(name)
+
+    @since(2.0)
+    def createOrReplaceTempView(self, name):
+        """Creates or replaces a temporary view with this DataFrame.
+
+        The lifetime of this temporary table is tied to the :class:`SparkSession`
+        that was used to create this :class:`DataFrame`.
+
+        >>> df.createOrReplaceTempView("people")
+        >>> df2 = df.filter(df.age > 3)
+        >>> df2.createOrReplaceTempView("people")
+        >>> df3 = spark.sql("select * from people")
+        >>> sorted(df3.collect()) == sorted(df2.collect())
+        True
+        >>> spark.catalog.dropTempView("people")
+
+        """
+        self._jdf.createOrReplaceTempView(name)
+>>>>>>> tuning_adaptive
 
     @property
     @since(1.4)

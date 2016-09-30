@@ -43,6 +43,7 @@ class SparkPlanner(
       InMemoryScans ::
       BasicOperators :: Nil)
 
+<<<<<<< HEAD
   override protected def collectPlaceholders(plan: SparkPlan): Seq[(SparkPlan, LogicalPlan)] = {
     plan.collect {
       case placeholder @ PlanLater(logicalPlan) => placeholder -> logicalPlan
@@ -55,6 +56,18 @@ class SparkPlanner(
     plans
   }
 
+=======
+  override def plan(plan: LogicalPlan): Iterator[SparkPlan] = {
+    super.plan(plan).map {
+      _.transformUp {
+        case PlanLater(p) =>
+          // TODO: use the first plan for now, but we will implement plan space exploaration later.
+          this.plan(p).next()
+      }
+    }
+  }
+
+>>>>>>> tuning_adaptive
   /**
    * Used to build table scan operators where complex projection and filtering are done using
    * separate physical operators.  This function returns the given scan operator with Project and

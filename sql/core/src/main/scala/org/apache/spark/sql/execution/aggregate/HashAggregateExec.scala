@@ -475,9 +475,18 @@ case class HashAggregateExec(
   }
 
   /**
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/aggregate/HashAggregateExec.scala
    * A required check for any fast hash map implementation (basically the common requirements
    * for row-based and vectorized).
    * Currently fast hash map is supported for primitive data types during partial aggregation.
+=======
+   * Using the vectorized hash map in HashAggregate is currently supported for all primitive
+   * data types during partial aggregation. However, we currently only enable the hash map for a
+   * subset of cases that've been verified to show performance improvements on our benchmarks
+   * subject to an internal conf that sets an upper limit on the maximum length of the aggregate
+   * key/value schema.
+   *
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/aggregate/HashAggregateExec.scala
    * This list of supported use-cases should be expanded over time.
    */
   private def checkIfFastHashMapSupported(ctx: CodegenContext): Boolean = {
@@ -751,6 +760,7 @@ case class HashAggregateExec(
       }
     }
 
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/aggregate/HashAggregateExec.scala
 
     def updateRowInFastHashMap(isVectorized: Boolean): Option[String] = {
       ctx.INPUT_ROW = fastRowBuffer
@@ -774,6 +784,32 @@ case class HashAggregateExec(
            |${updateFastRow.mkString("\n").trim}
            |
          """.stripMargin)
+=======
+    val updateRowInVectorizedHashMap: Option[String] = {
+      if (isVectorizedHashMapEnabled) {
+        ctx.INPUT_ROW = vectorizedRowBuffer
+        val boundUpdateExpr = updateExpr.map(BindReferences.bindReference(_, inputAttr))
+        val subExprs = ctx.subexpressionEliminationForWholeStageCodegen(boundUpdateExpr)
+        val effectiveCodes = subExprs.codes.mkString("\n")
+        val vectorizedRowEvals = ctx.withSubExprEliminationExprs(subExprs.states) {
+          boundUpdateExpr.map(_.genCode(ctx))
+        }
+        val updateVectorizedRow = vectorizedRowEvals.zipWithIndex.map { case (ev, i) =>
+          val dt = updateExpr(i).dataType
+          ctx.updateColumn(vectorizedRowBuffer, dt, i, ev, updateExpr(i).nullable,
+            isVectorized = true)
+        }
+        Option(
+          s"""
+             |// common sub-expressions
+             |$effectiveCodes
+             |// evaluate aggregate function
+             |${evaluateVariables(vectorizedRowEvals)}
+             |// update vectorized row
+             |${updateVectorizedRow.mkString("\n").trim}
+           """.stripMargin)
+      } else None
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/aggregate/HashAggregateExec.scala
     }
 
     // Next, we generate code to probe and update the unsafe row hash map.

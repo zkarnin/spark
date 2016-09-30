@@ -75,7 +75,11 @@ public class JavaOneVsRestExample {
 
     // compute the classification error on test data.
     double accuracy = evaluator.evaluate(predictions);
+<<<<<<< HEAD
     System.out.println("Test Error = " + (1 - accuracy));
+=======
+    System.out.println("Test Error : " + (1 - accuracy));
+>>>>>>> tuning_adaptive
     // $example off$
 
     spark.stop();

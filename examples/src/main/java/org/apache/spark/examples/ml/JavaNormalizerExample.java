@@ -43,6 +43,7 @@ public class JavaNormalizerExample {
       .getOrCreate();
 
     // $example on$
+<<<<<<< HEAD
     List<Row> data = Arrays.asList(
         RowFactory.create(0, Vectors.dense(1.0, 0.1, -8.0)),
         RowFactory.create(1, Vectors.dense(2.0, 1.0, -4.0)),
@@ -53,6 +54,10 @@ public class JavaNormalizerExample {
         new StructField("features", new VectorUDT(), false, Metadata.empty())
     });
     Dataset<Row> dataFrame = spark.createDataFrame(data, schema);
+=======
+    Dataset<Row> dataFrame =
+      spark.read().format("libsvm").load("data/mllib/sample_libsvm_data.txt");
+>>>>>>> tuning_adaptive
 
     // Normalize each Vector using $L^1$ norm.
     Normalizer normalizer = new Normalizer()
@@ -68,7 +73,10 @@ public class JavaNormalizerExample {
       normalizer.transform(dataFrame, normalizer.p().w(Double.POSITIVE_INFINITY));
     lInfNormData.show();
     // $example off$
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     spark.stop();
   }
 }

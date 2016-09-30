@@ -32,7 +32,11 @@ Run with:
 if __name__ == "__main__":
     spark = SparkSession \
         .builder \
+<<<<<<< HEAD
         .appName("AFTSurvivalRegressionExample") \
+=======
+        .appName("PythonAFTSurvivalRegressionExample") \
+>>>>>>> tuning_adaptive
         .getOrCreate()
 
     # $example on$

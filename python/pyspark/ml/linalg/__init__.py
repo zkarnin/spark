@@ -478,6 +478,7 @@ class SparseVector(Vector):
         SparseVector(4, {1: 1.0, 3: 5.5})
         >>> SparseVector(4, [1, 3], [1.0, 5.5])
         SparseVector(4, {1: 1.0, 3: 5.5})
+<<<<<<< HEAD
         >>> SparseVector(4, {1:1.0, 6:2.0})
         Traceback (most recent call last):
         ...
@@ -486,6 +487,8 @@ class SparseVector(Vector):
         Traceback (most recent call last):
         ...
         AssertionError: Contains negative index -1
+=======
+>>>>>>> tuning_adaptive
         """
         self.size = int(size)
         """ Size of the vector. """
@@ -519,6 +522,7 @@ class SparseVector(Vector):
                         "Indices %s and %s are not strictly increasing"
                         % (self.indices[i], self.indices[i + 1]))
 
+<<<<<<< HEAD
         if self.indices.size > 0:
             assert np.max(self.indices) < self.size, \
                 "Index %d is out of the the size of vector with size=%d" \
@@ -526,6 +530,8 @@ class SparseVector(Vector):
             assert np.min(self.indices) >= 0, \
                 "Contains negative index %d" % (np.min(self.indices))
 
+=======
+>>>>>>> tuning_adaptive
     def numNonzeros(self):
         """
         Number of nonzero elements. This scans all active values and count non zeros.

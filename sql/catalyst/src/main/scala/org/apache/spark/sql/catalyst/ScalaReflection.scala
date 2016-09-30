@@ -472,6 +472,7 @@ object ScalaReflection extends ScalaReflection {
 
       case t if t <:< localTypeOf[Map[_, _]] =>
         val TypeRef(_, _, Seq(keyType, valueType)) = t
+<<<<<<< HEAD
         val keyClsName = getClassNameFromType(keyType)
         val valueClsName = getClassNameFromType(valueType)
         val keyPath = s"""- map key class: "$keyClsName"""" +: walkedTypePath
@@ -483,6 +484,31 @@ object ScalaReflection extends ScalaReflection {
           serializerFor(_, keyType, keyPath),
           dataTypeFor(valueType),
           serializerFor(_, valueType, valuePath))
+=======
+
+        val keys =
+          Invoke(
+            Invoke(inputObject, "keysIterator",
+              ObjectType(classOf[scala.collection.Iterator[_]])),
+            "toSeq",
+            ObjectType(classOf[scala.collection.Seq[_]]))
+        val convertedKeys = toCatalystArray(keys, keyType)
+
+        val values =
+          Invoke(
+            Invoke(inputObject, "valuesIterator",
+              ObjectType(classOf[scala.collection.Iterator[_]])),
+            "toSeq",
+            ObjectType(classOf[scala.collection.Seq[_]]))
+        val convertedValues = toCatalystArray(values, valueType)
+
+        val Schema(keyDataType, _) = schemaFor(keyType)
+        val Schema(valueDataType, valueNullable) = schemaFor(valueType)
+        NewInstance(
+          classOf[ArrayBasedMapData],
+          convertedKeys :: convertedValues :: Nil,
+          dataType = MapType(keyDataType, valueDataType, valueNullable))
+>>>>>>> tuning_adaptive
 
       case t if t <:< localTypeOf[String] =>
         StaticInvoke(

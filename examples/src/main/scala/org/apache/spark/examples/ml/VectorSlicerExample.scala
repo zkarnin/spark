@@ -37,10 +37,14 @@ object VectorSlicerExample {
       .getOrCreate()
 
     // $example on$
+<<<<<<< HEAD
     val data = Arrays.asList(
       Row(Vectors.sparse(3, Seq((0, -2.0), (1, 2.3)))),
       Row(Vectors.dense(-2.0, 2.3, 0.0))
     )
+=======
+    val data = Arrays.asList(Row(Vectors.dense(-2.0, 2.3, 0.0)))
+>>>>>>> tuning_adaptive
 
     val defaultAttr = NumericAttribute.defaultAttr
     val attrs = Array("f1", "f2", "f3").map(defaultAttr.withName)

@@ -25,6 +25,10 @@ import org.apache.spark.ml.feature.HashingTF;
 import org.apache.spark.ml.feature.IDF;
 import org.apache.spark.ml.feature.IDFModel;
 import org.apache.spark.ml.feature.Tokenizer;
+<<<<<<< HEAD
+=======
+import org.apache.spark.ml.linalg.Vector;
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
@@ -53,7 +57,10 @@ public class JavaTfIdfExample {
       new StructField("sentence", DataTypes.StringType, false, Metadata.empty())
     });
     Dataset<Row> sentenceData = spark.createDataFrame(data, schema);
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     Tokenizer tokenizer = new Tokenizer().setInputCol("sentence").setOutputCol("words");
     Dataset<Row> wordsData = tokenizer.transform(sentenceData);
 

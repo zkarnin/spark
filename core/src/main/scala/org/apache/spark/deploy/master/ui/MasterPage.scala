@@ -211,8 +211,12 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
           if (app.isFinished) {
             app.desc.name
           } else {
+<<<<<<< HEAD
             <a href={UIUtils.makeHref(parent.master.reverseProxy,
               app.id, app.desc.appUiUrl)}>{app.desc.name}</a>
+=======
+            <a href={app.desc.appUiUrl}>{app.desc.name}</a>
+>>>>>>> tuning_adaptive
           }
         }
       </td>

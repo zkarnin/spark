@@ -17,6 +17,7 @@
 
 package org.apache.spark.sql.internal
 
+<<<<<<< HEAD
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
@@ -24,6 +25,9 @@ import org.apache.hadoop.conf.Configuration
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.internal.config._
+=======
+import org.apache.spark.SparkContext
+>>>>>>> tuning_adaptive
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.{SparkSession, SQLContext}
 import org.apache.spark.sql.catalyst.catalog.{ExternalCatalog, InMemoryCatalog}
@@ -57,11 +61,15 @@ private[sql] class SharedState(val sparkContext: SparkContext) extends Logging {
   /**
    * A catalog that interacts with external systems.
    */
+<<<<<<< HEAD
   lazy val externalCatalog: ExternalCatalog =
     SharedState.reflect[ExternalCatalog, SparkConf, Configuration](
       SharedState.externalCatalogClassName(sparkContext.conf),
       sparkContext.conf,
       sparkContext.hadoopConfiguration)
+=======
+  lazy val externalCatalog: ExternalCatalog = new InMemoryCatalog(sparkContext.hadoopConfiguration)
+>>>>>>> tuning_adaptive
 
   /**
    * A classloader used to load all user-added jar.
@@ -106,6 +114,7 @@ private[sql] class SharedState(val sparkContext: SparkContext) extends Logging {
     }
     SparkSession.sqlListener.get()
   }
+<<<<<<< HEAD
 }
 
 object SharedState {
@@ -139,6 +148,8 @@ object SharedState {
         throw new IllegalArgumentException(s"Error while instantiating '$className':", e)
     }
   }
+=======
+>>>>>>> tuning_adaptive
 }
 
 

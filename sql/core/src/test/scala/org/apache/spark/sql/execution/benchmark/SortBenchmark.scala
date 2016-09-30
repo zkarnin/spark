@@ -110,7 +110,11 @@ class SortBenchmark extends BenchmarkBase {
     benchmark.addTimerCase("radix sort key prefix array") { timer =>
       val (_, buf2) = generateKeyPrefixTestData(size, rand.nextLong)
       timer.startTiming()
+<<<<<<< HEAD
       RadixSort.sortKeyPrefixArray(buf2, 0, size, 0, 7, false, false)
+=======
+      RadixSort.sortKeyPrefixArray(buf2, size, 0, 7, false, false)
+>>>>>>> tuning_adaptive
       timer.stopTiming()
     }
     benchmark.run()

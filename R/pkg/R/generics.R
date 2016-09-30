@@ -1341,6 +1341,7 @@ setGeneric("spark.naiveBayes", function(data, formula, ...) { standardGeneric("s
 #' @rdname spark.survreg
 #' @export
 setGeneric("spark.survreg", function(data, formula) { standardGeneric("spark.survreg") })
+<<<<<<< HEAD
 
 #' @rdname spark.lda
 #' @export
@@ -1364,6 +1365,8 @@ setGeneric("spark.gaussianMixture",
            function(data, formula, ...) {
              standardGeneric("spark.gaussianMixture")
            })
+=======
+>>>>>>> tuning_adaptive
 
 #' @param object a fitted ML model object.
 #' @param path the directory where the model is saved.

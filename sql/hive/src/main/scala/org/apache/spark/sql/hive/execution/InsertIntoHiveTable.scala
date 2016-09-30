@@ -240,6 +240,21 @@ case class InsertIntoHiveTable(
     // holdDDLTime will be true when TOK_HOLD_DDLTIME presents in the query as a hint.
     val holdDDLTime = false
     if (partition.nonEmpty) {
+<<<<<<< HEAD
+=======
+
+      // loadPartition call orders directories created on the iteration order of the this map
+      val orderedPartitionSpec = new util.LinkedHashMap[String, String]()
+      table.hiveQlTable.getPartCols.asScala.foreach { entry =>
+        orderedPartitionSpec.put(entry.getName, partitionSpec.getOrElse(entry.getName, ""))
+      }
+
+      // inheritTableSpecs is set to true. It should be set to false for an IMPORT query
+      // which is currently considered as a Hive native command.
+      val inheritTableSpecs = true
+      // TODO: Correctly set isSkewedStoreAsSubdir.
+      val isSkewedStoreAsSubdir = false
+>>>>>>> tuning_adaptive
       if (numDynamicPartitions > 0) {
         externalCatalog.loadDynamicPartitions(
           db = table.catalogTable.database,

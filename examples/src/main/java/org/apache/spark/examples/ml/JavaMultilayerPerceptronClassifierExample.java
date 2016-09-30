@@ -41,7 +41,10 @@ public class JavaMultilayerPerceptronClassifierExample {
     // Load training data
     String path = "data/mllib/sample_multiclass_classification_data.txt";
     Dataset<Row> dataFrame = spark.read().format("libsvm").load(path);
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     // Split the data into train and test
     Dataset<Row>[] splits = dataFrame.randomSplit(new double[]{0.6, 0.4}, 1234L);
     Dataset<Row> train = splits[0];
@@ -61,14 +64,21 @@ public class JavaMultilayerPerceptronClassifierExample {
 
     // train the model
     MultilayerPerceptronClassificationModel model = trainer.fit(train);
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     // compute accuracy on the test set
     Dataset<Row> result = model.transform(test);
     Dataset<Row> predictionAndLabels = result.select("prediction", "label");
     MulticlassClassificationEvaluator evaluator = new MulticlassClassificationEvaluator()
       .setMetricName("accuracy");
+<<<<<<< HEAD
 
     System.out.println("Test set accuracy = " + evaluator.evaluate(predictionAndLabels));
+=======
+    System.out.println("Accuracy = " + evaluator.evaluate(predictionAndLabels));
+>>>>>>> tuning_adaptive
     // $example off$
 
     spark.stop();

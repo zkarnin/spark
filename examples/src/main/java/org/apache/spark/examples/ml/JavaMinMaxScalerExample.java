@@ -44,6 +44,7 @@ public class JavaMinMaxScalerExample {
       .getOrCreate();
 
     // $example on$
+<<<<<<< HEAD
     List<Row> data = Arrays.asList(
         RowFactory.create(0, Vectors.dense(1.0, 0.1, -1.0)),
         RowFactory.create(1, Vectors.dense(2.0, 1.1, 1.0)),
@@ -55,6 +56,12 @@ public class JavaMinMaxScalerExample {
     });
     Dataset<Row> dataFrame = spark.createDataFrame(data, schema);
 
+=======
+    Dataset<Row> dataFrame = spark
+      .read()
+      .format("libsvm")
+      .load("data/mllib/sample_libsvm_data.txt");
+>>>>>>> tuning_adaptive
     MinMaxScaler scaler = new MinMaxScaler()
       .setInputCol("features")
       .setOutputCol("scaledFeatures");
@@ -68,7 +75,10 @@ public class JavaMinMaxScalerExample {
         + scaler.getMax() + "]");
     scaledData.select("features", "scaledFeatures").show();
     // $example off$
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     spark.stop();
   }
 }

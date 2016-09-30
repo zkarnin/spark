@@ -221,7 +221,11 @@ class RelationalGroupedDataset protected[sql](
   def agg(expr: Column, exprs: Column*): DataFrame = {
     toDF((expr +: exprs).map {
       case typed: TypedColumn[_, _] =>
+<<<<<<< HEAD
         typed.withInputType(df.exprEnc, df.logicalPlan.output).expr
+=======
+        typed.withInputType(df.exprEnc.deserializer, df.logicalPlan.output).expr
+>>>>>>> tuning_adaptive
       case c => c.expr
     })
   }

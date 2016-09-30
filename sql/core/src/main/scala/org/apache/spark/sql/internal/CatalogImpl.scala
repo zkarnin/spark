@@ -223,7 +223,24 @@ class CatalogImpl(sparkSession: SparkSession) extends Catalog {
       tableName: String,
       source: String,
       options: Map[String, String]): DataFrame = {
+<<<<<<< HEAD
     createExternalTable(tableName, source, new StructType, options)
+=======
+    val tableIdent = sparkSession.sessionState.sqlParser.parseTableIdentifier(tableName)
+    val cmd =
+      CreateTableUsing(
+        tableIdent,
+        userSpecifiedSchema = None,
+        source,
+        temporary = false,
+        options = options,
+        partitionColumns = Array.empty[String],
+        bucketSpec = None,
+        allowExisting = false,
+        managedIfNoPath = false)
+    sparkSession.sessionState.executePlan(cmd).toRdd
+    sparkSession.table(tableIdent)
+>>>>>>> tuning_adaptive
   }
 
   /**
@@ -263,6 +280,7 @@ class CatalogImpl(sparkSession: SparkSession) extends Catalog {
     }
 
     val tableIdent = sparkSession.sessionState.sqlParser.parseTableIdentifier(tableName)
+<<<<<<< HEAD
     val tableDesc = CatalogTable(
       identifier = tableIdent,
       tableType = CatalogTableType.EXTERNAL,
@@ -272,6 +290,20 @@ class CatalogImpl(sparkSession: SparkSession) extends Catalog {
     )
     val plan = CreateTable(tableDesc, SaveMode.ErrorIfExists, None)
     sparkSession.sessionState.executePlan(plan).toRdd
+=======
+    val cmd =
+      CreateTableUsing(
+        tableIdent,
+        userSpecifiedSchema = Some(schema),
+        source,
+        temporary = false,
+        options,
+        partitionColumns = Array.empty[String],
+        bucketSpec = None,
+        allowExisting = false,
+        managedIfNoPath = false)
+    sparkSession.sessionState.executePlan(cmd).toRdd
+>>>>>>> tuning_adaptive
     sparkSession.table(tableIdent)
   }
 
@@ -285,7 +317,11 @@ class CatalogImpl(sparkSession: SparkSession) extends Catalog {
    */
   override def dropTempView(viewName: String): Unit = {
     sparkSession.sharedState.cacheManager.uncacheQuery(sparkSession.table(viewName))
+<<<<<<< HEAD
     sessionCatalog.dropTable(TableIdentifier(viewName), ignoreIfNotExists = true, purge = false)
+=======
+    sessionCatalog.dropTable(TableIdentifier(viewName), ignoreIfNotExists = true)
+>>>>>>> tuning_adaptive
   }
 
   /**
@@ -340,15 +376,22 @@ class CatalogImpl(sparkSession: SparkSession) extends Catalog {
 
   /**
    * Refresh the cache entry for a table, if any. For Hive metastore table, the metadata
+<<<<<<< HEAD
    * is refreshed. For data source tables, the schema will not be inferred and refreshed.
+=======
+   * is refreshed.
+>>>>>>> tuning_adaptive
    *
    * @group cachemgmt
    * @since 2.0.0
    */
   override def refreshTable(tableName: String): Unit = {
     val tableIdent = sparkSession.sessionState.sqlParser.parseTableIdentifier(tableName)
+<<<<<<< HEAD
     // Temp tables: refresh (or invalidate) any metadata/data cached in the plan recursively.
     // Non-temp tables: refresh the metadata cache.
+=======
+>>>>>>> tuning_adaptive
     sessionCatalog.refreshTable(tableIdent)
 
     // If this table is cached as an InMemoryRelation, drop the original

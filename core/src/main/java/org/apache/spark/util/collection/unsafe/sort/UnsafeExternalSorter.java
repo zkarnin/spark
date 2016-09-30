@@ -402,7 +402,11 @@ public final class UnsafeExternalSorter extends MemoryConsumer {
     pageCursor += 4;
     Platform.copyMemory(recordBase, recordOffset, base, pageCursor, length);
     pageCursor += length;
+<<<<<<< HEAD
     inMemSorter.insertRecord(recordAddress, prefix, prefixIsNull);
+=======
+    inMemSorter.insertRecord(recordAddress, prefix);
+>>>>>>> tuning_adaptive
   }
 
   /**

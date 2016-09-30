@@ -82,7 +82,11 @@ private[spark] object Utils extends Logging {
 
   /**
    * The performance overhead of creating and logging strings for wide schemas can be large. To
+<<<<<<< HEAD
    * limit the impact, we bound the number of fields to include by default. This can be overridden
+=======
+   * limit the impact, we bound the number of fields to include by default. This can be overriden
+>>>>>>> tuning_adaptive
    * by setting the 'spark.debug.maxToStringFields' conf in SparkEnv.
    */
   val DEFAULT_MAX_TO_STRING_FIELDS = 25

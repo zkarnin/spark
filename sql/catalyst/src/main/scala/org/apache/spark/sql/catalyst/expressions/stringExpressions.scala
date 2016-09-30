@@ -17,7 +17,11 @@
 
 package org.apache.spark.sql.catalyst.expressions
 
+<<<<<<< HEAD
 import java.net.{URI, URISyntaxException}
+=======
+import java.net.{MalformedURLException, URL}
+>>>>>>> tuning_adaptive
 import java.text.{BreakIterator, DecimalFormat, DecimalFormatSymbols}
 import java.util.{HashMap, Locale, Map => JMap}
 import java.util.regex.Pattern
@@ -171,7 +175,11 @@ case class ConcatWs(children: Seq[Expression])
   usage = "_FUNC_(n, str1, str2, ...) - returns the n-th string, e.g. returns str2 when n is 2",
   extended = "> SELECT _FUNC_(1, 'scala', 'java') FROM src LIMIT 1;\n" + "'scala'")
 case class Elt(children: Seq[Expression])
+<<<<<<< HEAD
   extends Expression with ImplicitCastInputTypes {
+=======
+  extends Expression with ImplicitCastInputTypes with CodegenFallback {
+>>>>>>> tuning_adaptive
 
   private lazy val indexExpr = children.head
   private lazy val stringExprs = children.tail.toArray
@@ -204,6 +212,7 @@ case class Elt(children: Seq[Expression])
       }
     }
   }
+<<<<<<< HEAD
 
   override protected def doGenCode(ctx: CodegenContext, ev: ExprCode): ExprCode = {
     val index = indexExpr.genCode(ctx)
@@ -227,6 +236,8 @@ case class Elt(children: Seq[Expression])
       final boolean ${ev.isNull} = ${ev.value} == null;
     """)
   }
+=======
+>>>>>>> tuning_adaptive
 }
 
 
@@ -749,6 +760,7 @@ case class ParseUrl(children: Seq[Expression])
     Pattern.compile(REGEXPREFIX + key.toString + REGEXSUBFIX)
   }
 
+<<<<<<< HEAD
   private def getUrl(url: UTF8String): URI = {
     try {
       new URI(url.toString)
@@ -787,6 +799,27 @@ case class ParseUrl(children: Seq[Expression])
       case AUTHORITY => _.getRawAuthority
       case USERINFO => _.getRawUserInfo
       case _ => (url: URI) => null
+=======
+  private def getUrl(url: UTF8String): URL = {
+    try {
+      new URL(url.toString)
+    } catch {
+      case e: MalformedURLException => null
+    }
+  }
+
+  private def getExtractPartFunc(partToExtract: UTF8String): URL => String = {
+    partToExtract match {
+      case HOST => _.getHost
+      case PATH => _.getPath
+      case QUERY => _.getQuery
+      case REF => _.getRef
+      case PROTOCOL => _.getProtocol
+      case FILE => _.getFile
+      case AUTHORITY => _.getAuthority
+      case USERINFO => _.getUserInfo
+      case _ => (url: URL) => null
+>>>>>>> tuning_adaptive
     }
   }
 
@@ -799,7 +832,11 @@ case class ParseUrl(children: Seq[Expression])
     }
   }
 
+<<<<<<< HEAD
   private def extractFromUrl(url: URI, partToExtract: UTF8String): UTF8String = {
+=======
+  private def extractFromUrl(url: URL, partToExtract: UTF8String): UTF8String = {
+>>>>>>> tuning_adaptive
     if (cachedExtractPartFunc ne null) {
       UTF8String.fromString(cachedExtractPartFunc.apply(url))
     } else {

@@ -657,8 +657,11 @@ class DecisionTreeRegressor(JavaEstimator, HasFeaturesCol, HasLabelCol, HasPredi
     3
     >>> model.featureImportances
     SparseVector(1, {0: 1.0})
+<<<<<<< HEAD
     >>> model.numFeatures
     1
+=======
+>>>>>>> tuning_adaptive
     >>> test0 = spark.createDataFrame([(Vectors.dense(-1.0),)], ["features"])
     >>> model.transform(test0).head().prediction
     0.0
@@ -724,7 +727,11 @@ class DecisionTreeRegressor(JavaEstimator, HasFeaturesCol, HasLabelCol, HasPredi
 
 
 @inherit_doc
+<<<<<<< HEAD
 class DecisionTreeModel(JavaModel, JavaPredictionModel):
+=======
+class DecisionTreeModel(JavaModel):
+>>>>>>> tuning_adaptive
     """
     Abstraction for Decision Tree models.
 
@@ -754,7 +761,11 @@ class DecisionTreeModel(JavaModel, JavaPredictionModel):
 
 
 @inherit_doc
+<<<<<<< HEAD
 class TreeEnsembleModel(JavaModel):
+=======
+class TreeEnsembleModels(JavaModel):
+>>>>>>> tuning_adaptive
     """
     (private abstraction)
 
@@ -848,8 +859,11 @@ class RandomForestRegressor(JavaEstimator, HasFeaturesCol, HasLabelCol, HasPredi
     >>> test0 = spark.createDataFrame([(Vectors.dense(-1.0),)], ["features"])
     >>> model.transform(test0).head().prediction
     0.0
+<<<<<<< HEAD
     >>> model.numFeatures
     1
+=======
+>>>>>>> tuning_adaptive
     >>> model.trees
     [DecisionTreeRegressionModel (uid=...) of depth..., DecisionTreeRegressionModel...]
     >>> model.getNumTrees

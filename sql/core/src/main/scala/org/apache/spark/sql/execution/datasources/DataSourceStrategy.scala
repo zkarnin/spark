@@ -31,10 +31,17 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.planning.PhysicalOperation
 import org.apache.spark.sql.catalyst.plans.logical
 import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, Project}
+<<<<<<< HEAD
 import org.apache.spark.sql.catalyst.plans.physical.{HashPartitioning, UnknownPartitioning}
 import org.apache.spark.sql.catalyst.rules.Rule
 import org.apache.spark.sql.execution.{RowDataSourceScanExec, SparkPlan}
 import org.apache.spark.sql.execution.command.{DDLUtils, ExecutedCommandExec}
+=======
+import org.apache.spark.sql.catalyst.plans.physical.HashPartitioning
+import org.apache.spark.sql.catalyst.rules.Rule
+import org.apache.spark.sql.execution.DataSourceScanExec.PUSHED_FILTERS
+import org.apache.spark.sql.execution.command.{CreateDataSourceTableUtils, DDLUtils, ExecutedCommandExec}
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
@@ -45,6 +52,7 @@ import org.apache.spark.unsafe.types.UTF8String
  */
 case class DataSourceAnalysis(conf: CatalystConf) extends Rule[LogicalPlan] {
 
+<<<<<<< HEAD
   def resolver: Resolver = conf.resolver
 
   // Visible for testing.
@@ -53,6 +61,22 @@ case class DataSourceAnalysis(conf: CatalystConf) extends Rule[LogicalPlan] {
       providedPartitions: Map[String, Option[String]],
       targetAttributes: Seq[Attribute],
       targetPartitionSchema: StructType): Seq[NamedExpression] = {
+=======
+  def resolver: Resolver = {
+    if (conf.caseSensitiveAnalysis) {
+      caseSensitiveResolution
+    } else {
+      caseInsensitiveResolution
+    }
+  }
+
+  // The access modifier is used to expose this method to tests.
+  def convertStaticPartitions(
+    sourceAttributes: Seq[Attribute],
+    providedPartitions: Map[String, Option[String]],
+    targetAttributes: Seq[Attribute],
+    targetPartitionSchema: StructType): Seq[NamedExpression] = {
+>>>>>>> tuning_adaptive
 
     assert(providedPartitions.exists(_._2.isDefined))
 
@@ -198,6 +222,7 @@ case class DataSourceAnalysis(conf: CatalystConf) extends Rule[LogicalPlan] {
  */
 class FindDataSourceTable(sparkSession: SparkSession) extends Rule[LogicalPlan] {
   private def readDataSourceTable(sparkSession: SparkSession, table: CatalogTable): LogicalPlan = {
+<<<<<<< HEAD
     val dataSource =
       DataSource(
         sparkSession,
@@ -210,6 +235,30 @@ class FindDataSourceTable(sparkSession: SparkSession) extends Rule[LogicalPlan] 
     LogicalRelation(
       dataSource.resolveRelation(),
       catalogTable = Some(table))
+=======
+    val userSpecifiedSchema = DDLUtils.getSchemaFromTableProperties(table)
+
+    // We only need names at here since userSpecifiedSchema we loaded from the metastore
+    // contains partition columns. We can always get datatypes of partitioning columns
+    // from userSpecifiedSchema.
+    val partitionColumns = DDLUtils.getPartitionColumnsFromTableProperties(table)
+
+    val bucketSpec = DDLUtils.getBucketSpecFromTableProperties(table)
+
+    val options = table.storage.serdeProperties
+    val dataSource =
+      DataSource(
+        sparkSession,
+        userSpecifiedSchema = userSpecifiedSchema,
+        partitionColumns = partitionColumns,
+        bucketSpec = bucketSpec,
+        className = table.properties(CreateDataSourceTableUtils.DATASOURCE_PROVIDER),
+        options = options)
+
+    LogicalRelation(
+      dataSource.resolveRelation(),
+      metastoreTableIdentifier = Some(table.identifier))
+>>>>>>> tuning_adaptive
   }
 
   override def apply(plan: LogicalPlan): LogicalPlan = plan transform {
@@ -341,11 +390,17 @@ object DataSourceStrategy extends Strategy with Logging {
 
       // Mark filters which are handled by the underlying DataSource with an Astrisk
       if (pushedFilters.nonEmpty) {
+<<<<<<< HEAD
         val markedFilters = for (filter <- pushedFilters) yield {
             if (handledFilters.contains(filter)) s"*$filter" else s"$filter"
         }
         pairs += ("PushedFilters" -> markedFilters.mkString("[", ", ", "]"))
       }
+=======
+        pairs += (PUSHED_FILTERS -> pushedFilters.mkString("[", ", ", "]"))
+      }
+
+>>>>>>> tuning_adaptive
       pairs.toMap
     }
 
@@ -366,8 +421,12 @@ object DataSourceStrategy extends Strategy with Logging {
       val scan = RowDataSourceScanExec(
         projects.map(_.toAttribute),
         scanBuilder(requestedColumns, candidatePredicates, pushedFilters),
+<<<<<<< HEAD
         relation.relation, UnknownPartitioning(0), metadata,
         relation.catalogTable.map(_.identifier))
+=======
+        relation.relation, metadata, relation.metastoreTableIdentifier)
+>>>>>>> tuning_adaptive
       filterCondition.map(execution.FilterExec(_, scan)).getOrElse(scan)
     } else {
       // Don't request columns that are only referenced by pushed filters.
@@ -377,8 +436,12 @@ object DataSourceStrategy extends Strategy with Logging {
       val scan = RowDataSourceScanExec(
         requestedColumns,
         scanBuilder(requestedColumns, candidatePredicates, pushedFilters),
+<<<<<<< HEAD
         relation.relation, UnknownPartitioning(0), metadata,
         relation.catalogTable.map(_.identifier))
+=======
+        relation.relation, metadata, relation.metastoreTableIdentifier)
+>>>>>>> tuning_adaptive
       execution.ProjectExec(
         projects, filterCondition.map(execution.FilterExec(_, scan)).getOrElse(scan))
     }

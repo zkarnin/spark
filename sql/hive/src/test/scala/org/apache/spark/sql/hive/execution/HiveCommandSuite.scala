@@ -20,7 +20,11 @@ package org.apache.spark.sql.hive.execution
 import org.apache.spark.sql.{AnalysisException, QueryTest, Row, SaveMode}
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.analysis.NoSuchTableException
+<<<<<<< HEAD
 import org.apache.spark.sql.catalyst.catalog.{CatalogStorageFormat, CatalogTable, CatalogTableType}
+=======
+import org.apache.spark.sql.execution.command.CreateDataSourceTableUtils._
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.sql.test.SQLTestUtils
 import org.apache.spark.sql.types.StructType
@@ -112,6 +116,7 @@ class HiveCommandSuite extends QueryTest with SQLTestUtils with TestHiveSingleto
 
   test("show tblproperties of data source tables - basic") {
     checkAnswer(
+<<<<<<< HEAD
       sql("SHOW TBLPROPERTIES parquet_tab1").filter(s"key = 'my_key1'"),
       Row("my_key1", "v1") :: Nil
     )
@@ -120,6 +125,25 @@ class HiveCommandSuite extends QueryTest with SQLTestUtils with TestHiveSingleto
       sql(s"SHOW TBLPROPERTIES parquet_tab1('my_key1')"),
       Row("v1") :: Nil
     )
+=======
+      sql("SHOW TBLPROPERTIES parquet_tab1").filter(s"key = '$DATASOURCE_PROVIDER'"),
+      Row(DATASOURCE_PROVIDER, "org.apache.spark.sql.parquet.DefaultSource") :: Nil
+    )
+
+    checkAnswer(
+      sql(s"SHOW TBLPROPERTIES parquet_tab1($DATASOURCE_PROVIDER)"),
+      Row("org.apache.spark.sql.parquet.DefaultSource") :: Nil
+    )
+
+    checkAnswer(
+      sql("SHOW TBLPROPERTIES parquet_tab1").filter(s"key = '$DATASOURCE_SCHEMA_NUMPARTS'"),
+      Row(DATASOURCE_SCHEMA_NUMPARTS, "1") :: Nil
+    )
+
+    checkAnswer(
+      sql(s"SHOW TBLPROPERTIES parquet_tab1('$DATASOURCE_SCHEMA_NUMPARTS')"),
+      Row("1"))
+>>>>>>> tuning_adaptive
   }
 
   test("show tblproperties for datasource table - errors") {

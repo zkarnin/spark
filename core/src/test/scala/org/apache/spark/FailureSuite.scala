@@ -253,6 +253,7 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
     rdd.count()
   }
 
+<<<<<<< HEAD
   test("SPARK-16304: Link error should not crash executor") {
     sc = new SparkContext("local[1,2]", "test")
     intercept[SparkException] {
@@ -262,6 +263,8 @@ class FailureSuite extends SparkFunSuite with LocalSparkContext {
     }
   }
 
+=======
+>>>>>>> tuning_adaptive
   // TODO: Need to add tests with shuffle fetch failures.
 }
 

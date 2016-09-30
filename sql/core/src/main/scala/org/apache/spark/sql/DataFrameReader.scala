@@ -276,6 +276,7 @@ class DataFrameReader private[sql](sparkSession: SparkSession) extends Logging {
    *  a schema is set by user, it sets `null` for extra fields.</li>
    *  <li> - `DROPMALFORMED` : ignores the whole corrupted records.</li>
    *  <li> - `FAILFAST` : throws an exception when it meets corrupted records.</li>
+<<<<<<< HEAD
    * </ul>
    * <li>`columnNameOfCorruptRecord` (default is the value specified in
    * `spark.sql.columnNameOfCorruptRecord`): allows renaming the new field having malformed string
@@ -288,6 +289,19 @@ class DataFrameReader private[sql](sparkSession: SparkSession) extends Logging {
    * `java.text.SimpleDateFormat`. This applies to timestamp type.</li>
    * </ul>
    *
+=======
+   * </ul>
+   * <li>`columnNameOfCorruptRecord` (default is the value specified in
+   * `spark.sql.columnNameOfCorruptRecord`): allows renaming the new field having malformed string
+   * created by `PERMISSIVE` mode. This overrides `spark.sql.columnNameOfCorruptRecord`.</li>
+   * <li>`dateFormat` (default `yyyy-MM-dd`): sets the string that indicates a date format.
+   * Custom date formats follow the formats at `java.text.SimpleDateFormat`. This applies to
+   * date type.</li>
+   * <li>`timestampFormat` (default `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`): sets the string that
+   * indicates a timestamp format. Custom date formats follow the formats at
+   * `java.text.SimpleDateFormat`. This applies to timestamp type.</li>
+   * </ul>
+>>>>>>> tuning_adaptive
    * @since 2.0.0
    */
   @scala.annotation.varargs
@@ -334,6 +348,17 @@ class DataFrameReader private[sql](sparkSession: SparkSession) extends Logging {
     Dataset.ofRows(
       sparkSession,
       LogicalRDD(schema.toAttributes, parsed)(sparkSession))
+  }
+
+  /**
+   * Loads a CSV file and returns the result as a [[DataFrame]]. See the documentation on the
+   * other overloaded `csv()` method for more details.
+   *
+   * @since 2.0.0
+   */
+  def csv(path: String): DataFrame = {
+    // This method ensures that calls that explicit need single argument works, see SPARK-16009
+    csv(Seq(path): _*)
   }
 
   /**

@@ -739,6 +739,7 @@ class JDBCSuite extends SparkFunSuite
       map(_.databaseTypeDefinition).get == "VARCHAR2(255)")
   }
 
+<<<<<<< HEAD
   test("SPARK-16625: General data types to be mapped to Oracle") {
 
     def getJdbcType(dialect: JdbcDialect, dt: DataType): String = {
@@ -760,6 +761,8 @@ class JDBCSuite extends SparkFunSuite
     assert(getJdbcType(oracleDialect, TimestampType) == "TIMESTAMP")
   }
 
+=======
+>>>>>>> tuning_adaptive
   private def assertEmptyQuery(sqlString: String): Unit = {
     assert(sql(sqlString).collect().isEmpty)
   }

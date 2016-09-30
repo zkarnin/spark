@@ -68,6 +68,7 @@ class TableIdentifierParserSuite extends SparkFunSuite {
     }
   }
 
+<<<<<<< HEAD
   test("quoted identifiers") {
     assert(TableIdentifier("z", Some("x.y")) === parseTableIdentifier("`x.y`.z"))
     assert(TableIdentifier("y.z", Some("x")) === parseTableIdentifier("x.`y.z`"))
@@ -76,6 +77,8 @@ class TableIdentifierParserSuite extends SparkFunSuite {
     assert(TableIdentifier("x.y.z", None) === parseTableIdentifier("`x.y.z`"))
   }
 
+=======
+>>>>>>> tuning_adaptive
   test("table identifier - strict keywords") {
     // SQL Keywords.
     hiveStrictNonReservedKeyword.foreach { keyword =>

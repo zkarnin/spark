@@ -18,6 +18,10 @@
 package org.apache.spark.sql.catalyst.catalog
 
 import java.util.Date
+<<<<<<< HEAD
+=======
+import javax.annotation.Nullable
+>>>>>>> tuning_adaptive
 
 import org.apache.spark.sql.AnalysisException
 import org.apache.spark.sql.catalyst.{FunctionIdentifier, TableIdentifier}
@@ -49,12 +53,21 @@ case class CatalogStorageFormat(
     outputFormat: Option[String],
     serde: Option[String],
     compressed: Boolean,
+<<<<<<< HEAD
     properties: Map[String, String]) {
 
   override def toString: String = {
     val serdePropsToString =
       if (properties.nonEmpty) {
         s"Properties: " + properties.map(p => p._1 + "=" + p._2).mkString("[", ", ", "]")
+=======
+    serdeProperties: Map[String, String]) {
+
+  override def toString: String = {
+    val serdePropsToString =
+      if (serdeProperties.nonEmpty) {
+        s"Properties: " + serdeProperties.map(p => p._1 + "=" + p._2).mkString("[", ", ", "]")
+>>>>>>> tuning_adaptive
       } else {
         ""
       }
@@ -67,6 +80,7 @@ case class CatalogStorageFormat(
         serdePropsToString)
     output.filter(_.nonEmpty).mkString("Storage(", ", ", ")")
   }
+<<<<<<< HEAD
 
 }
 
@@ -74,6 +88,37 @@ object CatalogStorageFormat {
   /** Empty storage format for default values and copies. */
   val empty = CatalogStorageFormat(locationUri = None, inputFormat = None,
     outputFormat = None, serde = None, compressed = false, properties = Map.empty)
+=======
+
+}
+
+object CatalogStorageFormat {
+  /** Empty storage format for default values and copies. */
+  val empty = CatalogStorageFormat(locationUri = None, inputFormat = None,
+    outputFormat = None, serde = None, compressed = false, serdeProperties = Map.empty)
+}
+
+/**
+ * A column in a table.
+ */
+case class CatalogColumn(
+    name: String,
+    // This may be null when used to create views. TODO: make this type-safe; this is left
+    // as a string due to issues in converting Hive varchars to and from SparkSQL strings.
+    @Nullable dataType: String,
+    nullable: Boolean = true,
+    comment: Option[String] = None) {
+
+  override def toString: String = {
+    val output =
+      Seq(s"`$name`",
+        dataType,
+        if (!nullable) "NOT NULL" else "",
+        comment.map("(" + _ + ")").getOrElse(""))
+    output.filter(_.nonEmpty).mkString(" ")
+  }
+
+>>>>>>> tuning_adaptive
 }
 
 /**
@@ -113,8 +158,11 @@ case class BucketSpec(
  * Note that Hive's metastore also tracks skewed columns. We should consider adding that in the
  * future once we have a better understanding of how we want to handle skewed columns.
  *
+<<<<<<< HEAD
  * @param provider the name of the data source provider for this table, e.g. parquet, json, etc.
  *                 Can be None if this table is a View, should be "hive" for hive serde tables.
+=======
+>>>>>>> tuning_adaptive
  * @param unsupportedFeatures is a list of string descriptions of features that are used by the
  *        underlying table but not supported by Spark SQL yet.
  */
@@ -125,7 +173,13 @@ case class CatalogTable(
     schema: StructType,
     provider: Option[String] = None,
     partitionColumnNames: Seq[String] = Seq.empty,
+<<<<<<< HEAD
     bucketSpec: Option[BucketSpec] = None,
+=======
+    sortColumnNames: Seq[String] = Seq.empty,
+    bucketColumnNames: Seq[String] = Seq.empty,
+    numBuckets: Int = -1,
+>>>>>>> tuning_adaptive
     owner: String = "",
     createTime: Long = System.currentTimeMillis,
     lastAccessTime: Long = -1,
@@ -158,11 +212,16 @@ case class CatalogTable(
       serde: Option[String] = storage.serde,
       properties: Map[String, String] = storage.properties): CatalogTable = {
     copy(storage = CatalogStorageFormat(
+<<<<<<< HEAD
       locationUri, inputFormat, outputFormat, serde, compressed, properties))
+=======
+      locationUri, inputFormat, outputFormat, serde, compressed, serdeProperties))
+>>>>>>> tuning_adaptive
   }
 
   override def toString: String = {
     val tableProperties = properties.map(p => p._1 + "=" + p._2).mkString("[", ", ", "]")
+<<<<<<< HEAD
     val partitionColumns = partitionColumnNames.map(quoteIdentifier).mkString("[", ", ", "]")
     val bucketStrings = bucketSpec match {
       case Some(BucketSpec(numBuckets, bucketColumnNames, sortColumnNames)) =>
@@ -176,6 +235,11 @@ case class CatalogTable(
 
       case _ => Nil
     }
+=======
+    val partitionColumns = partitionColumnNames.map("`" + _ + "`").mkString("[", ", ", "]")
+    val sortColumns = sortColumnNames.map("`" + _ + "`").mkString("[", ", ", "]")
+    val bucketColumns = bucketColumnNames.map("`" + _ + "`").mkString("[", ", ", "]")
+>>>>>>> tuning_adaptive
 
     val output =
       Seq(s"Table: ${identifier.quotedString}",
@@ -184,14 +248,24 @@ case class CatalogTable(
         s"Last Access: ${new Date(lastAccessTime).toString}",
         s"Type: ${tableType.name}",
         if (schema.nonEmpty) s"Schema: ${schema.mkString("[", ", ", "]")}" else "",
+<<<<<<< HEAD
         if (provider.isDefined) s"Provider: ${provider.get}" else "",
         if (partitionColumnNames.nonEmpty) s"Partition Columns: $partitionColumns" else ""
       ) ++ bucketStrings ++ Seq(
+=======
+        if (partitionColumnNames.nonEmpty) s"Partition Columns: $partitionColumns" else "",
+        if (numBuckets != -1) s"Num Buckets: $numBuckets" else "",
+        if (bucketColumnNames.nonEmpty) s"Bucket Columns: $bucketColumns" else "",
+        if (sortColumnNames.nonEmpty) s"Sort Columns: $sortColumns" else "",
+>>>>>>> tuning_adaptive
         viewOriginalText.map("Original View: " + _).getOrElse(""),
         viewText.map("View: " + _).getOrElse(""),
         comment.map("Comment: " + _).getOrElse(""),
         if (properties.nonEmpty) s"Properties: $tableProperties" else "",
+<<<<<<< HEAD
         if (stats.isDefined) s"Statistics: ${stats.get}" else "",
+=======
+>>>>>>> tuning_adaptive
         s"$storage")
 
     output.filter(_.nonEmpty).mkString("CatalogTable(\n\t", "\n\t", ")")

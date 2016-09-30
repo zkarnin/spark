@@ -18,7 +18,11 @@
 library(SparkR)
 
 # $example on:init_session$
+<<<<<<< HEAD
 sparkR.session(appName = "R Spark SQL basic example", sparkConfig = list(spark.some.config.option = "some-value"))
+=======
+sparkR.session(appName = "MyApp", sparkConfig = list(spark.some.config.option = "some-value"))
+>>>>>>> tuning_adaptive
 # $example off:init_session$
 
 

@@ -2586,6 +2586,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
       Row(s"$expected") :: Nil)
   }
 
+<<<<<<< HEAD
   test("SPARK-15752 optimize metadata only query for datasource table") {
     withSQLConf(SQLConf.OPTIMIZER_METADATA_ONLY.key -> "true") {
       withTable("srcpart_15752") {
@@ -2622,6 +2623,8 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     }
   }
 
+=======
+>>>>>>> tuning_adaptive
   test("SPARK-16975: Column-partition path starting '_' should be handled correctly") {
     withTempDir { dir =>
       val parquetDir = new File(dir, "parquet").getCanonicalPath

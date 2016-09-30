@@ -362,11 +362,14 @@ private[spark] class Executor(
         case _: TaskKilledException =>
           logInfo(s"Executor killed $taskName (TID $taskId)")
           setTaskFinishedAndClearInterruptStatus()
+<<<<<<< HEAD
           execBackend.statusUpdate(taskId, TaskState.KILLED, ser.serialize(TaskKilled))
 
         case _: InterruptedException if task.killed =>
           logInfo(s"Executor interrupted and killed $taskName (TID $taskId)")
           setTaskFinishedAndClearInterruptStatus()
+=======
+>>>>>>> tuning_adaptive
           execBackend.statusUpdate(taskId, TaskState.KILLED, ser.serialize(TaskKilled))
 
         case CausedBy(cDE: CommitDeniedException) =>

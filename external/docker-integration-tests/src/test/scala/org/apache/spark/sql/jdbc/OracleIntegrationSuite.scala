@@ -20,7 +20,10 @@ package org.apache.spark.sql.jdbc
 import java.sql.{Connection, Date, Timestamp}
 import java.util.Properties
 
+<<<<<<< HEAD
 import org.apache.spark.sql.Row
+=======
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 import org.apache.spark.tags.DockerTest

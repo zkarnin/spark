@@ -19,7 +19,13 @@ package org.apache.spark.sql.execution.joins
 
 import scala.reflect.ClassTag
 
+<<<<<<< HEAD
 import org.apache.spark.AccumulatorSuite
+=======
+import org.scalatest.BeforeAndAfterAll
+
+import org.apache.spark.{AccumulatorSuite, SparkConf, SparkContext}
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.{Dataset, QueryTest, Row, SparkSession}
 import org.apache.spark.sql.execution.exchange.EnsureRequirements
 import org.apache.spark.sql.execution.SparkPlan
@@ -65,11 +71,18 @@ class BroadcastJoinSuite extends QueryTest with SQLTestUtils {
     }
   }
 
+<<<<<<< HEAD
   private def testBroadcastJoin[T: ClassTag](
       joinType: String,
       forceBroadcast: Boolean = false): SparkPlan = {
     val df1 = spark.createDataFrame(Seq((1, "4"), (2, "2"))).toDF("key", "value")
     val df2 = spark.createDataFrame(Seq((1, "1"), (2, "2"))).toDF("key", "value")
+=======
+  private def testBroadcastJoin[T: ClassTag](joinType: String,
+                                             forceBroadcast: Boolean = false): SparkPlan = {
+    val df1 = spark.createDataFrame(Seq((1, "4"), (2, "2"))).toDF("key", "value")
+    var df2 = spark.createDataFrame(Seq((1, "1"), (2, "2"))).toDF("key", "value")
+>>>>>>> tuning_adaptive
 
     // Comparison at the end is for broadcast left semi join
     val joinExpression = df1("key") === df2("key") && df1("value") > df2("value")
@@ -78,9 +91,17 @@ class BroadcastJoinSuite extends QueryTest with SQLTestUtils {
     } else {
       df1.join(df2, joinExpression, joinType)
     }
+<<<<<<< HEAD
     val plan = EnsureRequirements(spark.sessionState.conf).apply(df3.queryExecution.sparkPlan)
     assert(plan.collect { case p: T => p }.size === 1)
     plan
+=======
+    val plan =
+      EnsureRequirements(spark.sessionState.conf).apply(df3.queryExecution.sparkPlan)
+    assert(plan.collect { case p: T => p }.size === 1)
+
+    return plan
+>>>>>>> tuning_adaptive
   }
 
   test("unsafe broadcast hash join updates peak execution memory") {

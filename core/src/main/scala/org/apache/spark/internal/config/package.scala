@@ -17,6 +17,8 @@
 
 package org.apache.spark.internal
 
+import java.util.concurrent.TimeUnit
+
 import org.apache.spark.launcher.SparkLauncher
 import org.apache.spark.network.util.ByteUnit
 
@@ -80,6 +82,11 @@ package object config {
     .doc("Name of the Kerberos principal.")
     .stringConf.createOptional
 
+  private[spark] val TOKEN_RENEWAL_INTERVAL = ConfigBuilder("spark.yarn.token.renewal.interval")
+    .internal()
+    .timeConf(TimeUnit.MILLISECONDS)
+    .createOptional
+
   private[spark] val EXECUTOR_INSTANCES = ConfigBuilder("spark.executor.instances")
     .intConf
     .createOptional
@@ -97,6 +104,7 @@ package object config {
     .checkValues(Set("hive", "in-memory"))
     .createWithDefault("in-memory")
 
+<<<<<<< HEAD
   private[spark] val LISTENER_BUS_EVENT_QUEUE_SIZE =
     ConfigBuilder("spark.scheduler.listenerbus.eventqueue.size")
       .intConf
@@ -115,6 +123,8 @@ package object config {
     .stringConf
     .createOptional
 
+=======
+>>>>>>> tuning_adaptive
   // To limit memory usage, we only track information for a fixed number of tasks
   private[spark] val UI_RETAINED_TASKS = ConfigBuilder("spark.ui.retainedTasks")
     .intConf
@@ -123,6 +133,7 @@ package object config {
   // To limit how many applications are shown in the History Server summary ui
   private[spark] val HISTORY_UI_MAX_APPS =
     ConfigBuilder("spark.history.ui.maxApplications").intConf.createWithDefault(Integer.MAX_VALUE)
+<<<<<<< HEAD
 
   private[spark] val IO_ENCRYPTION_ENABLED = ConfigBuilder("spark.io.encryption.enabled")
     .booleanConf
@@ -143,4 +154,6 @@ package object config {
       .internal()
       .stringConf
       .createWithDefaultString("AES/CTR/NoPadding")
+=======
+>>>>>>> tuning_adaptive
 }

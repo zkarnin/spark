@@ -30,10 +30,18 @@ Run with:
   bin/spark-submit examples/src/main/python/ml/one_vs_rest_example.py
 """
 
+<<<<<<< HEAD
 if __name__ == "__main__":
     spark = SparkSession \
         .builder \
         .appName("OneVsRestExample") \
+=======
+
+if __name__ == "__main__":
+    spark = SparkSession \
+        .builder \
+        .appName("PythonOneVsRestExample") \
+>>>>>>> tuning_adaptive
         .getOrCreate()
 
     # $example on$
@@ -61,7 +69,11 @@ if __name__ == "__main__":
 
     # compute the classification error on test data.
     accuracy = evaluator.evaluate(predictions)
+<<<<<<< HEAD
     print("Test Error = %g" % (1.0 - accuracy))
+=======
+    print("Test Error : " + str(1 - accuracy))
+>>>>>>> tuning_adaptive
     # $example off$
 
     spark.stop()

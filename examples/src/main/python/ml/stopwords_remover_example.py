@@ -30,7 +30,11 @@ if __name__ == "__main__":
 
     # $example on$
     sentenceData = spark.createDataFrame([
+<<<<<<< HEAD
         (0, ["I", "saw", "the", "red", "balloon"]),
+=======
+        (0, ["I", "saw", "the", "red", "baloon"]),
+>>>>>>> tuning_adaptive
         (1, ["Mary", "had", "a", "little", "lamb"])
     ], ["id", "raw"])
 

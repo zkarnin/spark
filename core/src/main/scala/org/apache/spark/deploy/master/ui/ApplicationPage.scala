@@ -77,10 +77,14 @@ private[ui] class ApplicationPage(parent: MasterWebUI) extends WebUIPage("app") 
             <li><strong>State:</strong> {app.state}</li>
             {
               if (!app.isFinished) {
+<<<<<<< HEAD
                 <li><strong>
                     <a href={UIUtils.makeHref(parent.master.reverseProxy,
                       app.id, app.desc.appUiUrl)}>Application Detail UI</a>
                 </strong></li>
+=======
+                <li><strong><a href={app.desc.appUiUrl}>Application Detail UI</a></strong></li>
+>>>>>>> tuning_adaptive
               }
             }
           </ul>

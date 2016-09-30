@@ -23,13 +23,23 @@ from pyspark.ml.clustering import LDA
 # $example off$
 from pyspark.sql import SparkSession
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> tuning_adaptive
 """
 An example demonstrating LDA.
 Run with:
   bin/spark-submit examples/src/main/python/ml/lda_example.py
 """
 
+<<<<<<< HEAD
 if __name__ == "__main__":
+=======
+
+if __name__ == "__main__":
+    # Creates a SparkSession
+>>>>>>> tuning_adaptive
     spark = SparkSession \
         .builder \
         .appName("LDAExample") \

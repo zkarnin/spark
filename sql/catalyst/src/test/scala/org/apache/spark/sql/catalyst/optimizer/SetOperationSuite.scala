@@ -31,8 +31,12 @@ class SetOperationSuite extends PlanTest {
         EliminateSubqueryAliases) ::
       Batch("Union Pushdown", Once,
         CombineUnions,
+<<<<<<< HEAD
         PushProjectionThroughUnion,
         PushDownPredicate,
+=======
+        PushThroughSetOperations,
+>>>>>>> tuning_adaptive
         PruneFilters) :: Nil
   }
 

@@ -18,6 +18,10 @@
 // scalastyle:off println
 package org.apache.spark.examples
 
+<<<<<<< HEAD
+=======
+import org.apache.spark.SparkConf
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.SparkSession
 
 /**

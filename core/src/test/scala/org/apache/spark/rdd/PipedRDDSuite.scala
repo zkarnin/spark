@@ -21,6 +21,10 @@ import java.io.File
 
 import scala.collection.Map
 import scala.io.Codec
+<<<<<<< HEAD
+=======
+import scala.language.postfixOps
+>>>>>>> tuning_adaptive
 import scala.sys.process._
 import scala.util.Try
 

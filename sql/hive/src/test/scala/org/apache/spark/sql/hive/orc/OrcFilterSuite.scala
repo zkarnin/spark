@@ -95,7 +95,11 @@ class OrcFilterSuite extends QueryTest with OrcTest {
     }.flatten.reduceLeftOption(_ && _)
     assert(maybeAnalyzedPredicate.isDefined, "No filter is analyzed from the given query")
 
+<<<<<<< HEAD
     val (_, selectedFilters, _) =
+=======
+    val (_, selectedFilters) =
+>>>>>>> tuning_adaptive
       DataSourceStrategy.selectFilters(maybeRelation.get, maybeAnalyzedPredicate.toSeq)
     assert(selectedFilters.nonEmpty, "No filter is pushed down")
 
@@ -208,6 +212,7 @@ class OrcFilterSuite extends QueryTest with OrcTest {
     }
   }
 
+<<<<<<< HEAD
   test("filter pushdown - boolean") {
     withOrcDataFrame((true :: false :: Nil).map(b => Tuple1.apply(Option(b)))) { implicit df =>
       checkFilterPredicate('_1.isNull, PredicateLeaf.Operator.IS_NULL)
@@ -229,6 +234,8 @@ class OrcFilterSuite extends QueryTest with OrcTest {
     }
   }
 
+=======
+>>>>>>> tuning_adaptive
   test("filter pushdown - combinations with logical operators") {
     withOrcDataFrame((1 to 4).map(i => Tuple1(Option(i)))) { implicit df =>
       // Because `ExpressionTree` is not accessible at Hive 1.2.x, this should be checked
@@ -285,6 +292,13 @@ class OrcFilterSuite extends QueryTest with OrcTest {
     withOrcDataFrame((1 to 4).map(i => Tuple1(i.b))) { implicit df =>
       checkNoFilterPredicate('_1 <=> 1.b)
     }
+<<<<<<< HEAD
+=======
+    // BooleanType
+    withOrcDataFrame((true :: false :: Nil).map(b => Tuple1.apply(Option(b)))) { implicit df =>
+      checkNoFilterPredicate('_1 === true)
+    }
+>>>>>>> tuning_adaptive
     // TimestampType
     val stringTimestamp = "2015-08-20 15:57:00"
     withOrcDataFrame(Seq(Tuple1(Timestamp.valueOf(stringTimestamp)))) { implicit df =>

@@ -302,7 +302,11 @@ case class Join(
           .union(splitConjunctivePredicates(condition.get).toSet)
       case j: ExistenceJoin =>
         left.constraints
+<<<<<<< HEAD
       case _: InnerLike =>
+=======
+      case Inner =>
+>>>>>>> tuning_adaptive
         left.constraints.union(right.constraints)
       case LeftExistence(_) =>
         left.constraints
@@ -459,9 +463,15 @@ case class Range(
       s"SELECT id AS `${output.head.name}` FROM range($start, $end, $step)"
     }
   }
+<<<<<<< HEAD
 
   override def newInstance(): Range = copy(output = output.map(_.newInstance()))
 
+=======
+
+  override def newInstance(): Range = copy(output = output.map(_.newInstance()))
+
+>>>>>>> tuning_adaptive
   override lazy val statistics: Statistics = {
     val sizeInBytes = LongType.defaultSize * numElements
     Statistics( sizeInBytes = sizeInBytes )

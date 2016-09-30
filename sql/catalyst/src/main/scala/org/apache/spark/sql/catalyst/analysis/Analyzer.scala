@@ -22,16 +22,28 @@ import scala.collection.mutable.ArrayBuffer
 
 import org.apache.spark.sql.AnalysisException
 import org.apache.spark.sql.catalyst.{CatalystConf, ScalaReflection, SimpleCatalystConf}
+<<<<<<< HEAD
 import org.apache.spark.sql.catalyst.catalog.{CatalogDatabase, InMemoryCatalog, SessionCatalog}
+=======
+import org.apache.spark.sql.catalyst.catalog.{CatalogDatabase, CatalogRelation, InMemoryCatalog, SessionCatalog}
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.catalyst.encoders.OuterScopes
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate._
 import org.apache.spark.sql.catalyst.expressions.objects.NewInstance
 import org.apache.spark.sql.catalyst.optimizer.BooleanSimplification
+<<<<<<< HEAD
 import org.apache.spark.sql.catalyst.plans._
 import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, _}
 import org.apache.spark.sql.catalyst.rules._
 import org.apache.spark.sql.catalyst.trees.{TreeNodeRef}
+=======
+import org.apache.spark.sql.catalyst.planning.IntegerIndex
+import org.apache.spark.sql.catalyst.plans._
+import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, _}
+import org.apache.spark.sql.catalyst.rules._
+import org.apache.spark.sql.catalyst.trees.TreeNodeRef
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.catalyst.util.toPrettySQL
 import org.apache.spark.sql.types._
 
@@ -390,6 +402,7 @@ class Analyzer(
             Alias(PivotFirst(namedPivotCol.toAttribute, a.toAttribute, castPivotValues)
               .toAggregateExpression()
             , "__pivot_" + a.sql)()
+<<<<<<< HEAD
           }
           val secondAgg = Aggregate(groupByExprs, groupByExprs ++ pivotAggs, firstAgg)
           val pivotAggAttribute = pivotAggs.map(_.toAttribute)
@@ -404,6 +417,22 @@ class Analyzer(
             def ifExpr(expr: Expression) = {
               If(EqualTo(pivotColumn, value), expr, Literal(null))
             }
+=======
+          }
+          val secondAgg = Aggregate(groupByExprs, groupByExprs ++ pivotAggs, firstAgg)
+          val pivotAggAttribute = pivotAggs.map(_.toAttribute)
+          val pivotOutputs = pivotValues.zipWithIndex.flatMap { case (value, i) =>
+            aggregates.zip(pivotAggAttribute).map { case (aggregate, pivotAtt) =>
+              Alias(ExtractValue(pivotAtt, Literal(i), resolver), outputName(value, aggregate))()
+            }
+          }
+          Project(groupByExprs ++ pivotOutputs, secondAgg)
+        } else {
+          val pivotAggregates: Seq[NamedExpression] = pivotValues.flatMap { value =>
+            def ifExpr(expr: Expression) = {
+              If(EqualTo(pivotColumn, value), expr, Literal(null))
+            }
+>>>>>>> tuning_adaptive
             aggregates.map { aggregate =>
               val filteredAggregate = aggregate.transformDown {
                 // Assumption is the aggregate function ignores nulls. This is true for all current
@@ -731,7 +760,11 @@ class Analyzer(
       case a @ Aggregate(groups, aggs, child) if aggs.forall(_.resolved) &&
         groups.exists(_.isInstanceOf[UnresolvedOrdinal]) =>
         val newGroups = groups.map {
+<<<<<<< HEAD
           case ordinal @ UnresolvedOrdinal(index) if index > 0 && index <= aggs.size =>
+=======
+          case ordinal @ IntegerIndex(index) if index > 0 && index <= aggs.size =>
+>>>>>>> tuning_adaptive
             aggs(index - 1) match {
               case e if ResolveAggregateFunctions.containsAggregate(e) =>
                 ordinal.failAnalysis(
@@ -739,7 +772,11 @@ class Analyzer(
                     "aggregate functions are not allowed in GROUP BY")
               case o => o
             }
+<<<<<<< HEAD
           case ordinal @ UnresolvedOrdinal(index) =>
+=======
+          case ordinal @ IntegerIndex(index) =>
+>>>>>>> tuning_adaptive
             ordinal.failAnalysis(
               s"GROUP BY position $index is not in select list " +
                 s"(valid range is [1, ${aggs.size}])")

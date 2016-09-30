@@ -103,10 +103,16 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
    * Find the first [[TreeNode]] that satisfies the condition specified by `f`.
    * The condition is recursively applied to this node and all of its children (pre-order).
    */
+<<<<<<< HEAD
   def find(f: BaseType => Boolean): Option[BaseType] = if (f(this)) {
     Some(this)
   } else {
     children.foldLeft(Option.empty[BaseType]) { (l, r) => l.orElse(r.find(f)) }
+=======
+  def find(f: BaseType => Boolean): Option[BaseType] = f(this) match {
+    case true => Some(this)
+    case false => children.foldLeft(Option.empty[BaseType]) { (l, r) => l.orElse(r.find(f)) }
+>>>>>>> tuning_adaptive
   }
 
   /**
@@ -316,9 +322,31 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
   protected def transformChildren(
       rule: PartialFunction[BaseType, BaseType],
       nextOperation: (BaseType, PartialFunction[BaseType, BaseType]) => BaseType): BaseType = {
+<<<<<<< HEAD
     if (children.nonEmpty) {
       var changed = false
       val newArgs = mapProductIterator {
+=======
+    var changed = false
+    val newArgs = mapProductIterator {
+      case arg: TreeNode[_] if containsChild(arg) =>
+        val newChild = nextOperation(arg.asInstanceOf[BaseType], rule)
+        if (!(newChild fastEquals arg)) {
+          changed = true
+          newChild
+        } else {
+          arg
+        }
+      case Some(arg: TreeNode[_]) if containsChild(arg) =>
+        val newChild = nextOperation(arg.asInstanceOf[BaseType], rule)
+        if (!(newChild fastEquals arg)) {
+          changed = true
+          Some(newChild)
+        } else {
+          Some(arg)
+        }
+      case m: Map[_, _] => m.mapValues {
+>>>>>>> tuning_adaptive
         case arg: TreeNode[_] if containsChild(arg) =>
           val newChild = nextOperation(arg.asInstanceOf[BaseType], rule)
           if (!(newChild fastEquals arg)) {
@@ -370,10 +398,17 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
         case nonChild: AnyRef => nonChild
         case null => null
       }
+<<<<<<< HEAD
       if (changed) makeCopy(newArgs) else this
     } else {
       this
     }
+=======
+      case nonChild: AnyRef => nonChild
+      case null => null
+    }
+    if (changed) makeCopy(newArgs) else this
+>>>>>>> tuning_adaptive
   }
 
   /**
@@ -539,9 +574,15 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
 
     if (innerChildren.nonEmpty) {
       innerChildren.init.foreach(_.generateTreeString(
+<<<<<<< HEAD
         depth + 2, lastChildren :+ children.isEmpty :+ false, builder, verbose))
       innerChildren.last.generateTreeString(
         depth + 2, lastChildren :+ children.isEmpty :+ true, builder, verbose)
+=======
+        depth + 2, lastChildren :+ false :+ false, builder, verbose))
+      innerChildren.last.generateTreeString(
+        depth + 2, lastChildren :+ false :+ true, builder, verbose)
+>>>>>>> tuning_adaptive
     }
 
     if (children.nonEmpty) {

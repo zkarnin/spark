@@ -48,7 +48,11 @@ import org.apache.spark.sql.types._
  * Due to this reason, we no longer rely on [[ReadContext]] to pass requested schema from [[init()]]
  * to [[prepareForRead()]], but use a private `var` for simplicity.
  */
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetReadSupport.scala
 private[parquet] class ParquetReadSupport extends ReadSupport[UnsafeRow] with Logging {
+=======
+private[parquet] class ParquetReadSupport extends ReadSupport[InternalRow] with Logging {
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetReadSupport.scala
   private var catalystRequestedSchema: StructType = _
 
   /**
@@ -94,8 +98,12 @@ private[parquet] class ParquetReadSupport extends ReadSupport[UnsafeRow] with Lo
 
     new ParquetRecordMaterializer(
       parquetRequestedSchema,
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetReadSupport.scala
       ParquetReadSupport.expandUDT(catalystRequestedSchema),
       new ParquetSchemaConverter(conf))
+=======
+      ParquetReadSupport.expandUDT(catalystRequestedSchema))
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetReadSupport.scala
   }
 }
 
@@ -110,6 +118,7 @@ private[parquet] object ParquetReadSupport {
    */
   def clipParquetSchema(parquetSchema: MessageType, catalystSchema: StructType): MessageType = {
     val clippedParquetFields = clipParquetGroupFields(parquetSchema.asGroupType(), catalystSchema)
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetReadSupport.scala
     if (clippedParquetFields.isEmpty) {
       ParquetSchemaConverter.EMPTY_MESSAGE
     } else {
@@ -118,6 +127,12 @@ private[parquet] object ParquetReadSupport {
         .addFields(clippedParquetFields: _*)
         .named(ParquetSchemaConverter.SPARK_PARQUET_SCHEMA_NAME)
     }
+=======
+    Types
+      .buildMessage()
+      .addFields(clippedParquetFields: _*)
+      .named(ParquetSchemaConverter.SPARK_PARQUET_SCHEMA_NAME)
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetReadSupport.scala
   }
 
   private def clipParquetType(parquetType: Type, catalystType: DataType): Type = {

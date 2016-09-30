@@ -17,7 +17,11 @@
 
 package org.apache.spark.deploy
 
+<<<<<<< HEAD
 import java.io.IOException
+=======
+import java.io.{ByteArrayInputStream, DataInputStream, IOException}
+>>>>>>> tuning_adaptive
 import java.lang.reflect.Method
 import java.security.PrivilegedExceptionAction
 import java.text.DateFormat
@@ -38,6 +42,7 @@ import org.apache.hadoop.security.token.delegation.AbstractDelegationTokenIdenti
 import org.apache.spark.{SparkConf, SparkException}
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.internal.Logging
+import org.apache.spark.internal.config._
 import org.apache.spark.util.Utils
 
 /**
@@ -274,6 +279,32 @@ class SparkHadoopUtil extends Logging {
     }
   }
 
+<<<<<<< HEAD
+=======
+  /**
+   * How much time is remaining (in millis) from now to (fraction * renewal time for the token that
+   * is valid the latest)?
+   * This will return -ve (or 0) value if the fraction of validity has already expired.
+   */
+  def getTimeFromNowToRenewal(
+      sparkConf: SparkConf,
+      fraction: Double,
+      credentials: Credentials): Long = {
+    val now = System.currentTimeMillis()
+
+    val renewalInterval = sparkConf.get(TOKEN_RENEWAL_INTERVAL).get
+
+    credentials.getAllTokens.asScala
+      .filter(_.getKind == DelegationTokenIdentifier.HDFS_DELEGATION_KIND)
+      .map { t =>
+        val identifier = new DelegationTokenIdentifier()
+        identifier.readFields(new DataInputStream(new ByteArrayInputStream(t.getIdentifier)))
+        (identifier.getIssueDate + fraction * renewalInterval).toLong - now
+      }.foldLeft(0L)(math.max)
+  }
+
+
+>>>>>>> tuning_adaptive
   private[spark] def getSuffixForCredentialsPath(credentialsPath: Path): Int = {
     val fileName = credentialsPath.getName
     fileName.substring(

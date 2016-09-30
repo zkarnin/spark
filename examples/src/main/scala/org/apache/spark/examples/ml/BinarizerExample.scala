@@ -29,10 +29,16 @@ object BinarizerExample {
       .builder
       .appName("BinarizerExample")
       .getOrCreate()
+<<<<<<< HEAD
 
     // $example on$
     val data = Array((0, 0.1), (1, 0.8), (2, 0.2))
     val dataFrame = spark.createDataFrame(data).toDF("id", "feature")
+=======
+    // $example on$
+    val data = Array((0, 0.1), (1, 0.8), (2, 0.2))
+    val dataFrame = spark.createDataFrame(data).toDF("label", "feature")
+>>>>>>> tuning_adaptive
 
     val binarizer: Binarizer = new Binarizer()
       .setInputCol("feature")

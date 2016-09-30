@@ -42,7 +42,11 @@ if [[ -z "$PYSPARK_DRIVER_PYTHON" ]]; then
   PYSPARK_DRIVER_PYTHON="${PYSPARK_PYTHON:-"python"}"
 fi
 
+<<<<<<< HEAD
 WORKS_WITH_IPYTHON=$(python -c 'import sys; print(sys.version_info >= (2, 7, 0))')
+=======
+WORKS_WITH_IPYTHON=$($DEFAULT_PYTHON -c 'import sys; print(sys.version_info >= (2, 7, 0))')
+>>>>>>> tuning_adaptive
 
 # Determine the Python executable to use for the executors:
 if [[ -z "$PYSPARK_PYTHON" ]]; then

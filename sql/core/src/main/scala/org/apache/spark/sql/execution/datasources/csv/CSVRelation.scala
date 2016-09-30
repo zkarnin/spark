@@ -31,7 +31,12 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.GenericMutableRow
 import org.apache.spark.sql.catalyst.util.DateTimeUtils
+<<<<<<< HEAD
 import org.apache.spark.sql.execution.datasources.{OutputWriter, OutputWriterFactory, PartitionedFile, WriterContainer}
+=======
+import org.apache.spark.sql.execution.command.CreateDataSourceTableUtils
+import org.apache.spark.sql.execution.datasources.{OutputWriter, OutputWriterFactory, PartitionedFile}
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.types._
 
 object CSVRelation extends Logging {
@@ -200,7 +205,11 @@ private[csv] class CsvOutputWriter(
     new TextOutputFormat[NullWritable, Text]() {
       override def getDefaultWorkFile(context: TaskAttemptContext, extension: String): Path = {
         val configuration = context.getConfiguration
+<<<<<<< HEAD
         val uniqueWriteJobId = configuration.get(WriterContainer.DATASOURCE_WRITEJOBUUID)
+=======
+        val uniqueWriteJobId = configuration.get(CreateDataSourceTableUtils.DATASOURCE_WRITEJOBUUID)
+>>>>>>> tuning_adaptive
         val taskAttemptId = context.getTaskAttemptID
         val split = taskAttemptId.getTaskID.getId
         new Path(path, f"part-r-$split%05d-$uniqueWriteJobId.csv$extension")
@@ -262,7 +271,10 @@ private[csv] class CsvOutputWriter(
 
   override def close(): Unit = {
     flush()
+<<<<<<< HEAD
     csvWriter.close()
+=======
+>>>>>>> tuning_adaptive
     recordWriter.close(context)
   }
 }

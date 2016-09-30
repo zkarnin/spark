@@ -32,8 +32,13 @@ if __name__ == "__main__":
 
     # $example on$
     df = spark.createDataFrame([
+<<<<<<< HEAD
         Row(userFeatures=Vectors.sparse(3, {0: -2.0, 1: 2.3})),
         Row(userFeatures=Vectors.dense([-2.0, 2.3, 0.0]))])
+=======
+        Row(userFeatures=Vectors.sparse(3, {0: -2.0, 1: 2.3}),),
+        Row(userFeatures=Vectors.dense([-2.0, 2.3, 0.0]),)])
+>>>>>>> tuning_adaptive
 
     slicer = VectorSlicer(inputCol="userFeatures", outputCol="features", indices=[1])
 

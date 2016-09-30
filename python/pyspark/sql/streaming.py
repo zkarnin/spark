@@ -273,11 +273,17 @@ class DataStreamReader(OptionUtils):
 
         >>> s = spark.readStream.schema(sdf_schema)
         """
+<<<<<<< HEAD
         from pyspark.sql import SparkSession
         if not isinstance(schema, StructType):
             raise TypeError("schema should be StructType")
         spark = SparkSession.builder.getOrCreate()
         jschema = spark._jsparkSession.parseDataType(schema.json())
+=======
+        if not isinstance(schema, StructType):
+            raise TypeError("schema should be StructType")
+        jschema = self._spark._ssql_ctx.parseDataType(schema.json())
+>>>>>>> tuning_adaptive
         self._jreader = self._jreader.schema(jschema)
         return self
 

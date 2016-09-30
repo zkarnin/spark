@@ -72,7 +72,10 @@ public class JavaOneHotEncoderExample {
     Dataset<Row> encoded = encoder.transform(indexed);
     encoded.show();
     // $example off$
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     spark.stop();
   }
 }

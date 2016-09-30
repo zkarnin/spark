@@ -31,11 +31,18 @@ import org.apache.spark.sql.types.StructType
  * @param schemaConverter A Parquet-Catalyst schema converter that helps initializing row converters
  */
 private[parquet] class ParquetRecordMaterializer(
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetRecordMaterializer.scala
     parquetSchema: MessageType, catalystSchema: StructType, schemaConverter: ParquetSchemaConverter)
   extends RecordMaterializer[UnsafeRow] {
 
   private val rootConverter =
     new ParquetRowConverter(schemaConverter, parquetSchema, catalystSchema, NoopUpdater)
+=======
+    parquetSchema: MessageType, catalystSchema: StructType)
+  extends RecordMaterializer[InternalRow] {
+
+  private val rootConverter = new ParquetRowConverter(parquetSchema, catalystSchema, NoopUpdater)
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetRecordMaterializer.scala
 
   override def getCurrentRecord: UnsafeRow = rootConverter.currentRecord
 

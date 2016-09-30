@@ -19,13 +19,19 @@ package org.apache.spark.examples.sql;
 // $example on:schema_merging$
 import java.io.Serializable;
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.Arrays;
+=======
+>>>>>>> tuning_adaptive
 import java.util.List;
 // $example off:schema_merging$
 
 // $example on:basic_parquet_example$
+<<<<<<< HEAD
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+=======
+>>>>>>> tuning_adaptive
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 // $example on:schema_merging$
@@ -216,6 +222,7 @@ public class JavaSQLDataSourceExample {
     // +------+
     // |Justin|
     // +------+
+<<<<<<< HEAD
 
     // Alternatively, a DataFrame can be created for a JSON dataset represented by
     // an RDD[String] storing one JSON object per string.
@@ -230,6 +237,8 @@ public class JavaSQLDataSourceExample {
     // +---------------+----+
     // |[Columbus,Ohio]| Yin|
     // +---------------+----+
+=======
+>>>>>>> tuning_adaptive
     // $example off:json_dataset$
   }
 

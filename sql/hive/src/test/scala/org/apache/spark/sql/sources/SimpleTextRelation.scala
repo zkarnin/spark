@@ -29,6 +29,7 @@ import org.apache.spark.sql.{sources, Row, SparkSession}
 import org.apache.spark.sql.catalyst.{expressions, InternalRow}
 import org.apache.spark.sql.catalyst.expressions.{Cast, Expression, GenericInternalRow, InterpretedPredicate, InterpretedProjection, JoinedRow, Literal}
 import org.apache.spark.sql.catalyst.expressions.codegen.GenerateUnsafeProjection
+import org.apache.spark.sql.execution.command.CreateDataSourceTableUtils._
 import org.apache.spark.sql.execution.datasources._
 import org.apache.spark.sql.types.{DataType, StructType}
 import org.apache.spark.util.SerializableConfiguration
@@ -144,7 +145,11 @@ class AppendingTextOutputFormat(outputFile: Path) extends TextOutputFormat[NullW
 
   override def getDefaultWorkFile(context: TaskAttemptContext, extension: String): Path = {
     val configuration = context.getConfiguration
+<<<<<<< HEAD
     val uniqueWriteJobId = configuration.get(WriterContainer.DATASOURCE_WRITEJOBUUID)
+=======
+    val uniqueWriteJobId = configuration.get(DATASOURCE_WRITEJOBUUID)
+>>>>>>> tuning_adaptive
     val taskAttemptId = context.getTaskAttemptID
     val split = taskAttemptId.getTaskID.getId
     val name = FileOutputFormat.getOutputName(context)

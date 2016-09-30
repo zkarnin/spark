@@ -26,8 +26,11 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.AnalysisException
 import org.apache.spark.sql.catalyst.{FunctionIdentifier, TableIdentifier}
 import org.apache.spark.sql.catalyst.analysis.{FunctionAlreadyExistsException, NoSuchDatabaseException, NoSuchFunctionException}
+<<<<<<< HEAD
 import org.apache.spark.sql.catalyst.analysis.TableAlreadyExistsException
 import org.apache.spark.sql.types.StructType
+=======
+>>>>>>> tuning_adaptive
 import org.apache.spark.util.Utils
 
 
@@ -411,11 +414,19 @@ abstract class ExternalCatalogSuite extends SparkFunSuite with BeforeAndAfterEac
       // alter other storage information
       catalog.alterPartitions("db2", "tbl2", Seq(
         oldPart1.copy(storage = storageFormat.copy(serde = Some(newSerde))),
+<<<<<<< HEAD
         oldPart2.copy(storage = storageFormat.copy(properties = newSerdeProps))))
       val newPart1b = catalog.getPartition("db2", "tbl2", part1.spec)
       val newPart2b = catalog.getPartition("db2", "tbl2", part2.spec)
       assert(newPart1b.storage.serde == Some(newSerde))
       assert(newPart2b.storage.properties == newSerdeProps)
+=======
+        oldPart2.copy(storage = storageFormat.copy(serdeProperties = newSerdeProps))))
+      val newPart1b = catalog.getPartition("db2", "tbl2", part1.spec)
+      val newPart2b = catalog.getPartition("db2", "tbl2", part2.spec)
+      assert(newPart1b.storage.serde == Some(newSerde))
+      assert(newPart2b.storage.serdeProperties == newSerdeProps)
+>>>>>>> tuning_adaptive
       // alter but change spec, should fail because new partition specs do not exist yet
       val badPart1 = part1.copy(spec = Map("a" -> "v1", "b" -> "v2"))
       val badPart2 = part2.copy(spec = Map("a" -> "v3", "b" -> "v4"))
@@ -563,18 +574,29 @@ abstract class ExternalCatalogSuite extends SparkFunSuite with BeforeAndAfterEac
       identifier = TableIdentifier("my_table", Some("db1")),
       tableType = CatalogTableType.MANAGED,
       storage = CatalogStorageFormat(None, None, None, None, false, Map.empty),
+<<<<<<< HEAD
       schema = new StructType().add("a", "int").add("b", "string"),
       provider = Some("hive")
     )
 
     catalog.createTable(table, ignoreIfExists = false)
+=======
+      schema = Seq(CatalogColumn("a", "int"), CatalogColumn("b", "string"))
+    )
+
+    catalog.createTable("db1", table, ignoreIfExists = false)
+>>>>>>> tuning_adaptive
     assert(exists(db.locationUri, "my_table"))
 
     catalog.renameTable("db1", "my_table", "your_table")
     assert(!exists(db.locationUri, "my_table"))
     assert(exists(db.locationUri, "your_table"))
 
+<<<<<<< HEAD
     catalog.dropTable("db1", "your_table", ignoreIfNotExists = false, purge = false)
+=======
+    catalog.dropTable("db1", "your_table", ignoreIfNotExists = false)
+>>>>>>> tuning_adaptive
     assert(!exists(db.locationUri, "your_table"))
 
     val externalTable = CatalogTable(
@@ -583,10 +605,16 @@ abstract class ExternalCatalogSuite extends SparkFunSuite with BeforeAndAfterEac
       storage = CatalogStorageFormat(
         Some(Utils.createTempDir().getAbsolutePath),
         None, None, None, false, Map.empty),
+<<<<<<< HEAD
       schema = new StructType().add("a", "int").add("b", "string"),
       provider = Some("hive")
     )
     catalog.createTable(externalTable, ignoreIfExists = false)
+=======
+      schema = Seq(CatalogColumn("a", "int"), CatalogColumn("b", "string"))
+    )
+    catalog.createTable("db1", externalTable, ignoreIfExists = false)
+>>>>>>> tuning_adaptive
     assert(!exists(db.locationUri, "external_table"))
   }
 
@@ -597,6 +625,7 @@ abstract class ExternalCatalogSuite extends SparkFunSuite with BeforeAndAfterEac
       identifier = TableIdentifier("tbl", Some("db1")),
       tableType = CatalogTableType.MANAGED,
       storage = CatalogStorageFormat(None, None, None, None, false, Map.empty),
+<<<<<<< HEAD
       schema = new StructType()
         .add("col1", "int")
         .add("col2", "string")
@@ -606,6 +635,16 @@ abstract class ExternalCatalogSuite extends SparkFunSuite with BeforeAndAfterEac
       partitionColumnNames = Seq("a", "b")
     )
     catalog.createTable(table, ignoreIfExists = false)
+=======
+      schema = Seq(
+        CatalogColumn("col1", "int"),
+        CatalogColumn("col2", "string"),
+        CatalogColumn("a", "int"),
+        CatalogColumn("b", "string")),
+      partitionColumnNames = Seq("a", "b")
+    )
+    catalog.createTable("db1", table, ignoreIfExists = false)
+>>>>>>> tuning_adaptive
 
     catalog.createPartitions("db1", "tbl", Seq(part1, part2), ignoreIfExists = false)
     assert(exists(databaseDir, "tbl", "a=1", "b=2"))
@@ -615,8 +654,12 @@ abstract class ExternalCatalogSuite extends SparkFunSuite with BeforeAndAfterEac
     assert(!exists(databaseDir, "tbl", "a=1", "b=2"))
     assert(exists(databaseDir, "tbl", "a=5", "b=6"))
 
+<<<<<<< HEAD
     catalog.dropPartitions("db1", "tbl", Seq(part2.spec, part3.spec), ignoreIfNotExists = false,
       purge = false)
+=======
+    catalog.dropPartitions("db1", "tbl", Seq(part2.spec, part3.spec), ignoreIfNotExists = false)
+>>>>>>> tuning_adaptive
     assert(!exists(databaseDir, "tbl", "a=3", "b=4"))
     assert(!exists(databaseDir, "tbl", "a=5", "b=6"))
 
@@ -649,7 +692,11 @@ abstract class CatalogTestUtils {
     outputFormat = Some(tableOutputFormat),
     serde = None,
     compressed = false,
+<<<<<<< HEAD
     properties = Map.empty)
+=======
+    serdeProperties = Map.empty)
+>>>>>>> tuning_adaptive
   lazy val part1 = CatalogTablePartition(Map("a" -> "1", "b" -> "2"), storageFormat)
   lazy val part2 = CatalogTablePartition(Map("a" -> "3", "b" -> "4"), storageFormat)
   lazy val part3 = CatalogTablePartition(Map("a" -> "5", "b" -> "6"), storageFormat)

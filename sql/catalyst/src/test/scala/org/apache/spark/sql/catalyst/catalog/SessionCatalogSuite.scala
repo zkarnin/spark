@@ -230,6 +230,7 @@ class SessionCatalogSuite extends SparkFunSuite {
     val catalog = new SessionCatalog(newBasicCatalog())
     // Should always throw exception when the database does not exist
     intercept[NoSuchDatabaseException] {
+<<<<<<< HEAD
       catalog.dropTable(TableIdentifier("tbl1", Some("unknown_db")), ignoreIfNotExists = false,
         purge = false)
     }
@@ -243,6 +244,17 @@ class SessionCatalogSuite extends SparkFunSuite {
     }
     catalog.dropTable(TableIdentifier("unknown_table", Some("db2")), ignoreIfNotExists = true,
       purge = false)
+=======
+      catalog.dropTable(TableIdentifier("tbl1", Some("unknown_db")), ignoreIfNotExists = false)
+    }
+    intercept[NoSuchDatabaseException] {
+      catalog.dropTable(TableIdentifier("tbl1", Some("unknown_db")), ignoreIfNotExists = true)
+    }
+    intercept[NoSuchTableException] {
+      catalog.dropTable(TableIdentifier("unknown_table", Some("db2")), ignoreIfNotExists = false)
+    }
+    catalog.dropTable(TableIdentifier("unknown_table", Some("db2")), ignoreIfNotExists = true)
+>>>>>>> tuning_adaptive
   }
 
   test("drop temp table") {
@@ -285,15 +297,29 @@ class SessionCatalogSuite extends SparkFunSuite {
     intercept[TableAlreadyExistsException] {
       sessionCatalog.renameTable(TableIdentifier("tblone", Some("db2")), "table_two")
     }
+    // The new table already exists
+    intercept[TableAlreadyExistsException] {
+      sessionCatalog.renameTable(
+        TableIdentifier("tblone", Some("db2")), TableIdentifier("table_two", Some("db2")))
+    }
   }
 
   test("rename table when database/table does not exist") {
     val catalog = new SessionCatalog(newBasicCatalog())
     intercept[NoSuchDatabaseException] {
+<<<<<<< HEAD
       catalog.renameTable(TableIdentifier("tbl1", Some("unknown_db")), "tbl2")
     }
     intercept[NoSuchTableException] {
       catalog.renameTable(TableIdentifier("unknown_table", Some("db2")), "tbl2")
+=======
+      catalog.renameTable(
+        TableIdentifier("tbl1", Some("unknown_db")), TableIdentifier("tbl2", Some("unknown_db")))
+    }
+    intercept[NoSuchTableException] {
+      catalog.renameTable(
+        TableIdentifier("unknown_table", Some("db2")), TableIdentifier("tbl2", Some("db2")))
+>>>>>>> tuning_adaptive
     }
   }
 
@@ -306,12 +332,21 @@ class SessionCatalogSuite extends SparkFunSuite {
     assert(sessionCatalog.getTempTable("tbl1") == Option(tempTable))
     assert(externalCatalog.listTables("db2").toSet == Set("tbl1", "tbl2"))
     // If database is not specified, temp table should be renamed first
+<<<<<<< HEAD
     sessionCatalog.renameTable(TableIdentifier("tbl1"), "tbl3")
+=======
+    sessionCatalog.renameTable(TableIdentifier("tbl1"), TableIdentifier("tbl3"))
+>>>>>>> tuning_adaptive
     assert(sessionCatalog.getTempTable("tbl1").isEmpty)
     assert(sessionCatalog.getTempTable("tbl3") == Option(tempTable))
     assert(externalCatalog.listTables("db2").toSet == Set("tbl1", "tbl2"))
     // If database is specified, temp tables are never renamed
+<<<<<<< HEAD
     sessionCatalog.renameTable(TableIdentifier("tbl2", Some("db2")), "tbl4")
+=======
+    sessionCatalog.renameTable(
+      TableIdentifier("tbl2", Some("db2")), TableIdentifier("tbl4", Some("db2")))
+>>>>>>> tuning_adaptive
     assert(sessionCatalog.getTempTable("tbl3") == Option(tempTable))
     assert(sessionCatalog.getTempTable("tbl4").isEmpty)
     assert(externalCatalog.listTables("db2").toSet == Set("tbl1", "tbl4"))
@@ -652,6 +687,28 @@ class SessionCatalogSuite extends SparkFunSuite {
         Seq(partWithUnknownColumns.spec),
         ignoreIfNotExists = false,
         purge = false)
+    }
+    assert(e.getMessage.contains(
+      "Partition spec is invalid. The spec (a, unknown) must be contained within " +
+        "the partition spec (a, b) defined in table '`db2`.`tbl2`'"))
+  }
+
+  test("drop partitions with invalid partition spec") {
+    val catalog = new SessionCatalog(newBasicCatalog())
+    var e = intercept[AnalysisException] {
+      catalog.dropPartitions(
+        TableIdentifier("tbl2", Some("db2")),
+        Seq(partWithMoreColumns.spec),
+        ignoreIfNotExists = false)
+    }
+    assert(e.getMessage.contains(
+      "Partition spec is invalid. The spec (a, b, c) must be contained within " +
+        "the partition spec (a, b) defined in table '`db2`.`tbl2`'"))
+    e = intercept[AnalysisException] {
+      catalog.dropPartitions(
+        TableIdentifier("tbl2", Some("db2")),
+        Seq(partWithUnknownColumns.spec),
+        ignoreIfNotExists = false)
     }
     assert(e.getMessage.contains(
       "Partition spec is invalid. The spec (a, unknown) must be contained within " +

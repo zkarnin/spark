@@ -453,6 +453,11 @@ class LogisticRegression @Since("1.2.0") (
           throw new SparkException(msg)
         }
 
+        if (!state.actuallyConverged) {
+          logWarning("LogisticRegression training finished but the result " +
+            s"is not converged because: ${state.convergedReason.get.reason}")
+        }
+
         /*
            The coefficients are trained in the scaled space; we're converting them back to
            the original space.
@@ -1130,6 +1135,7 @@ private class LogisticAggregator(
       s"in {1, 2} but found $numClasses.")
   }
 
+
   private var weightSum = 0.0
   private var lossSum = 0.0
 
@@ -1267,9 +1273,14 @@ private class LogisticAggregator(
    * of the objective function.
    *
    * @param instance The instance of data point to be added.
+   * @param coefficients The coefficients corresponding to the features.
+   * @param featuresStd The standard deviation values of the features.
    * @return This LogisticAggregator object.
    */
-  def add(instance: Instance): this.type = {
+  def add(
+      instance: Instance,
+      coefficients: Vector,
+      featuresStd: Array[Double]): this.type = {
     instance match { case Instance(label, weight, features) =>
       require(numFeatures == features.size, s"Dimensions mismatch when adding new instance." +
         s" Expecting $numFeatures but got ${features.size}.")
@@ -1353,7 +1364,8 @@ private class LogisticCostFun(
     val numFeatures = featuresStd.length
 
     val logisticAggregator = {
-      val seqOp = (c: LogisticAggregator, instance: Instance) => c.add(instance)
+      val seqOp = (c: LogisticAggregator, instance: Instance) =>
+        c.add(instance, coeffs, localFeaturesStd)
       val combOp = (c1: LogisticAggregator, c2: LogisticAggregator) => c1.merge(c2)
 
       instances.treeAggregate(

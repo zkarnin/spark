@@ -33,7 +33,11 @@ numPairs <- list(list(1, 1), list(1, 2), list(2, 2), list(2, 3))
 strPairs <- list(list(strList, strList), list(strList, strList))
 
 # JavaSparkContext handle
+<<<<<<< HEAD
 sparkSession <- sparkR.session(enableHiveSupport = FALSE)
+=======
+sparkSession <- sparkR.session()
+>>>>>>> tuning_adaptive
 jsc <- callJStatic("org.apache.spark.sql.api.r.SQLUtils", "getJavaSparkContext", sparkSession)
 
 # Tests

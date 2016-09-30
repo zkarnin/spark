@@ -31,6 +31,10 @@ import org.apache.spark.sql.catalyst.planning.PhysicalOperation
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.util._
 import org.apache.spark.sql.execution.command._
+<<<<<<< HEAD
+=======
+import org.apache.spark.sql.hive.{InsertIntoHiveTable => LogicalInsertIntoHiveTable}
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.hive.test.{TestHive, TestHiveQueryExecution}
 
 /**
@@ -348,6 +352,10 @@ abstract class HiveComparisonTest
               val containsCommands = originalQuery.analyzed.collectFirst {
                 case _: Command => ()
                 case _: InsertIntoTable => ()
+<<<<<<< HEAD
+=======
+                case _: LogicalInsertIntoHiveTable => ()
+>>>>>>> tuning_adaptive
               }.nonEmpty
 
               if (containsCommands) {

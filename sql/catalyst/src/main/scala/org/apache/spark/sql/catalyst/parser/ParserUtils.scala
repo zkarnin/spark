@@ -39,6 +39,13 @@ object ParserUtils {
     throw new ParseException(s"Operation not allowed: $message", ctx)
   }
 
+<<<<<<< HEAD
+=======
+  def operationNotAllowed(message: String, ctx: ParserRuleContext): Nothing = {
+    throw new ParseException(s"Operation not allowed: $message", ctx)
+  }
+
+>>>>>>> tuning_adaptive
   /** Check if duplicate keys exist in a set of key-value pairs. */
   def checkDuplicateKeys[T](keyPairs: Seq[(String, T)], ctx: ParserRuleContext): Unit = {
     keyPairs.groupBy(_._1).filter(_._2.size > 1).foreach { case (key, _) =>

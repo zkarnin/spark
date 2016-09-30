@@ -24,6 +24,10 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.language.implicitConversions
 
+<<<<<<< HEAD
+=======
+import org.apache.hadoop.conf.Configuration
+>>>>>>> tuning_adaptive
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars
 import org.apache.hadoop.hive.ql.exec.FunctionRegistry
 import org.apache.hadoop.hive.serde2.`lazy`.LazySimpleSerDe
@@ -108,12 +112,20 @@ class TestHiveContext(
  * A [[SparkSession]] used in [[TestHiveContext]].
  *
  * @param sc SparkContext
+<<<<<<< HEAD
  * @param existingSharedState optional [[SharedState]]
+=======
+ * @param warehousePath path to the Hive warehouse directory
+ * @param scratchDirPath scratch directory used by Hive's metastore client
+ * @param metastoreTemporaryConf configuration options for Hive's metastore
+ * @param existingSharedState optional [[TestHiveSharedState]]
+>>>>>>> tuning_adaptive
  * @param loadTestTables if true, load the test tables. They can only be loaded when running
  *                       in the JVM, i.e when calling from Python this flag has to be false.
  */
 private[hive] class TestHiveSparkSession(
     @transient private val sc: SparkContext,
+<<<<<<< HEAD
     @transient private val existingSharedState: Option[SharedState],
     private val loadTestTables: Boolean)
   extends SparkSession(sc) with Logging { self =>
@@ -135,6 +147,29 @@ private[hive] class TestHiveSparkSession(
     metastoreTempConf.foreach { case (k, v) =>
       sc.hadoopConfiguration.set(k, v)
     }
+=======
+    val warehousePath: File,
+    scratchDirPath: File,
+    metastoreTemporaryConf: Map[String, String],
+    @transient private val existingSharedState: Option[TestHiveSharedState],
+    private val loadTestTables: Boolean)
+  extends SparkSession(sc) with Logging { self =>
+
+  // TODO: We need to set the temp warehouse path to sc's conf.
+  // Right now, In SparkSession, we will set the warehouse path to the default one
+  // instead of the temp one. Then, we override the setting in TestHiveSharedState
+  // when we creating metadataHive. This flow is not easy to follow and can introduce
+  // confusion when a developer is debugging an issue. We need to refactor this part
+  // to just set the temp warehouse path in sc's conf.
+  def this(sc: SparkContext, loadTestTables: Boolean) {
+    this(
+      sc,
+      Utils.createTempDir(namePrefix = "warehouse"),
+      TestHiveContext.makeScratchDir(),
+      HiveUtils.newTemporaryConfiguration(useInMemoryDerby = false),
+      None,
+      loadTestTables)
+>>>>>>> tuning_adaptive
   }
 
   assume(sc.conf.get(CATALOG_IMPLEMENTATION) == "hive")
@@ -151,7 +186,12 @@ private[hive] class TestHiveSparkSession(
     new TestHiveSessionState(self)
 
   override def newSession(): TestHiveSparkSession = {
+<<<<<<< HEAD
     new TestHiveSparkSession(sc, Some(sharedState), loadTestTables)
+=======
+    new TestHiveSparkSession(
+      sc, warehousePath, scratchDirPath, metastoreTemporaryConf, Some(sharedState), loadTestTables)
+>>>>>>> tuning_adaptive
   }
 
   private var cacheTables: Boolean = false
@@ -188,12 +228,15 @@ private[hive] class TestHiveSparkSession(
 
   def getHiveFile(path: String): File = {
     new File(Thread.currentThread().getContextClassLoader.getResource(path).getFile)
+<<<<<<< HEAD
   }
 
   def getWarehousePath(): String = {
     val tempConf = new SQLConf
     sc.conf.getAll.foreach { case (k, v) => tempConf.setConfString(k, v) }
     tempConf.warehousePath
+=======
+>>>>>>> tuning_adaptive
   }
 
   val describedTable = "DESCRIBE (\\w+)".r

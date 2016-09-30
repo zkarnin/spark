@@ -47,7 +47,11 @@ public class JavaStopWordsRemoverExample {
       .setOutputCol("filtered");
 
     List<Row> data = Arrays.asList(
+<<<<<<< HEAD
       RowFactory.create(Arrays.asList("I", "saw", "the", "red", "balloon")),
+=======
+      RowFactory.create(Arrays.asList("I", "saw", "the", "red", "baloon")),
+>>>>>>> tuning_adaptive
       RowFactory.create(Arrays.asList("Mary", "had", "a", "little", "lamb"))
     );
 
@@ -57,7 +61,11 @@ public class JavaStopWordsRemoverExample {
     });
 
     Dataset<Row> dataset = spark.createDataFrame(data, schema);
+<<<<<<< HEAD
     remover.transform(dataset).show(false);
+=======
+    remover.transform(dataset).show();
+>>>>>>> tuning_adaptive
     // $example off$
     spark.stop();
   }

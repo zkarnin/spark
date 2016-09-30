@@ -510,6 +510,7 @@ private[spark] object UIUtils extends Logging {
 
   def getTimeZoneOffset() : Int =
     TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000 / 60
+<<<<<<< HEAD
 
   /**
   * Return the correct Href after checking if master is running in the
@@ -522,4 +523,6 @@ private[spark] object UIUtils extends Logging {
       origHref
     }
   }
+=======
+>>>>>>> tuning_adaptive
 }

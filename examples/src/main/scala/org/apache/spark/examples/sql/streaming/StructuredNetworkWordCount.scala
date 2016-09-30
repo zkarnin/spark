@@ -56,10 +56,17 @@ object StructuredNetworkWordCount {
       .format("socket")
       .option("host", host)
       .option("port", port)
+<<<<<<< HEAD
       .load()
 
     // Split the lines into words
     val words = lines.as[String].flatMap(_.split(" "))
+=======
+      .load().as[String]
+
+    // Split the lines into words
+    val words = lines.flatMap(_.split(" "))
+>>>>>>> tuning_adaptive
 
     // Generate running word count
     val wordCounts = words.groupBy("value").count()

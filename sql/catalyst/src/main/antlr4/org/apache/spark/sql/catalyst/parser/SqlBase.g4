@@ -171,7 +171,11 @@ unsupportedHiveNativeCommands
     | kw1=ALTER kw2=TABLE tableIdentifier partitionSpec? kw3=CONCATENATE
     | kw1=ALTER kw2=TABLE tableIdentifier partitionSpec? kw3=SET kw4=FILEFORMAT
     | kw1=ALTER kw2=TABLE tableIdentifier partitionSpec? kw3=ADD kw4=COLUMNS
+<<<<<<< HEAD
     | kw1=ALTER kw2=TABLE tableIdentifier partitionSpec? kw3=CHANGE kw4=COLUMN?
+=======
+    | kw1=ALTER kw2=TABLE tableIdentifier partitionSpec? kw3=CHANGE kw4=COLUMNS?
+>>>>>>> tuning_adaptive
     | kw1=ALTER kw2=TABLE tableIdentifier partitionSpec? kw3=REPLACE kw4=COLUMNS
     | kw1=START kw2=TRANSACTION
     | kw1=COMMIT
@@ -255,6 +259,7 @@ tableProperty
 
 tablePropertyKey
     : identifier ('.' identifier)*
+<<<<<<< HEAD
     | STRING
     ;
 
@@ -262,6 +267,8 @@ tablePropertyValue
     : INTEGER_VALUE
     | DECIMAL_VALUE
     | booleanValue
+=======
+>>>>>>> tuning_adaptive
     | STRING
     ;
 
@@ -378,7 +385,11 @@ relation
     ;
 
 joinRelation
+<<<<<<< HEAD
     : (joinType) JOIN right=relationPrimary joinCriteria?
+=======
+    : (CROSS | joinType) JOIN right=relationPrimary joinCriteria?
+>>>>>>> tuning_adaptive
     | NATURAL joinType JOIN right=relationPrimary
     ;
 
@@ -614,7 +625,11 @@ qualifiedName
 identifier
     : strictIdentifier
     | ANTI | FULL | INNER | LEFT | SEMI | RIGHT | NATURAL | JOIN | CROSS | ON
+<<<<<<< HEAD
     | UNION | INTERSECT | EXCEPT | SETMINUS
+=======
+    | UNION | INTERSECT | EXCEPT
+>>>>>>> tuning_adaptive
     ;
 
 strictIdentifier

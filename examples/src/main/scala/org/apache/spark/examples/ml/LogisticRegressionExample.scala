@@ -109,7 +109,11 @@ object LogisticRegressionExample {
     }
   }
 
+<<<<<<< HEAD
   def run(params: Params): Unit = {
+=======
+  def run(params: Params) {
+>>>>>>> tuning_adaptive
     val spark = SparkSession
       .builder
       .appName(s"LogisticRegressionExample with $params")

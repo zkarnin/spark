@@ -155,7 +155,11 @@ class MemorySink(val schema: StructType, outputMode: OutputMode) extends Sink wi
 
         case InternalOutputModes.Complete =>
           batches.clear()
+<<<<<<< HEAD
           batches += AddedData(batchId, data.collect())
+=======
+          batches.append(AddedData(batchId, data.collect()))
+>>>>>>> tuning_adaptive
 
         case _ =>
           throw new IllegalArgumentException(

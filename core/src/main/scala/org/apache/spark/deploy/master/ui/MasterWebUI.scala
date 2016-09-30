@@ -38,7 +38,10 @@ class MasterWebUI(
 
   val masterEndpointRef = master.self
   val killEnabled = master.conf.getBoolean("spark.ui.killEnabled", true)
+<<<<<<< HEAD
   private val proxyHandlers = new HashMap[String, ServletContextHandler]
+=======
+>>>>>>> tuning_adaptive
 
   initialize()
 
@@ -53,6 +56,7 @@ class MasterWebUI(
     attachHandler(createRedirectHandler(
       "/driver/kill", "/", masterPage.handleDriverKillRequest, httpMethods = Set("POST")))
   }
+<<<<<<< HEAD
 
   def addProxyTargets(id: String, target: String): Unit = {
     var endTarget = target.stripSuffix("/")
@@ -64,6 +68,8 @@ class MasterWebUI(
   def removeProxyTargets(id: String): Unit = {
     proxyHandlers.remove(id).foreach(detachHandler)
   }
+=======
+>>>>>>> tuning_adaptive
 }
 
 private[master] object MasterWebUI {

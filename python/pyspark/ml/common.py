@@ -51,7 +51,10 @@ py4j.protocol.smart_decode = _new_smart_decode
 _picklable_classes = [
     'SparseVector',
     'DenseVector',
+<<<<<<< HEAD
     'SparseMatrix',
+=======
+>>>>>>> tuning_adaptive
     'DenseMatrix',
 ]
 

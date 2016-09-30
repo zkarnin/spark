@@ -18,7 +18,11 @@
 context("functions in utils.R")
 
 # JavaSparkContext handle
+<<<<<<< HEAD
 sparkSession <- sparkR.session(enableHiveSupport = FALSE)
+=======
+sparkSession <- sparkR.session()
+>>>>>>> tuning_adaptive
 sc <- callJStatic("org.apache.spark.sql.api.r.SQLUtils", "getJavaSparkContext", sparkSession)
 
 test_that("convertJListToRList() gives back (deserializes) the original JLists
@@ -206,5 +210,8 @@ test_that("rbindRaws", {
   expect_equal(expected, result)
 
 })
+<<<<<<< HEAD
 
 sparkR.session.stop()
+=======
+>>>>>>> tuning_adaptive

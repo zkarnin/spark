@@ -19,8 +19,12 @@ package org.apache.spark.sql.hive
 
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.catalyst.TableIdentifier
+<<<<<<< HEAD
 import org.apache.spark.sql.catalyst.catalog.{CatalogStorageFormat, CatalogTable, CatalogTableType}
 import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
+=======
+import org.apache.spark.sql.catalyst.catalog.{CatalogColumn, CatalogStorageFormat, CatalogTable, CatalogTableType}
+>>>>>>> tuning_adaptive
 
 class MetastoreRelationSuite extends SparkFunSuite {
   test("makeCopy and toJSON should work") {
@@ -28,11 +32,19 @@ class MetastoreRelationSuite extends SparkFunSuite {
       identifier = TableIdentifier("test", Some("db")),
       tableType = CatalogTableType.VIEW,
       storage = CatalogStorageFormat.empty,
+<<<<<<< HEAD
       schema = StructType(StructField("a", IntegerType, true) :: Nil))
     val relation = MetastoreRelation("db", "test")(table, null, null)
 
     // No exception should be thrown
     relation.makeCopy(Array("db", "test"))
+=======
+      schema = Seq.empty[CatalogColumn])
+    val relation = MetastoreRelation("db", "test", None)(table, null, null)
+
+    // No exception should be thrown
+    relation.makeCopy(Array("db", "test", None))
+>>>>>>> tuning_adaptive
     // No exception should be thrown
     relation.toJSON
   }

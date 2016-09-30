@@ -17,7 +17,11 @@
 
 package org.apache.spark.sql.hive
 
+<<<<<<< HEAD
 import org.apache.spark.sql.{AnalysisException, SaveMode}
+=======
+import org.apache.spark.sql.AnalysisException
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.analysis.UnresolvedAttribute
 import org.apache.spark.sql.catalyst.catalog.{CatalogTable, CatalogTableType}
@@ -29,7 +33,10 @@ import org.apache.spark.sql.catalyst.parser.ParseException
 import org.apache.spark.sql.catalyst.plans.PlanTest
 import org.apache.spark.sql.catalyst.plans.logical.{Generate, ScriptTransformation}
 import org.apache.spark.sql.execution.command._
+<<<<<<< HEAD
 import org.apache.spark.sql.execution.datasources.CreateTable
+=======
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.hive.test.TestHive
 import org.apache.spark.sql.types.StructType
 
@@ -38,7 +45,13 @@ class HiveDDLCommandSuite extends PlanTest {
 
   private def extractTableDesc(sql: String): (CatalogTable, Boolean) = {
     parser.parsePlan(sql).collect {
+<<<<<<< HEAD
       case CreateTable(tableDesc, mode, _) => (tableDesc, mode == SaveMode.Ignore)
+=======
+      case c: CreateTableCommand => (c.table, c.ifNotExists)
+      case c: CreateHiveTableAsSelectLogicalPlan => (c.tableDesc, c.allowExisting)
+      case c: CreateViewCommand => (c.tableDesc, c.allowExisting)
+>>>>>>> tuning_adaptive
     }.head
   }
 
@@ -69,7 +82,11 @@ class HiveDDLCommandSuite extends PlanTest {
     // TODO will be SQLText
     assert(desc.viewText.isEmpty)
     assert(desc.viewOriginalText.isEmpty)
+<<<<<<< HEAD
     assert(desc.partitionColumnNames.isEmpty)
+=======
+    assert(desc.partitionColumns == Seq.empty[CatalogColumn])
+>>>>>>> tuning_adaptive
     assert(desc.storage.inputFormat == Some("org.apache.hadoop.hive.ql.io.RCFileInputFormat"))
     assert(desc.storage.outputFormat == Some("org.apache.hadoop.hive.ql.io.RCFileOutputFormat"))
     assert(desc.storage.serde ==
@@ -100,8 +117,13 @@ class HiveDDLCommandSuite extends PlanTest {
     assert(desc.comment == Some("This is the staging page view table"))
     assert(desc.viewText.isEmpty)
     assert(desc.viewOriginalText.isEmpty)
+<<<<<<< HEAD
     assert(desc.partitionColumnNames.isEmpty)
     assert(desc.storage.properties == Map())
+=======
+    assert(desc.partitionColumns == Seq.empty[CatalogColumn])
+    assert(desc.storage.serdeProperties == Map())
+>>>>>>> tuning_adaptive
     assert(desc.storage.inputFormat == Some("parquet.hive.DeprecatedParquetInputFormat"))
     assert(desc.storage.outputFormat == Some("parquet.hive.DeprecatedParquetOutputFormat"))
     assert(desc.storage.serde == Some("parquet.hive.serde.ParquetHiveSerDe"))

@@ -30,7 +30,11 @@ import org.apache.spark.sql.catalyst.parser.ParserInterface
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.execution._
 import org.apache.spark.sql.execution.command.AnalyzeTableCommand
+<<<<<<< HEAD
 import org.apache.spark.sql.execution.datasources._
+=======
+import org.apache.spark.sql.execution.datasources.{DataSourceAnalysis, FindDataSourceTable, PreprocessTableInsertion, ResolveDataSource}
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.streaming.{StreamingQuery, StreamingQueryManager}
 import org.apache.spark.sql.util.ExecutionListenerManager
 
@@ -111,7 +115,10 @@ private[sql] class SessionState(sparkSession: SparkSession) {
   lazy val analyzer: Analyzer = {
     new Analyzer(catalog, conf) {
       override val extendedResolutionRules =
+<<<<<<< HEAD
         PreprocessDDL(conf) ::
+=======
+>>>>>>> tuning_adaptive
         PreprocessTableInsertion(conf) ::
         new FindDataSourceTable(sparkSession) ::
         DataSourceAnalysis(conf) ::
@@ -164,6 +171,8 @@ private[sql] class SessionState(sparkSession: SparkSession) {
   //  Helper methods, partially leftover from pre-2.0 days
   // ------------------------------------------------------
 
+  def executeSql(sql: String): QueryExecution = executePlan(sqlParser.parsePlan(sql))
+
   def executePlan(plan: LogicalPlan): QueryExecution = new QueryExecution(sparkSession, plan)
 
   def refreshTable(tableName: String): Unit = {
@@ -192,7 +201,12 @@ private[sql] class SessionState(sparkSession: SparkSession) {
    * Right now, it only supports catalog tables and it only updates the size of a catalog table
    * in the external catalog.
    */
+<<<<<<< HEAD
   def analyze(tableName: String, noscan: Boolean = true): Unit = {
     AnalyzeTableCommand(tableName, noscan).run(sparkSession)
+=======
+  def analyze(tableName: String): Unit = {
+    AnalyzeTableCommand(tableName).run(sparkSession)
+>>>>>>> tuning_adaptive
   }
 }

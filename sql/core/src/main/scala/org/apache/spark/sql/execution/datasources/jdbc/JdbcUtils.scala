@@ -17,7 +17,11 @@
 
 package org.apache.spark.sql.execution.datasources.jdbc
 
+<<<<<<< HEAD
 import java.sql.{Connection, Driver, DriverManager, PreparedStatement, ResultSet, ResultSetMetaData, SQLException}
+=======
+import java.sql.{Connection, Driver, DriverManager, PreparedStatement, SQLException}
+>>>>>>> tuning_adaptive
 import java.util.Properties
 
 import scala.collection.JavaConverters._
@@ -45,7 +49,10 @@ object JdbcUtils extends Logging {
   // the property names are case sensitive
   val JDBC_BATCH_FETCH_SIZE = "fetchsize"
   val JDBC_BATCH_INSERT_SIZE = "batchsize"
+<<<<<<< HEAD
   val JDBC_TXN_ISOLATION_LEVEL = "isolationLevel"
+=======
+>>>>>>> tuning_adaptive
 
   /**
    * Returns a factory for creating connections to the given JDBC URL.
@@ -548,8 +555,12 @@ object JdbcUtils extends Logging {
       rddSchema: StructType,
       nullTypes: Array[Int],
       batchSize: Int,
+<<<<<<< HEAD
       dialect: JdbcDialect,
       isolationLevel: Int): Iterator[Byte] = {
+=======
+      dialect: JdbcDialect): Iterator[Byte] = {
+>>>>>>> tuning_adaptive
     require(batchSize >= 1,
       s"Invalid value `${batchSize.toString}` for parameter " +
       s"`${JdbcUtils.JDBC_BATCH_INSERT_SIZE}`. The minimum value is 1.")
@@ -588,9 +599,12 @@ object JdbcUtils extends Logging {
         conn.setTransactionIsolation(finalIsolationLevel)
       }
       val stmt = insertStatement(conn, table, rddSchema, dialect)
+<<<<<<< HEAD
       val setters: Array[JDBCValueSetter] = rddSchema.fields.map(_.dataType)
         .map(makeSetter(conn, dialect, _)).toArray
 
+=======
+>>>>>>> tuning_adaptive
       try {
         var rowCount = 0
         while (iterator.hasNext) {
@@ -622,7 +636,10 @@ object JdbcUtils extends Logging {
         conn.commit()
       }
       committed = true
+<<<<<<< HEAD
       Iterator.empty
+=======
+>>>>>>> tuning_adaptive
     } catch {
       case e: SQLException =>
         val cause = e.getNextException
@@ -685,6 +702,7 @@ object JdbcUtils extends Logging {
     val rddSchema = df.schema
     val getConnection: () => Connection = createConnectionFactory(url, properties)
     val batchSize = properties.getProperty(JDBC_BATCH_INSERT_SIZE, "1000").toInt
+<<<<<<< HEAD
     val isolationLevel =
       properties.getProperty(JDBC_TXN_ISOLATION_LEVEL, "READ_UNCOMMITTED") match {
         case "NONE" => Connection.TRANSACTION_NONE
@@ -696,5 +714,10 @@ object JdbcUtils extends Logging {
     df.foreachPartition(iterator => savePartition(
       getConnection, table, iterator, rddSchema, nullTypes, batchSize, dialect, isolationLevel)
     )
+=======
+    df.foreachPartition { iterator =>
+      savePartition(getConnection, table, iterator, rddSchema, nullTypes, batchSize, dialect)
+    }
+>>>>>>> tuning_adaptive
   }
 }

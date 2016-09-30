@@ -31,7 +31,11 @@ Run with:
 if __name__ == "__main__":
     spark = SparkSession\
         .builder\
+<<<<<<< HEAD
         .appName("BisectingKMeansExample")\
+=======
+        .appName("PythonBisectingKMeansExample")\
+>>>>>>> tuning_adaptive
         .getOrCreate()
 
     # $example on$

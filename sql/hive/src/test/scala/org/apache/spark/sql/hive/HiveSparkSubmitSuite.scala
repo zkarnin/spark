@@ -378,9 +378,16 @@ object SetMetastoreURLTest extends Logging {
         s"spark.sql.test.expectedMetastoreURL should be set.")
     }
 
+<<<<<<< HEAD
     // HiveExternalCatalog is used when Hive support is enabled.
     val actualMetastoreURL =
       spark.sharedState.externalCatalog.asInstanceOf[HiveExternalCatalog].client
+=======
+    // HiveSharedState is used when Hive support is enabled.
+    val actualMetastoreURL =
+      spark.sharedState.asInstanceOf[HiveSharedState]
+        .metadataHive
+>>>>>>> tuning_adaptive
         .getConf("javax.jdo.option.ConnectionURL", "this_is_a_wrong_URL")
     logInfo(s"javax.jdo.option.ConnectionURL is $actualMetastoreURL")
 

@@ -226,4 +226,55 @@ class VectorizedHashMapGenerator(
        |}
      """.stripMargin
   }
+<<<<<<< HEAD
+=======
+
+  private def generateClose(): String = {
+    s"""
+       |public void close() {
+       |  batch.close();
+       |}
+     """.stripMargin
+  }
+
+  private def genComputeHash(
+      ctx: CodegenContext,
+      input: String,
+      dataType: DataType,
+      result: String): String = {
+    def hashInt(i: String): String = s"int $result = $i;"
+    def hashLong(l: String): String = s"long $result = $l;"
+    def hashBytes(b: String): String = {
+      val hash = ctx.freshName("hash")
+      val bytes = ctx.freshName("bytes")
+      s"""
+         |int $result = 0;
+         |byte[] $bytes = $b;
+         |for (int i = 0; i < $bytes.length; i++) {
+         |  ${genComputeHash(ctx, s"$bytes[i]", ByteType, hash)}
+         |  $result = ($result ^ (0x9e3779b9)) + $hash + ($result << 6) + ($result >>> 2);
+         |}
+       """.stripMargin
+    }
+
+    dataType match {
+      case BooleanType => hashInt(s"$input ? 1 : 0")
+      case ByteType | ShortType | IntegerType | DateType => hashInt(input)
+      case LongType | TimestampType => hashLong(input)
+      case FloatType => hashInt(s"Float.floatToIntBits($input)")
+      case DoubleType => hashLong(s"Double.doubleToLongBits($input)")
+      case d: DecimalType =>
+        if (d.precision <= Decimal.MAX_LONG_DIGITS) {
+          hashLong(s"$input.toUnscaledLong()")
+        } else {
+          val bytes = ctx.freshName("bytes")
+          s"""
+            final byte[] $bytes = $input.toJavaBigDecimal().unscaledValue().toByteArray();
+            ${hashBytes(bytes)}
+          """
+        }
+      case StringType => hashBytes(s"$input.getBytes()")
+    }
+  }
+>>>>>>> tuning_adaptive
 }

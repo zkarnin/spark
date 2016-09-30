@@ -23,16 +23,30 @@ import org.apache.hadoop.fs.Path
 import org.scalatest.BeforeAndAfterEach
 
 import org.apache.spark.internal.config._
+<<<<<<< HEAD
 import org.apache.spark.sql.{AnalysisException, QueryTest, Row, SaveMode}
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.analysis.{DatabaseAlreadyExistsException, FunctionRegistry, NoSuchPartitionException, NoSuchTableException, TempTableAlreadyExistsException}
 import org.apache.spark.sql.catalyst.catalog.{BucketSpec, CatalogDatabase, CatalogStorageFormat}
 import org.apache.spark.sql.catalyst.catalog.{CatalogTable, CatalogTableType}
+=======
+import org.apache.spark.sql.{AnalysisException, QueryTest, Row}
+import org.apache.spark.sql.catalyst.TableIdentifier
+import org.apache.spark.sql.catalyst.analysis.{DatabaseAlreadyExistsException, FunctionRegistry, NoSuchPartitionException, NoSuchTableException, TempTableAlreadyExistsException}
+import org.apache.spark.sql.catalyst.catalog.{CatalogDatabase, CatalogStorageFormat}
+import org.apache.spark.sql.catalyst.catalog.{CatalogColumn, CatalogTable, CatalogTableType}
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.catalyst.catalog.{CatalogTablePartition, SessionCatalog}
 import org.apache.spark.sql.catalyst.catalog.CatalogTypes.TablePartitionSpec
+import org.apache.spark.sql.execution.command.CreateDataSourceTableUtils._
+import org.apache.spark.sql.execution.datasources.BucketSpec
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SharedSQLContext
+<<<<<<< HEAD
 import org.apache.spark.sql.types._
+=======
+import org.apache.spark.sql.types.{IntegerType, StructType}
+>>>>>>> tuning_adaptive
 import org.apache.spark.util.Utils
 
 class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
@@ -84,17 +98,29 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
         outputFormat = None,
         serde = None,
         compressed = false,
+<<<<<<< HEAD
         properties = Map())
+=======
+        serdeProperties = Map())
+>>>>>>> tuning_adaptive
     CatalogTable(
       identifier = name,
       tableType = CatalogTableType.EXTERNAL,
       storage = storage,
+<<<<<<< HEAD
       schema = new StructType()
         .add("col1", "int")
         .add("col2", "string")
         .add("a", "int")
         .add("b", "int"),
       provider = Some("hive"),
+=======
+      schema = Seq(
+        CatalogColumn("col1", "int"),
+        CatalogColumn("col2", "string"),
+        CatalogColumn("a", "int"),
+        CatalogColumn("b", "int")),
+>>>>>>> tuning_adaptive
       partitionColumnNames = Seq("a", "b"),
       createTime = 0L)
   }
@@ -255,6 +281,7 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
     }
   }
 
+<<<<<<< HEAD
   private def checkSchemaInCreatedDataSourceTable(
       path: File,
       userSpecifiedSchema: Option[String],
@@ -461,6 +488,8 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
     }
   }
 
+=======
+>>>>>>> tuning_adaptive
   test("desc table for parquet data source table using in-memory catalog") {
     assume(spark.sparkContext.conf.get(CATALOG_IMPLEMENTATION) == "in-memory")
     val tabName = "tab1"
@@ -561,7 +590,11 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
     }.getMessage
     assert(message.contains(s"Database '$dbName' is not empty. One or more tables exist"))
 
+<<<<<<< HEAD
     catalog.dropTable(tableIdent1, ignoreIfNotExists = false, purge = false)
+=======
+    catalog.dropTable(tableIdent1, ignoreIfNotExists = false)
+>>>>>>> tuning_adaptive
 
     assert(catalog.listDatabases().contains(dbName))
     sql(s"DROP DATABASE $dbName RESTRICT")
@@ -602,14 +635,33 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
     assert(catalog.getTableMetadata(tableIdent1) === expectedTable)
   }
 
+<<<<<<< HEAD
+=======
+  test("Analyze in-memory cataloged tables(SimpleCatalogRelation)") {
+    withTable("tbl") {
+      sql("CREATE TABLE tbl(a INT, b INT) USING parquet")
+      val e = intercept[AnalysisException] {
+        sql("ANALYZE TABLE tbl COMPUTE STATISTICS")
+      }.getMessage
+      assert(e.contains("ANALYZE TABLE is only supported for Hive tables, " +
+        "but 'tbl' is a SimpleCatalogRelation"))
+    }
+  }
+
+>>>>>>> tuning_adaptive
   test("create table using") {
     val catalog = spark.sessionState.catalog
     withTable("tbl") {
       sql("CREATE TABLE tbl(a INT, b INT) USING parquet")
       val table = catalog.getTableMetadata(TableIdentifier("tbl"))
       assert(table.tableType == CatalogTableType.MANAGED)
+<<<<<<< HEAD
       assert(table.schema == new StructType().add("a", "int").add("b", "int"))
       assert(table.provider == Some("parquet"))
+=======
+      assert(table.schema == Seq(CatalogColumn("a", "int"), CatalogColumn("b", "int")))
+      assert(table.properties(DATASOURCE_PROVIDER) == "parquet")
+>>>>>>> tuning_adaptive
     }
   }
 
@@ -619,9 +671,18 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
       sql("CREATE TABLE tbl(a INT, b INT) USING parquet PARTITIONED BY (a)")
       val table = catalog.getTableMetadata(TableIdentifier("tbl"))
       assert(table.tableType == CatalogTableType.MANAGED)
+<<<<<<< HEAD
       assert(table.provider == Some("parquet"))
       assert(table.schema == new StructType().add("a", IntegerType).add("b", IntegerType))
       assert(table.partitionColumnNames == Seq("a"))
+=======
+      assert(table.schema.isEmpty) // partitioned datasource table is not hive-compatible
+      assert(table.properties(DATASOURCE_PROVIDER) == "parquet")
+      assert(DDLUtils.getSchemaFromTableProperties(table) ==
+        Some(new StructType().add("a", IntegerType).add("b", IntegerType)))
+      assert(DDLUtils.getPartitionColumnsFromTableProperties(table) ==
+        Seq("a"))
+>>>>>>> tuning_adaptive
     }
   }
 
@@ -632,9 +693,18 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
         "CLUSTERED BY (a) SORTED BY (b) INTO 5 BUCKETS")
       val table = catalog.getTableMetadata(TableIdentifier("tbl"))
       assert(table.tableType == CatalogTableType.MANAGED)
+<<<<<<< HEAD
       assert(table.provider == Some("parquet"))
       assert(table.schema == new StructType().add("a", IntegerType).add("b", IntegerType))
       assert(table.bucketSpec == Some(BucketSpec(5, Seq("a"), Seq("b"))))
+=======
+      assert(table.schema.isEmpty) // partitioned datasource table is not hive-compatible
+      assert(table.properties(DATASOURCE_PROVIDER) == "parquet")
+      assert(DDLUtils.getSchemaFromTableProperties(table) ==
+        Some(new StructType().add("a", IntegerType).add("b", IntegerType)))
+      assert(DDLUtils.getBucketSpecFromTableProperties(table) ==
+        Some(BucketSpec(5, Seq("a"), Seq("b"))))
+>>>>>>> tuning_adaptive
     }
   }
 
@@ -725,6 +795,84 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
       }
       assert(e.getMessage.contains(
         "RENAME TEMPORARY TABLE from '`tab1`' to 'tab2': destination table already exists"))
+
+      val catalog = spark.sessionState.catalog
+      assert(catalog.listTables("default") == Seq(TableIdentifier("tab1"), TableIdentifier("tab2")))
+    }
+  }
+
+  test("alter table: rename cached table") {
+    import testImplicits._
+    sql("CREATE TABLE students (age INT, name STRING) USING parquet")
+    val df = (1 to 2).map { i => (i, i.toString) }.toDF("age", "name")
+    df.write.insertInto("students")
+    spark.catalog.cacheTable("students")
+    assume(spark.table("students").collect().toSeq == df.collect().toSeq, "bad test: wrong data")
+    assume(spark.catalog.isCached("students"), "bad test: table was not cached in the first place")
+    sql("ALTER TABLE students RENAME TO teachers")
+    sql("CREATE TABLE students (age INT, name STRING) USING parquet")
+    // Now we have both students and teachers.
+    // The cached data for the old students table should not be read by the new students table.
+    assert(!spark.catalog.isCached("students"))
+    assert(spark.catalog.isCached("teachers"))
+    assert(spark.table("students").collect().isEmpty)
+    assert(spark.table("teachers").collect().toSeq == df.collect().toSeq)
+  }
+
+  test("rename temporary table - destination table with database name") {
+    withTempView("tab1") {
+      sql(
+        """
+          |CREATE TEMPORARY TABLE tab1
+          |USING org.apache.spark.sql.sources.DDLScanSource
+          |OPTIONS (
+          |  From '1',
+          |  To '10',
+          |  Table 'test1'
+          |)
+        """.stripMargin)
+
+      val e = intercept[AnalysisException] {
+        sql("ALTER TABLE tab1 RENAME TO default.tab2")
+      }
+      assert(e.getMessage.contains(
+        "RENAME TEMPORARY TABLE from '`tab1`' to '`default`.`tab2`': " +
+          "cannot specify database name 'default' in the destination table"))
+
+      val catalog = spark.sessionState.catalog
+      assert(catalog.listTables("default") == Seq(TableIdentifier("tab1")))
+    }
+  }
+
+  test("rename temporary table - destination table already exists") {
+    withTempView("tab1", "tab2") {
+      sql(
+        """
+          |CREATE TEMPORARY TABLE tab1
+          |USING org.apache.spark.sql.sources.DDLScanSource
+          |OPTIONS (
+          |  From '1',
+          |  To '10',
+          |  Table 'test1'
+          |)
+        """.stripMargin)
+
+      sql(
+        """
+          |CREATE TEMPORARY TABLE tab2
+          |USING org.apache.spark.sql.sources.DDLScanSource
+          |OPTIONS (
+          |  From '1',
+          |  To '10',
+          |  Table 'test1'
+          |)
+        """.stripMargin)
+
+      val e = intercept[AnalysisException] {
+        sql("ALTER TABLE tab1 RENAME TO tab2")
+      }
+      assert(e.getMessage.contains(
+        "RENAME TEMPORARY TABLE from '`tab1`' to '`tab2`': destination table already exists"))
 
       val catalog = spark.sessionState.catalog
       assert(catalog.listTables("default") == Seq(TableIdentifier("tab1"), TableIdentifier("tab2")))
@@ -1038,7 +1186,11 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
       catalog: SessionCatalog,
       tableIdent: TableIdentifier): Unit = {
     catalog.alterTable(catalog.getTableMetadata(tableIdent).copy(
+<<<<<<< HEAD
       provider = Some("csv")))
+=======
+      properties = Map(DATASOURCE_PROVIDER -> "csv")))
+>>>>>>> tuning_adaptive
   }
 
   private def testSetProperties(isDatasourceTable: Boolean): Unit = {
@@ -1050,7 +1202,13 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
       convertToDatasourceTable(catalog, tableIdent)
     }
     def getProps: Map[String, String] = {
+<<<<<<< HEAD
       catalog.getTableMetadata(tableIdent).properties
+=======
+      catalog.getTableMetadata(tableIdent).properties.filterKeys { k =>
+        !isDatasourceTable || !k.startsWith(DATASOURCE_PREFIX)
+      }
+>>>>>>> tuning_adaptive
     }
     assert(getProps.isEmpty)
     // set table properties
@@ -1064,6 +1222,14 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
     intercept[AnalysisException] {
       sql("ALTER TABLE does_not_exist SET TBLPROPERTIES ('winner' = 'loser')")
     }
+<<<<<<< HEAD
+=======
+    // datasource table property keys are not allowed
+    val e = intercept[AnalysisException] {
+      sql(s"ALTER TABLE tab1 SET TBLPROPERTIES ('${DATASOURCE_PREFIX}foo' = 'loser')")
+    }
+    assert(e.getMessage.contains(DATASOURCE_PREFIX + "foo"))
+>>>>>>> tuning_adaptive
   }
 
   private def testUnsetProperties(isDatasourceTable: Boolean): Unit = {
@@ -1075,7 +1241,13 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
       convertToDatasourceTable(catalog, tableIdent)
     }
     def getProps: Map[String, String] = {
+<<<<<<< HEAD
       catalog.getTableMetadata(tableIdent).properties
+=======
+      catalog.getTableMetadata(tableIdent).properties.filterKeys { k =>
+        !isDatasourceTable || !k.startsWith(DATASOURCE_PREFIX)
+      }
+>>>>>>> tuning_adaptive
     }
     // unset table properties
     sql("ALTER TABLE dbx.tab1 SET TBLPROPERTIES ('j' = 'am', 'p' = 'an', 'c' = 'lan', 'x' = 'y')")
@@ -1097,6 +1269,14 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
     // property to unset does not exist, but "IF EXISTS" is specified
     sql("ALTER TABLE tab1 UNSET TBLPROPERTIES IF EXISTS ('c', 'xyz')")
     assert(getProps == Map("x" -> "y"))
+<<<<<<< HEAD
+=======
+    // datasource table property keys are not allowed
+    val e2 = intercept[AnalysisException] {
+      sql(s"ALTER TABLE tab1 UNSET TBLPROPERTIES ('${DATASOURCE_PREFIX}foo')")
+    }
+    assert(e2.getMessage.contains(DATASOURCE_PREFIX + "foo"))
+>>>>>>> tuning_adaptive
   }
 
   private def testSetLocation(isDatasourceTable: Boolean): Unit = {
@@ -1197,6 +1377,67 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
     sql("ALTER TABLE tab1 SET SERDEPROPERTIES ('kay' = 'veee')")
     assert(catalog.getTableMetadata(tableIdent).storage.properties ==
       Map("k" -> "vvv", "kay" -> "veee"))
+    // table to alter does not exist
+    intercept[AnalysisException] {
+      sql("ALTER TABLE does_not_exist SET SERDEPROPERTIES ('x' = 'y')")
+    }
+    // serde properties must not be a datasource property
+    val e = intercept[AnalysisException] {
+      sql(s"ALTER TABLE tab1 SET SERDEPROPERTIES ('${DATASOURCE_PREFIX}foo'='wah')")
+    }
+    assert(e.getMessage.contains(DATASOURCE_PREFIX + "foo"))
+  }
+
+  private def testSetSerdePartition(isDatasourceTable: Boolean): Unit = {
+    val catalog = spark.sessionState.catalog
+    val tableIdent = TableIdentifier("tab1", Some("dbx"))
+    val spec = Map("a" -> "1", "b" -> "2")
+    createDatabase(catalog, "dbx")
+    createTable(catalog, tableIdent)
+    createTablePartition(catalog, spec, tableIdent)
+    createTablePartition(catalog, Map("a" -> "1", "b" -> "3"), tableIdent)
+    createTablePartition(catalog, Map("a" -> "2", "b" -> "2"), tableIdent)
+    createTablePartition(catalog, Map("a" -> "2", "b" -> "3"), tableIdent)
+    if (isDatasourceTable) {
+      convertToDatasourceTable(catalog, tableIdent)
+    }
+    assert(catalog.getPartition(tableIdent, spec).storage.serde.isEmpty)
+    assert(catalog.getPartition(tableIdent, spec).storage.serdeProperties.isEmpty)
+    // set table serde and/or properties (should fail on datasource tables)
+    if (isDatasourceTable) {
+      val e1 = intercept[AnalysisException] {
+        sql("ALTER TABLE dbx.tab1 PARTITION (a=1, b=2) SET SERDE 'whatever'")
+      }
+      val e2 = intercept[AnalysisException] {
+        sql("ALTER TABLE dbx.tab1 PARTITION (a=1, b=2) SET SERDE 'org.apache.madoop' " +
+          "WITH SERDEPROPERTIES ('k' = 'v', 'kay' = 'vee')")
+      }
+      assert(e1.getMessage.contains("datasource"))
+      assert(e2.getMessage.contains("datasource"))
+    } else {
+      sql("ALTER TABLE dbx.tab1 PARTITION (a=1, b=2) SET SERDE 'org.apache.jadoop'")
+      assert(catalog.getPartition(tableIdent, spec).storage.serde == Some("org.apache.jadoop"))
+      assert(catalog.getPartition(tableIdent, spec).storage.serdeProperties.isEmpty)
+      sql("ALTER TABLE dbx.tab1 PARTITION (a=1, b=2) SET SERDE 'org.apache.madoop' " +
+        "WITH SERDEPROPERTIES ('k' = 'v', 'kay' = 'vee')")
+      assert(catalog.getPartition(tableIdent, spec).storage.serde == Some("org.apache.madoop"))
+      assert(catalog.getPartition(tableIdent, spec).storage.serdeProperties ==
+        Map("k" -> "v", "kay" -> "vee"))
+    }
+    // set serde properties only
+    maybeWrapException(isDatasourceTable) {
+      sql("ALTER TABLE dbx.tab1 PARTITION (a=1, b=2) " +
+        "SET SERDEPROPERTIES ('k' = 'vvv', 'kay' = 'vee')")
+      assert(catalog.getPartition(tableIdent, spec).storage.serdeProperties ==
+        Map("k" -> "vvv", "kay" -> "vee"))
+    }
+    // set things without explicitly specifying database
+    catalog.setCurrentDatabase("dbx")
+    maybeWrapException(isDatasourceTable) {
+      sql("ALTER TABLE tab1 PARTITION (a=1, b=2) SET SERDEPROPERTIES ('kay' = 'veee')")
+      assert(catalog.getPartition(tableIdent, spec).storage.serdeProperties ==
+        Map("k" -> "vvv", "kay" -> "veee"))
+    }
     // table to alter does not exist
     intercept[AnalysisException] {
       sql("ALTER TABLE does_not_exist SET SERDEPROPERTIES ('x' = 'y')")
@@ -1478,6 +1719,7 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
     }
   }
 
+<<<<<<< HEAD
   test("create table using CLUSTERED BY without schema specification") {
     import testImplicits._
     withTempPath { tempDir =>
@@ -1527,6 +1769,12 @@ class DDLSuite extends QueryTest with SharedSQLContext with BeforeAndAfterEach {
       sql("CREATE TABLE t2 USING parquet SELECT a, b from t1")
       checkAnswer(spark.table("t2"), spark.table("t1"))
     }
+=======
+  test("create table with datasource properties (not allowed)") {
+    assertUnsupported("CREATE TABLE my_tab TBLPROPERTIES ('spark.sql.sources.me'='anything')")
+    assertUnsupported("CREATE TABLE my_tab ROW FORMAT SERDE 'serde' " +
+      "WITH SERDEPROPERTIES ('spark.sql.sources.me'='anything')")
+>>>>>>> tuning_adaptive
   }
 
   test("drop current database") {

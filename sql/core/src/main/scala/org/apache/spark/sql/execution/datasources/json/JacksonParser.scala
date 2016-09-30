@@ -112,6 +112,7 @@ class JacksonParser(
   }
 
   /**
+<<<<<<< HEAD
    * Create a converter which converts the JSON documents held by the `JsonParser`
    * to a value according to a desired schema. This is a wrapper for the method
    * `makeConverter()` to handle a row wrapped with an array.
@@ -172,6 +173,83 @@ class JacksonParser(
       (parser: JsonParser) => parseJsonToken(parser, dataType) {
         case VALUE_NUMBER_INT => parser.getShortValue
       }
+=======
+   * Parse the current token (and related children) according to a desired schema
+   * This is a wrapper for the method `convertField()` to handle a row wrapped
+   * with an array.
+   */
+  def convertRootField(
+      factory: JsonFactory,
+      parser: JsonParser,
+      schema: DataType,
+      configOptions: JSONOptions): Any = {
+    import com.fasterxml.jackson.core.JsonToken._
+    (parser.getCurrentToken, schema) match {
+      case (START_ARRAY, st: StructType) =>
+        // SPARK-3308: support reading top level JSON arrays and take every element
+        // in such an array as a row
+        convertArray(factory, parser, st, configOptions)
+
+      case (START_OBJECT, ArrayType(st, _)) =>
+        // the business end of SPARK-3308:
+        // when an object is found but an array is requested just wrap it in a list
+        convertField(factory, parser, st, configOptions) :: Nil
+
+      case _ =>
+        convertField(factory, parser, schema, configOptions)
+    }
+  }
+
+  private def convertField(
+      factory: JsonFactory,
+      parser: JsonParser,
+      schema: DataType,
+      configOptions: JSONOptions): Any = {
+    import com.fasterxml.jackson.core.JsonToken._
+    (parser.getCurrentToken, schema) match {
+      case (null | VALUE_NULL, _) =>
+        null
+
+      case (FIELD_NAME, _) =>
+        parser.nextToken()
+        convertField(factory, parser, schema, configOptions)
+
+      case (VALUE_STRING, StringType) =>
+        UTF8String.fromString(parser.getText)
+
+      case (VALUE_STRING, _) if parser.getTextLength < 1 =>
+        // guard the non string type
+        null
+
+      case (VALUE_STRING, BinaryType) =>
+        parser.getBinaryValue
+
+      case (VALUE_STRING, DateType) =>
+        val stringValue = parser.getText
+        // This one will lose microseconds parts.
+        // See https://issues.apache.org/jira/browse/SPARK-10681.x
+        Try(DateTimeUtils.millisToDays(configOptions.dateFormat.parse(parser.getText).getTime))
+          .getOrElse {
+            // If it fails to parse, then tries the way used in 2.0 and 1.x for backwards
+            // compatibility.
+            Try(DateTimeUtils.millisToDays(DateTimeUtils.stringToTime(parser.getText).getTime))
+              .getOrElse {
+                // In Spark 1.5.0, we store the data as number of days since epoch in string.
+                // So, we just convert it to Int.
+                stringValue.toInt
+              }
+          }
+
+      case (VALUE_STRING, TimestampType) =>
+        // This one will lose microseconds parts.
+        // See https://issues.apache.org/jira/browse/SPARK-10681.
+        Try(configOptions.timestampFormat.parse(parser.getText).getTime * 1000L)
+          .getOrElse {
+            // If it fails to parse, then tries the way used in 2.0 and 1.x for backwards
+            // compatibility.
+            DateTimeUtils.stringToTime(parser.getText).getTime * 1000L
+          }
+>>>>>>> tuning_adaptive
 
     case IntegerType =>
       (parser: JsonParser) => parseJsonToken(parser, dataType) {
@@ -295,6 +373,7 @@ class JacksonParser(
         case START_ARRAY => convertArray(parser, elementConverter)
       }
 
+<<<<<<< HEAD
     case mt: MapType =>
       val valueConverter = makeConverter(mt.valueType)
       (parser: JsonParser) => parseJsonToken(parser, dataType) {
@@ -325,6 +404,19 @@ class JacksonParser(
         // There are useless FIELD_NAMEs between START_OBJECT and END_OBJECT tokens
         parser.nextToken()
         parseJsonToken(parser, dataType)(f)
+=======
+      case (START_OBJECT, st: StructType) =>
+        convertObject(factory, parser, st, configOptions)
+
+      case (START_ARRAY, ArrayType(st, _)) =>
+        convertArray(factory, parser, st, configOptions)
+
+      case (START_OBJECT, MapType(StringType, kt, _)) =>
+        convertMap(factory, parser, kt, configOptions)
+
+      case (_, udt: UserDefinedType[_]) =>
+        convertField(factory, parser, udt.sqlType, configOptions)
+>>>>>>> tuning_adaptive
 
       case null | VALUE_NULL => null
 
@@ -359,12 +451,20 @@ class JacksonParser(
   private def convertObject(
       parser: JsonParser,
       schema: StructType,
+<<<<<<< HEAD
       fieldConverters: Seq[ValueConverter]): InternalRow = {
+=======
+      configOptions: JSONOptions): InternalRow = {
+>>>>>>> tuning_adaptive
     val row = new GenericMutableRow(schema.length)
     while (nextUntil(parser, JsonToken.END_OBJECT)) {
       schema.getFieldIndex(parser.getCurrentName) match {
         case Some(index) =>
+<<<<<<< HEAD
           row.update(index, fieldConverters(index).apply(parser))
+=======
+          row.update(index, convertField(factory, parser, schema(index).dataType, configOptions))
+>>>>>>> tuning_adaptive
 
         case None =>
           parser.skipChildren()
@@ -379,12 +479,21 @@ class JacksonParser(
    */
   private def convertMap(
       parser: JsonParser,
+<<<<<<< HEAD
       fieldConverter: ValueConverter): MapData = {
+=======
+      valueType: DataType,
+      configOptions: JSONOptions): MapData = {
+>>>>>>> tuning_adaptive
     val keys = ArrayBuffer.empty[UTF8String]
     val values = ArrayBuffer.empty[Any]
     while (nextUntil(parser, JsonToken.END_OBJECT)) {
       keys += UTF8String.fromString(parser.getCurrentName)
+<<<<<<< HEAD
       values += fieldConverter.apply(parser)
+=======
+      values += convertField(factory, parser, valueType, configOptions)
+>>>>>>> tuning_adaptive
     }
 
     ArrayBasedMapData(keys.toArray, values.toArray)
@@ -395,15 +504,24 @@ class JacksonParser(
    */
   private def convertArray(
       parser: JsonParser,
+<<<<<<< HEAD
       fieldConverter: ValueConverter): ArrayData = {
     val values = ArrayBuffer.empty[Any]
     while (nextUntil(parser, JsonToken.END_ARRAY)) {
       values += fieldConverter.apply(parser)
+=======
+      elementType: DataType,
+      configOptions: JSONOptions): ArrayData = {
+    val values = ArrayBuffer.empty[Any]
+    while (nextUntil(parser, JsonToken.END_ARRAY)) {
+      values += convertField(factory, parser, elementType, configOptions)
+>>>>>>> tuning_adaptive
     }
 
     new GenericArrayData(values.toArray)
   }
 
+<<<<<<< HEAD
   /**
    * Parse the string JSON input to the set of [[InternalRow]]s.
    */
@@ -427,6 +545,55 @@ class JacksonParser(
               }
             case _ =>
               failedRecord(input)
+=======
+  def parseJson(
+      input: Iterator[String],
+      schema: StructType,
+      columnNameOfCorruptRecords: String,
+      configOptions: JSONOptions): Iterator[InternalRow] = {
+
+    def failedRecord(record: String): Seq[InternalRow] = {
+      // create a row even if no corrupt record column is present
+      if (configOptions.failFast) {
+        throw new RuntimeException(s"Malformed line in FAILFAST mode: $record")
+      }
+      if (configOptions.dropMalformed) {
+        logWarning(s"Dropping malformed line: $record")
+        Nil
+      } else {
+        val row = new GenericMutableRow(schema.length)
+        for (corruptIndex <- schema.getFieldIndex(columnNameOfCorruptRecords)) {
+          require(schema(corruptIndex).dataType == StringType)
+          row.update(corruptIndex, UTF8String.fromString(record))
+        }
+        Seq(row)
+      }
+    }
+
+    val factory = new JsonFactory()
+    configOptions.setJacksonOptions(factory)
+
+    input.flatMap { record =>
+      if (record.trim.isEmpty) {
+        Nil
+      } else {
+        try {
+          Utils.tryWithResource(factory.createParser(record)) { parser =>
+            parser.nextToken()
+
+            convertRootField(factory, parser, schema, configOptions) match {
+              case null => failedRecord(record)
+              case row: InternalRow => row :: Nil
+              case array: ArrayData =>
+                if (array.numElements() == 0) {
+                  Nil
+                } else {
+                  array.toArray[InternalRow](schema)
+                }
+              case _ =>
+                failedRecord(record)
+            }
+>>>>>>> tuning_adaptive
           }
         }
       } catch {

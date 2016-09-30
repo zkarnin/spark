@@ -98,7 +98,11 @@ class AstBuilder extends SqlBaseBaseVisitor[AnyRef] with Logging {
       }
       // Check for duplicate names.
       checkDuplicateKeys(ctes, ctx)
+<<<<<<< HEAD
       With(query, ctes)
+=======
+      With(query, ctes.toMap)
+>>>>>>> tuning_adaptive
     }
   }
 
@@ -553,7 +557,10 @@ class AstBuilder extends SqlBaseBaseVisitor[AnyRef] with Logging {
       withOrigin(join) {
         val baseJoinType = join.joinType match {
           case null => Inner
+<<<<<<< HEAD
           case jt if jt.CROSS != null => Cross
+=======
+>>>>>>> tuning_adaptive
           case jt if jt.FULL != null => FullOuter
           case jt if jt.SEMI != null => LeftSemi
           case jt if jt.ANTI != null => LeftAnti
@@ -572,9 +579,12 @@ class AstBuilder extends SqlBaseBaseVisitor[AnyRef] with Logging {
           case Some(c) if c.booleanExpression != null =>
             (baseJoinType, Option(expression(c.booleanExpression)))
           case None if join.NATURAL != null =>
+<<<<<<< HEAD
             if (baseJoinType == Cross) {
               throw new ParseException("NATURAL CROSS JOIN is not supported", ctx)
             }
+=======
+>>>>>>> tuning_adaptive
             (NaturalJoin(baseJoinType), None)
           case None =>
             (baseJoinType, None)
@@ -720,7 +730,11 @@ class AstBuilder extends SqlBaseBaseVisitor[AnyRef] with Logging {
    * Create an alias (SubqueryAlias) for a LogicalPlan.
    */
   private def aliasPlan(alias: ParserRuleContext, plan: LogicalPlan): LogicalPlan = {
+<<<<<<< HEAD
     SubqueryAlias(alias.getText, plan, None)
+=======
+    SubqueryAlias(alias.getText, plan)
+>>>>>>> tuning_adaptive
   }
 
   /**

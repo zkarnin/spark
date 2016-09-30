@@ -243,6 +243,7 @@ package object config {
     .toSequence
     .createWithDefault(Nil)
 
+<<<<<<< HEAD
   /* Rolled log aggregation configuration. */
 
   private[spark] val ROLLED_LOG_INCLUDE_PATTERN =
@@ -259,6 +260,8 @@ package object config {
       .stringConf
       .createOptional
 
+=======
+>>>>>>> tuning_adaptive
   /* Private configs. */
 
   private[spark] val CREDENTIALS_FILE_PATH = ConfigBuilder("spark.yarn.credentials.file")

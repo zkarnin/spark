@@ -306,6 +306,7 @@ class CatalogSuite
     columnFields.foreach { f => assert(columnString.contains(f.toString)) }
   }
 
+<<<<<<< HEAD
   test("createExternalTable should fail if path is not given for file-based data source") {
     val e = intercept[AnalysisException] {
       spark.catalog.createExternalTable("tbl", "json", Map.empty[String, String])
@@ -322,6 +323,8 @@ class CatalogSuite
     assert(e2.message == "Cannot create a file-based external data source table without path")
   }
 
+=======
+>>>>>>> tuning_adaptive
   // TODO: add tests for the rest of them
 
 }

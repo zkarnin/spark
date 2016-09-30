@@ -20,6 +20,11 @@ package org.apache.spark.sql
 import java.io.{Externalizable, ObjectInput, ObjectOutput}
 import java.sql.{Date, Timestamp}
 
+<<<<<<< HEAD
+=======
+import scala.language.postfixOps
+
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.catalyst.encoders.{OuterScopes, RowEncoder}
 import org.apache.spark.sql.catalyst.util.sideBySide
 import org.apache.spark.sql.execution.streaming.MemoryStream
@@ -764,7 +769,11 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
 
   private def checkShowString[T](ds: Dataset[T], expected: String): Unit = {
     val numRows = expected.split("\n").length - 4
+<<<<<<< HEAD
     val actual = ds.showString(numRows, truncate = 20)
+=======
+    val actual = ds.showString(numRows, truncate = true)
+>>>>>>> tuning_adaptive
 
     if (expected != actual) {
       fail(

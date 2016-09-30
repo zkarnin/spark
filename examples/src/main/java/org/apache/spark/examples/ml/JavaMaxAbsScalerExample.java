@@ -44,6 +44,7 @@ public class JavaMaxAbsScalerExample {
       .getOrCreate();
 
     // $example on$
+<<<<<<< HEAD
     List<Row> data = Arrays.asList(
         RowFactory.create(0, Vectors.dense(1.0, 0.1, -8.0)),
         RowFactory.create(1, Vectors.dense(2.0, 1.0, -4.0)),
@@ -55,6 +56,12 @@ public class JavaMaxAbsScalerExample {
     });
     Dataset<Row> dataFrame = spark.createDataFrame(data, schema);
 
+=======
+    Dataset<Row> dataFrame = spark
+      .read()
+      .format("libsvm")
+      .load("data/mllib/sample_libsvm_data.txt");
+>>>>>>> tuning_adaptive
     MaxAbsScaler scaler = new MaxAbsScaler()
       .setInputCol("features")
       .setOutputCol("scaledFeatures");
@@ -66,7 +73,10 @@ public class JavaMaxAbsScalerExample {
     Dataset<Row> scaledData = scalerModel.transform(dataFrame);
     scaledData.select("features", "scaledFeatures").show();
     // $example off$
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     spark.stop();
   }
 

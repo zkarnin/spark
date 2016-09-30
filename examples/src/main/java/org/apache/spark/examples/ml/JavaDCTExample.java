@@ -51,7 +51,10 @@ public class JavaDCTExample {
       new StructField("features", new VectorUDT(), false, Metadata.empty()),
     });
     Dataset<Row> df = spark.createDataFrame(data, schema);
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     DCT dct = new DCT()
       .setInputCol("features")
       .setOutputCol("featuresDCT")
@@ -61,7 +64,10 @@ public class JavaDCTExample {
 
     dctDf.select("featuresDCT").show(false);
     // $example off$
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     spark.stop();
   }
 }

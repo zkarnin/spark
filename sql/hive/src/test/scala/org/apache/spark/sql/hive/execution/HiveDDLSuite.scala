@@ -24,12 +24,20 @@ import org.scalatest.BeforeAndAfterEach
 
 import org.apache.spark.internal.config._
 import org.apache.spark.sql.{AnalysisException, QueryTest, Row, SaveMode}
+<<<<<<< HEAD
 import org.apache.spark.sql.catalyst.analysis.TableAlreadyExistsException
 import org.apache.spark.sql.catalyst.catalog.{CatalogDatabase, CatalogTable, CatalogTableType}
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.execution.command.DDLUtils
 import org.apache.spark.sql.execution.datasources.CaseInsensitiveMap
 import org.apache.spark.sql.hive.HiveExternalCatalog
+=======
+import org.apache.spark.sql.catalyst.catalog.{CatalogDatabase, CatalogTable, CatalogTableType}
+import org.apache.spark.sql.catalyst.TableIdentifier
+import org.apache.spark.sql.execution.command.{CreateDataSourceTableUtils, DDLUtils}
+import org.apache.spark.sql.execution.command.CreateDataSourceTableUtils._
+import org.apache.spark.sql.execution.datasources.CaseInsensitiveMap
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SQLTestUtils
@@ -370,7 +378,11 @@ class HiveDDLSuite
       expectedSerdeProps.map { case (k, v) => s"'$k'='$v'" }.mkString(", ")
     val oldPart = catalog.getPartition(TableIdentifier("boxes"), Map("width" -> "4"))
     assume(oldPart.storage.serde != Some(expectedSerde), "bad test: serde was already set")
+<<<<<<< HEAD
     assume(oldPart.storage.properties.filterKeys(expectedSerdeProps.contains) !=
+=======
+    assume(oldPart.storage.serdeProperties.filterKeys(expectedSerdeProps.contains) !=
+>>>>>>> tuning_adaptive
       expectedSerdeProps, "bad test: serde properties were already set")
     sql(s"""ALTER TABLE boxes PARTITION (width=4)
       |    SET SERDE '$expectedSerde'
@@ -378,7 +390,11 @@ class HiveDDLSuite
       |""".stripMargin)
     val newPart = catalog.getPartition(TableIdentifier("boxes"), Map("width" -> "4"))
     assert(newPart.storage.serde == Some(expectedSerde))
+<<<<<<< HEAD
     assume(newPart.storage.properties.filterKeys(expectedSerdeProps.contains) ==
+=======
+    assume(newPart.storage.serdeProperties.filterKeys(expectedSerdeProps.contains) ==
+>>>>>>> tuning_adaptive
       expectedSerdeProps)
   }
 
@@ -662,6 +678,10 @@ class HiveDDLSuite
     }
   }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> tuning_adaptive
   test("CREATE TABLE LIKE a temporary view") {
     val sourceViewName = "tab1"
     val targetTabName = "tab2"
@@ -804,7 +824,11 @@ class HiveDDLSuite
 
   private def getTablePath(table: CatalogTable): Option[String] = {
     if (DDLUtils.isDatasourceTable(table)) {
+<<<<<<< HEAD
       new CaseInsensitiveMap(table.storage.properties).get("path")
+=======
+      new CaseInsensitiveMap(table.storage.serdeProperties).get("path")
+>>>>>>> tuning_adaptive
     } else {
       table.storage.locationUri
     }
@@ -838,11 +862,21 @@ class HiveDDLSuite
       "maxFileSize",
       "minFileSize"
     )
+<<<<<<< HEAD
     assert(targetTable.properties.filterKeys(!metastoreGeneratedProperties.contains(_)).isEmpty,
       "the table properties of source tables should not be copied in the created table")
 
     if (DDLUtils.isDatasourceTable(sourceTable) ||
         sourceTable.tableType == CatalogTableType.VIEW) {
+=======
+    assert(targetTable.properties.filterKeys { key =>
+        !metastoreGeneratedProperties.contains(key) && !key.startsWith(DATASOURCE_PREFIX)
+      }.isEmpty,
+      "the table properties of source tables should not be copied in the created table")
+
+    if (DDLUtils.isDatasourceTable(sourceTable) ||
+      sourceTable.tableType == CatalogTableType.VIEW) {
+>>>>>>> tuning_adaptive
       assert(DDLUtils.isDatasourceTable(targetTable),
         "the target table should be a data source table")
     } else {
@@ -853,9 +887,17 @@ class HiveDDLSuite
     if (sourceTable.tableType == CatalogTableType.VIEW) {
       // Source table is a temporary/permanent view, which does not have a provider. The created
       // target table uses the default data source format
+<<<<<<< HEAD
       assert(targetTable.provider == Option(spark.sessionState.conf.defaultDataSourceName))
     } else {
       assert(targetTable.provider == sourceTable.provider)
+=======
+      assert(targetTable.properties(CreateDataSourceTableUtils.DATASOURCE_PROVIDER) ==
+        spark.sessionState.conf.defaultDataSourceName)
+    } else if (DDLUtils.isDatasourceTable(sourceTable)) {
+      assert(targetTable.properties(CreateDataSourceTableUtils.DATASOURCE_PROVIDER) ==
+        sourceTable.properties(CreateDataSourceTableUtils.DATASOURCE_PROVIDER))
+>>>>>>> tuning_adaptive
     }
 
     val sourceTablePath = getTablePath(sourceTable)
@@ -870,8 +912,13 @@ class HiveDDLSuite
 
     // Their schema should be identical
     checkAnswer(
+<<<<<<< HEAD
       sql(s"DESC ${sourceTable.identifier}"),
       sql(s"DESC ${targetTable.identifier}"))
+=======
+      sql(s"DESC ${sourceTable.identifier}").select("col_name", "data_type"),
+      sql(s"DESC ${targetTable.identifier}").select("col_name", "data_type"))
+>>>>>>> tuning_adaptive
 
     withSQLConf("hive.exec.dynamic.partition.mode" -> "nonstrict") {
       // Check whether the new table can be inserted using the data from the original table
@@ -884,6 +931,24 @@ class HiveDDLSuite
       sql(s"SELECT * FROM ${targetTable.identifier}"))
   }
 
+<<<<<<< HEAD
+=======
+  test("Analyze data source tables(LogicalRelation)") {
+    withTable("t1") {
+      withTempPath { dir =>
+        val path = dir.getCanonicalPath
+        spark.range(1).write.format("parquet").save(path)
+        sql(s"CREATE TABLE t1 USING parquet OPTIONS (PATH '$path')")
+        val e = intercept[AnalysisException] {
+          sql("ANALYZE TABLE t1 COMPUTE STATISTICS")
+        }.getMessage
+        assert(e.contains("ANALYZE TABLE is only supported for Hive tables, " +
+          "but 't1' is a LogicalRelation"))
+      }
+    }
+  }
+
+>>>>>>> tuning_adaptive
   test("desc table for data source table") {
     withTable("tab1") {
       val tabName = "tab1"
@@ -901,6 +966,7 @@ class HiveDDLSuite
     }
   }
 
+<<<<<<< HEAD
   test("create table with the same name as an index table") {
     val tabName = "tab1"
     val indexName = tabName + "_index"
@@ -970,6 +1036,8 @@ class HiveDDLSuite
     }
   }
 
+=======
+>>>>>>> tuning_adaptive
   test("desc table for data source table - no user-defined schema") {
     Seq("parquet", "json", "orc").foreach { fileFormat =>
       withTable("t1") {
@@ -1025,6 +1093,7 @@ class HiveDDLSuite
       ))
     }
   }
+<<<<<<< HEAD
 
   test("datasource and statistics table property keys are not allowed") {
     import org.apache.spark.sql.hive.HiveExternalCatalog.DATASOURCE_PREFIX
@@ -1051,4 +1120,6 @@ class HiveDDLSuite
       }
     }
   }
+=======
+>>>>>>> tuning_adaptive
 }

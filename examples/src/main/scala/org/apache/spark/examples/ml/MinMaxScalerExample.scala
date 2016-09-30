@@ -32,11 +32,15 @@ object MinMaxScalerExample {
       .getOrCreate()
 
     // $example on$
+<<<<<<< HEAD
     val dataFrame = spark.createDataFrame(Seq(
       (0, Vectors.dense(1.0, 0.1, -1.0)),
       (1, Vectors.dense(2.0, 1.1, 1.0)),
       (2, Vectors.dense(3.0, 10.1, 3.0))
     )).toDF("id", "features")
+=======
+    val dataFrame = spark.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
+>>>>>>> tuning_adaptive
 
     val scaler = new MinMaxScaler()
       .setInputCol("features")

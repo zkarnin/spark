@@ -21,12 +21,20 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.{Estimator, Model}
 import org.apache.spark.ml.attribute.NominalAttribute
 import org.apache.spark.ml.evaluation.Evaluator
+<<<<<<< HEAD
 import org.apache.spark.ml.feature.Instance
 import org.apache.spark.ml.linalg.{Vector, Vectors}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.ml.recommendation.{ALS, ALSModel}
 import org.apache.spark.ml.tree.impl.TreeTests
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+=======
+import org.apache.spark.ml.linalg.Vectors
+import org.apache.spark.ml.param.ParamMap
+import org.apache.spark.ml.recommendation.{ALS, ALSModel}
+import org.apache.spark.ml.tree.impl.TreeTests
+import org.apache.spark.sql.{DataFrame, SparkSession}
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 

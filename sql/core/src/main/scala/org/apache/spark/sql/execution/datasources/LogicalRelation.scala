@@ -90,7 +90,11 @@ case class LogicalRelation(
     LogicalRelation(
       relation,
       expectedOutputAttributes.map(_.map(_.newInstance())),
+<<<<<<< HEAD
       catalogTable).asInstanceOf[this.type]
+=======
+      metastoreTableIdentifier).asInstanceOf[this.type]
+>>>>>>> tuning_adaptive
   }
 
   override def refresh(): Unit = relation match {

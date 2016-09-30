@@ -172,6 +172,7 @@ case class MapElements(
     argumentSchema: StructType,
     outputObjAttr: Attribute,
     child: LogicalPlan) extends ObjectConsumer with ObjectProducer
+<<<<<<< HEAD
 
 object TypedFilter {
   def apply[T : Encoder](func: AnyRef, child: LogicalPlan): TypedFilter = {
@@ -216,6 +217,8 @@ case class TypedFilter(
     Invoke(funcObj, methodName, BooleanType, input :: Nil)
   }
 }
+=======
+>>>>>>> tuning_adaptive
 
 /** Factory for constructing new `AppendColumn` nodes. */
 object AppendColumns {

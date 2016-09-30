@@ -411,7 +411,11 @@ object QueryTest {
         s"""
         |Results do not match for query:
         |Timezone: ${TimeZone.getDefault}
+<<<<<<< HEAD
         |Timezone Env: ${sys.env.getOrElse("TZ", "")}
+=======
+        |Timezone Env: ${sys.env("TZ")}
+>>>>>>> tuning_adaptive
         |
         |${df.queryExecution}
         |== Results ==

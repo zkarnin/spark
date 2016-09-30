@@ -223,7 +223,11 @@ class SessionCatalog(
     val table = formatTableName(tableDefinition.identifier.table)
     val newTableDefinition = tableDefinition.copy(identifier = TableIdentifier(table, Some(db)))
     requireDbExists(db)
+<<<<<<< HEAD
     externalCatalog.createTable(newTableDefinition, ignoreIfExists)
+=======
+    externalCatalog.createTable(db, newTableDefinition, ignoreIfExists)
+>>>>>>> tuning_adaptive
   }
 
   /**
@@ -242,7 +246,11 @@ class SessionCatalog(
     val newTableDefinition = tableDefinition.copy(identifier = tableIdentifier)
     requireDbExists(db)
     requireTableExists(tableIdentifier)
+<<<<<<< HEAD
     externalCatalog.alterTable(newTableDefinition)
+=======
+    externalCatalog.alterTable(db, newTableDefinition)
+>>>>>>> tuning_adaptive
   }
 
   /**
@@ -259,7 +267,17 @@ class SessionCatalog(
         identifier = tid,
         tableType = CatalogTableType.VIEW,
         storage = CatalogStorageFormat.empty,
+<<<<<<< HEAD
         schema = tempTables(table).output.toStructType,
+=======
+        schema = tempTables(table).output.map { c =>
+          CatalogColumn(
+            name = c.name,
+            dataType = c.dataType.catalogString,
+            nullable = c.nullable
+          )
+        },
+>>>>>>> tuning_adaptive
         properties = Map(),
         viewText = None)
     } else {
@@ -309,13 +327,23 @@ class SessionCatalog(
       partition: TablePartitionSpec,
       isOverwrite: Boolean,
       holdDDLTime: Boolean,
+<<<<<<< HEAD
       inheritTableSpecs: Boolean): Unit = {
+=======
+      inheritTableSpecs: Boolean,
+      isSkewedStoreAsSubdir: Boolean): Unit = {
+>>>>>>> tuning_adaptive
     val db = formatDatabaseName(name.database.getOrElse(getCurrentDatabase))
     val table = formatTableName(name.table)
     requireDbExists(db)
     requireTableExists(TableIdentifier(table, Some(db)))
+<<<<<<< HEAD
     externalCatalog.loadPartition(
       db, table, loadPath, partition, isOverwrite, holdDDLTime, inheritTableSpecs)
+=======
+    externalCatalog.loadPartition(db, table, loadPath, partition, isOverwrite, holdDDLTime,
+      inheritTableSpecs, isSkewedStoreAsSubdir)
+>>>>>>> tuning_adaptive
   }
 
   def defaultTablePath(tableIdent: TableIdentifier): String = {
@@ -350,9 +378,20 @@ class SessionCatalog(
    * If no database is specified, this will first attempt to rename a temporary table with
    * the same name, then, if that does not exist, rename the table in the current database.
    */
+<<<<<<< HEAD
   def renameTable(oldName: TableIdentifier, newName: String): Unit = synchronized {
     val db = formatDatabaseName(oldName.database.getOrElse(currentDb))
     requireDbExists(db)
+=======
+  def renameTable(oldName: TableIdentifier, newName: TableIdentifier): Unit = synchronized {
+    val db = formatDatabaseName(oldName.database.getOrElse(currentDb))
+    requireDbExists(db)
+    val newDb = formatDatabaseName(newName.database.getOrElse(currentDb))
+    if (db != newDb) {
+      throw new AnalysisException(
+        s"RENAME TABLE source and destination databases do not match: '$db' != '$newDb'")
+    }
+>>>>>>> tuning_adaptive
     val oldTableName = formatTableName(oldName.table)
     val newTableName = formatTableName(newName)
     if (oldName.database.isDefined || !tempTables.contains(oldTableName)) {
@@ -360,6 +399,14 @@ class SessionCatalog(
       requireTableNotExists(TableIdentifier(newTableName, Some(db)))
       externalCatalog.renameTable(db, oldTableName, newTableName)
     } else {
+<<<<<<< HEAD
+=======
+      if (newName.database.isDefined) {
+        throw new AnalysisException(
+          s"RENAME TEMPORARY TABLE from '$oldName' to '$newName': cannot specify database " +
+            s"name '${newName.database.get}' in the destination table")
+      }
+>>>>>>> tuning_adaptive
       if (tempTables.contains(newTableName)) {
         throw new AnalysisException(
           s"RENAME TEMPORARY TABLE from '$oldName' to '$newName': destination table already exists")
@@ -377,10 +424,14 @@ class SessionCatalog(
    * If no database is specified, this will first attempt to drop a temporary table with
    * the same name, then, if that does not exist, drop the table from the current database.
    */
+<<<<<<< HEAD
   def dropTable(
       name: TableIdentifier,
       ignoreIfNotExists: Boolean,
       purge: Boolean): Unit = synchronized {
+=======
+  def dropTable(name: TableIdentifier, ignoreIfNotExists: Boolean): Unit = synchronized {
+>>>>>>> tuning_adaptive
     val db = formatDatabaseName(name.database.getOrElse(currentDb))
     val table = formatTableName(name.table)
     if (name.database.isDefined || !tempTables.contains(table)) {
@@ -388,7 +439,11 @@ class SessionCatalog(
       // When ignoreIfNotExists is false, no exception is issued when the table does not exist.
       // Instead, log it as an error message.
       if (tableExists(TableIdentifier(table, Option(db)))) {
+<<<<<<< HEAD
         externalCatalog.dropTable(db, table, ignoreIfNotExists = true, purge = purge)
+=======
+        externalCatalog.dropTable(db, table, ignoreIfNotExists = true)
+>>>>>>> tuning_adaptive
       } else if (!ignoreIfNotExists) {
         throw new NoSuchTableException(db = db, table = table)
       }
@@ -411,6 +466,7 @@ class SessionCatalog(
     synchronized {
       val db = formatDatabaseName(name.database.getOrElse(currentDb))
       val table = formatTableName(name.table)
+<<<<<<< HEAD
       val relationAlias = alias.getOrElse(table)
       if (name.database.isDefined || !tempTables.contains(table)) {
         val metadata = externalCatalog.getTable(db, table)
@@ -421,6 +477,19 @@ class SessionCatalog(
       } else {
         SubqueryAlias(relationAlias, tempTables(table), Option(name))
       }
+=======
+      val relation =
+        if (name.database.isDefined || !tempTables.contains(table)) {
+          val metadata = externalCatalog.getTable(db, table)
+          SimpleCatalogRelation(db, metadata, alias)
+        } else {
+          tempTables(table)
+        }
+      val qualifiedTable = SubqueryAlias(table, relation)
+      // If an alias was specified by the lookup, wrap the plan in a subquery so that
+      // attributes are properly qualified with this alias.
+      alias.map(a => SubqueryAlias(a, qualifiedTable)).getOrElse(qualifiedTable)
+>>>>>>> tuning_adaptive
     }
   }
 
@@ -535,14 +604,22 @@ class SessionCatalog(
   def dropPartitions(
       tableName: TableIdentifier,
       specs: Seq[TablePartitionSpec],
+<<<<<<< HEAD
       ignoreIfNotExists: Boolean,
       purge: Boolean): Unit = {
+=======
+      ignoreIfNotExists: Boolean): Unit = {
+>>>>>>> tuning_adaptive
     requirePartialMatchedPartitionSpec(specs, getTableMetadata(tableName))
     val db = formatDatabaseName(tableName.database.getOrElse(getCurrentDatabase))
     val table = formatTableName(tableName.table)
     requireDbExists(db)
     requireTableExists(TableIdentifier(table, Option(db)))
+<<<<<<< HEAD
     externalCatalog.dropPartitions(db, table, specs, ignoreIfNotExists, purge)
+=======
+    externalCatalog.dropPartitions(db, table, specs, ignoreIfNotExists)
+>>>>>>> tuning_adaptive
   }
 
   /**
@@ -894,7 +971,11 @@ class SessionCatalog(
       dropDatabase(db, ignoreIfNotExists = false, cascade = true)
     }
     listTables(DEFAULT_DATABASE).foreach { table =>
+<<<<<<< HEAD
       dropTable(table, ignoreIfNotExists = false, purge = false)
+=======
+      dropTable(table, ignoreIfNotExists = false)
+>>>>>>> tuning_adaptive
     }
     listFunctions(DEFAULT_DATABASE).map(_._1).foreach { func =>
       if (func.database.isDefined) {

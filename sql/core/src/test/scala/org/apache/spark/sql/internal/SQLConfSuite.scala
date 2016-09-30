@@ -128,6 +128,7 @@ class SQLConfSuite extends QueryTest with SharedSQLContext {
 
   test("reset - internal conf") {
     spark.sessionState.conf.clear()
+<<<<<<< HEAD
     val original = spark.conf.get(SQLConf.OPTIMIZER_MAX_ITERATIONS)
     try {
       assert(spark.conf.get(SQLConf.OPTIMIZER_MAX_ITERATIONS) === 100)
@@ -139,6 +140,19 @@ class SQLConfSuite extends QueryTest with SharedSQLContext {
       assert(sql(s"set").where(s"key = '${SQLConf.OPTIMIZER_MAX_ITERATIONS.key}'").count() == 0)
     } finally {
       sql(s"set ${SQLConf.OPTIMIZER_MAX_ITERATIONS}=$original")
+=======
+    val original = spark.conf.get(SQLConf.NATIVE_VIEW)
+    try {
+      assert(spark.conf.get(SQLConf.NATIVE_VIEW) === true)
+      sql(s"set ${SQLConf.NATIVE_VIEW.key}=false")
+      assert(spark.conf.get(SQLConf.NATIVE_VIEW) === false)
+      assert(sql(s"set").where(s"key = '${SQLConf.NATIVE_VIEW.key}'").count() == 1)
+      sql(s"reset")
+      assert(spark.conf.get(SQLConf.NATIVE_VIEW) === true)
+      assert(sql(s"set").where(s"key = '${SQLConf.NATIVE_VIEW.key}'").count() == 0)
+    } finally {
+      sql(s"set ${SQLConf.NATIVE_VIEW}=$original")
+>>>>>>> tuning_adaptive
     }
   }
 

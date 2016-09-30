@@ -550,6 +550,7 @@ class SparseVector @Since("2.0.0") (
     @Since("2.0.0") val indices: Array[Int],
     @Since("2.0.0") val values: Array[Double]) extends Vector {
 
+<<<<<<< HEAD
   // validate the data
   {
     require(size >= 0, "The size of the requested sparse vector must be greater than 0.")
@@ -569,6 +570,13 @@ class SparseVector @Since("2.0.0") (
     }
     require(prev < size, s"Index $prev out of bounds for vector of size $size")
   }
+=======
+  require(indices.length == values.length, "Sparse vectors require that the dimension of the" +
+    s" indices match the dimension of the values. You provided ${indices.length} indices and " +
+    s" ${values.length} values.")
+  require(indices.length <= size, s"You provided ${indices.length} indices and values, " +
+    s"which exceeds the specified vector size ${size}.")
+>>>>>>> tuning_adaptive
 
   override def toString: String =
     s"($size,${indices.mkString("[", ",", "]")},${values.mkString("[", ",", "]")})"

@@ -31,10 +31,33 @@ Run with:
 This example requires NumPy (http://www.numpy.org/).
 """
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> tuning_adaptive
 if __name__ == "__main__":
     spark = SparkSession\
         .builder\
         .appName("KMeansExample")\
+        .getOrCreate()
+
+<<<<<<< HEAD
+    # $example on$
+    # Loads data.
+    dataset = spark.read.format("libsvm").load("data/mllib/sample_kmeans_data.txt")
+
+    # Trains a k-means model.
+    kmeans = KMeans().setK(2).setSeed(1)
+    model = kmeans.fit(dataset)
+
+    # Evaluate clustering by computing Within Set Sum of Squared Errors.
+    wssse = model.computeCost(dataset)
+    print("Within Set Sum of Squared Errors = " + str(wssse))
+
+=======
+    spark = SparkSession\
+        .builder\
+        .appName("PythonKMeansExample")\
         .getOrCreate()
 
     # $example on$
@@ -49,6 +72,7 @@ if __name__ == "__main__":
     wssse = model.computeCost(dataset)
     print("Within Set Sum of Squared Errors = " + str(wssse))
 
+>>>>>>> tuning_adaptive
     # Shows the result.
     centers = model.clusterCenters()
     print("Cluster Centers: ")

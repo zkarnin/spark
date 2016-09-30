@@ -486,6 +486,7 @@ class OrcQuerySuite extends QueryTest with BeforeAndAfterAll with OrcTest {
       }
     }
   }
+<<<<<<< HEAD
 
   test("SPARK-15198 Support for pushing down filters for boolean types") {
     withSQLConf(SQLConf.ORC_FILTER_PUSHDOWN_ENABLED.key -> "true") {
@@ -520,4 +521,6 @@ class OrcQuerySuite extends QueryTest with BeforeAndAfterAll with OrcTest {
       assert(spark.table(tableName).schema == schema.copy(fields = expectedFields))
     }
   }
+=======
+>>>>>>> tuning_adaptive
 }

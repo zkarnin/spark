@@ -26,7 +26,11 @@ from pyspark.sql import SparkSession
 if __name__ == "__main__":
     spark = SparkSession\
         .builder\
+<<<<<<< HEAD
         .appName("NaiveBayesExample")\
+=======
+        .appName("naive_bayes_example")\
+>>>>>>> tuning_adaptive
         .getOrCreate()
 
     # $example on$
@@ -44,6 +48,7 @@ if __name__ == "__main__":
 
     # train the model
     model = nb.fit(train)
+<<<<<<< HEAD
 
     # select example rows to display.
     predictions = model.transform(test)
@@ -54,6 +59,13 @@ if __name__ == "__main__":
                                                   metricName="accuracy")
     accuracy = evaluator.evaluate(predictions)
     print("Test set accuracy = " + str(accuracy))
+=======
+    # compute accuracy on the test set
+    result = model.transform(test)
+    predictionAndLabels = result.select("prediction", "label")
+    evaluator = MulticlassClassificationEvaluator(metricName="accuracy")
+    print("Accuracy: " + str(evaluator.evaluate(predictionAndLabels)))
+>>>>>>> tuning_adaptive
     # $example off$
 
     spark.stop()

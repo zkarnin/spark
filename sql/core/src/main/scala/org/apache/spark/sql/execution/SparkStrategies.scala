@@ -18,7 +18,11 @@
 package org.apache.spark.sql.execution
 
 import org.apache.spark.rdd.RDD
+<<<<<<< HEAD
 import org.apache.spark.sql.{execution, SaveMode, Strategy}
+=======
+import org.apache.spark.sql.{AnalysisException, Strategy}
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.catalog.CatalogTableType
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
@@ -140,7 +144,11 @@ abstract class SparkStrategies extends QueryPlanner[SparkPlan] {
     }
 
     private def canBuildRight(joinType: JoinType): Boolean = joinType match {
+<<<<<<< HEAD
       case _: InnerLike | LeftOuter | LeftSemi | LeftAnti => true
+=======
+      case Inner | LeftOuter | LeftSemi | LeftAnti => true
+>>>>>>> tuning_adaptive
       case j: ExistenceJoin => true
       case _ => false
     }
@@ -212,7 +220,8 @@ abstract class SparkStrategies extends QueryPlanner[SparkPlan] {
           }
         // This join could be very slow or OOM
         joins.BroadcastNestedLoopJoinExec(
-          planLater(left), planLater(right), buildSide, joinType, condition) :: Nil
+          planLater(left), planLater(right), buildSide, joinType, condition,
+          withinBroadcastThreshold = false) :: Nil
 
       // --- Cases where this strategy does not apply ---------------------------------------------
 
@@ -353,7 +362,11 @@ abstract class SparkStrategies extends QueryPlanner[SparkPlan] {
       case logical.FlatMapGroupsInR(f, p, b, is, os, key, value, grouping, data, objAttr, child) =>
         execution.FlatMapGroupsInRExec(f, p, b, is, os, key, value, grouping,
           data, objAttr, planLater(child)) :: Nil
+<<<<<<< HEAD
       case logical.MapElements(f, _, _, objAttr, child) =>
+=======
+      case logical.MapElements(f, objAttr, child) =>
+>>>>>>> tuning_adaptive
         execution.MapElementsExec(f, objAttr, planLater(child)) :: Nil
       case logical.AppendColumns(f, _, _, in, out, child) =>
         execution.AppendColumnsExec(f, in, out, planLater(child)) :: Nil
@@ -417,12 +430,23 @@ abstract class SparkStrategies extends QueryPlanner[SparkPlan] {
 
   object DDLStrategy extends Strategy {
     def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
+<<<<<<< HEAD
       case CreateTable(tableDesc, mode, None) if tableDesc.provider.get == "hive" =>
         val cmd = CreateTableCommand(tableDesc, ifNotExists = mode == SaveMode.Ignore)
         ExecutedCommandExec(cmd) :: Nil
+=======
+      case c: CreateTableUsing if c.temporary && !c.allowExisting =>
+        logWarning(
+          s"CREATE TEMPORARY TABLE ${c.tableIdent.identifier} USING... is deprecated, " +
+            s"please use CREATE TEMPORARY VIEW viewName USING... instead")
+        ExecutedCommandExec(
+          CreateTempViewUsing(
+            c.tableIdent, c.userSpecifiedSchema, replace = true, c.provider, c.options)) :: Nil
+>>>>>>> tuning_adaptive
 
       case CreateTable(tableDesc, mode, None) =>
         val cmd =
+<<<<<<< HEAD
           CreateDataSourceTableCommand(tableDesc, ignoreIfExists = mode == SaveMode.Ignore)
         ExecutedCommandExec(cmd) :: Nil
 
@@ -430,6 +454,24 @@ abstract class SparkStrategies extends QueryPlanner[SparkPlan] {
       // `CreateTables`
 
       case CreateTable(tableDesc, mode, Some(query)) if tableDesc.provider.get != "hive" =>
+=======
+          CreateDataSourceTableCommand(
+            c.tableIdent,
+            c.userSpecifiedSchema,
+            c.provider,
+            c.options,
+            c.partitionColumns,
+            c.bucketSpec,
+            c.allowExisting,
+            c.managedIfNoPath)
+        ExecutedCommandExec(cmd) :: Nil
+
+      case c: CreateTableUsing if c.temporary && c.allowExisting =>
+        throw new AnalysisException(
+          "allowExisting should be set to false when creating a temporary table.")
+
+      case c: CreateTableUsingAsSelect =>
+>>>>>>> tuning_adaptive
         val cmd =
           CreateDataSourceTableAsSelectCommand(
             tableDesc,
@@ -437,8 +479,13 @@ abstract class SparkStrategies extends QueryPlanner[SparkPlan] {
             query)
         ExecutedCommandExec(cmd) :: Nil
 
+<<<<<<< HEAD
       case c: CreateTempViewUsing => ExecutedCommandExec(c) :: Nil
 
+=======
+      case c: CreateTempViewUsing =>
+        ExecutedCommandExec(c) :: Nil
+>>>>>>> tuning_adaptive
       case _ => Nil
     }
   }

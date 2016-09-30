@@ -45,6 +45,7 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.types.{IntegralType, StringType}
 import org.apache.spark.util.Utils
 
+
 /**
  * A shim that defines the interface between [[HiveClientImpl]] and the underlying Hive library used
  * to talk to the metastore. Each Hive version has its own implementation of this class, defining
@@ -360,6 +361,7 @@ private[client] class Shim_v0_12 extends Shim with Logging {
     dropIndexMethod.invoke(hive, dbName, tableName, indexName, true: JBoolean)
   }
 
+<<<<<<< HEAD
   override def dropTable(
       hive: Hive,
       dbName: String,
@@ -386,6 +388,8 @@ private[client] class Shim_v0_12 extends Shim with Logging {
     hive.dropPartition(dbName, tableName, part, deleteData)
   }
 
+=======
+>>>>>>> tuning_adaptive
   override def createFunction(hive: Hive, db: String, func: CatalogFunction): Unit = {
     throw new AnalysisException("Hive 0.12 doesn't support creating permanent functions. " +
       "Please use Hive 0.13 or higher.")

@@ -170,7 +170,11 @@ class DataFrameJoinSuite extends QueryTest with SharedSQLContext {
     withTempPath { path =>
       df1.write.parquet(path.getCanonicalPath)
       val pf1 = spark.read.parquet(path.getCanonicalPath)
+<<<<<<< HEAD
       assert(df1.crossJoin(broadcast(pf1)).count() === 4)
+=======
+      assert(df1.join(broadcast(pf1)).count() === 4)
+>>>>>>> tuning_adaptive
     }
   }
 

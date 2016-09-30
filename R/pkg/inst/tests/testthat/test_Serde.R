@@ -17,7 +17,11 @@
 
 context("SerDe functionality")
 
+<<<<<<< HEAD
 sparkSession <- sparkR.session(enableHiveSupport = FALSE)
+=======
+sparkSession <- sparkR.session()
+>>>>>>> tuning_adaptive
 
 test_that("SerDe of primitive types", {
   x <- callJStatic("SparkRHandler", "echo", 1L)

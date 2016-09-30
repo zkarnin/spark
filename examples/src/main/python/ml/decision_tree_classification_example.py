@@ -31,7 +31,11 @@ from pyspark.sql import SparkSession
 if __name__ == "__main__":
     spark = SparkSession\
         .builder\
+<<<<<<< HEAD
         .appName("DecisionTreeClassificationExample")\
+=======
+        .appName("decision_tree_classification_example")\
+>>>>>>> tuning_adaptive
         .getOrCreate()
 
     # $example on$

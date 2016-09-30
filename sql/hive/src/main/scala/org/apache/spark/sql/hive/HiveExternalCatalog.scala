@@ -44,7 +44,11 @@ import org.apache.spark.sql.types.{DataType, StructType}
  * A persistent implementation of the system catalog using Hive.
  * All public methods must be synchronized for thread-safety.
  */
+<<<<<<< HEAD
 private[spark] class HiveExternalCatalog(conf: SparkConf, hadoopConf: Configuration)
+=======
+private[spark] class HiveExternalCatalog(client: HiveClient, hadoopConf: Configuration)
+>>>>>>> tuning_adaptive
   extends ExternalCatalog with Logging {
 
   import CatalogTypes.TablePartitionSpec
@@ -90,6 +94,17 @@ private[spark] class HiveExternalCatalog(conf: SparkConf, hadoopConf: Configurat
       case NonFatal(e) if isClientException(e) =>
         throw new AnalysisException(
           e.getClass.getCanonicalName + ": " + e.getMessage, cause = Some(e))
+<<<<<<< HEAD
+=======
+    }
+  }
+
+  private def requireDbMatches(db: String, table: CatalogTable): Unit = {
+    if (table.identifier.database != Some(db)) {
+      throw new AnalysisException(
+        s"Provided database '$db' does not match the one specified in the " +
+        s"table definition (${table.identifier.database.getOrElse("n/a")})")
+>>>>>>> tuning_adaptive
     }
   }
 
@@ -177,6 +192,7 @@ private[spark] class HiveExternalCatalog(conf: SparkConf, hadoopConf: Configurat
     val db = tableDefinition.identifier.database.get
     val table = tableDefinition.identifier.table
     requireDbExists(db)
+<<<<<<< HEAD
     verifyTableProperties(tableDefinition)
 
     if (tableExists(db, table) && !ignoreIfExists) {
@@ -340,6 +356,19 @@ private[spark] class HiveExternalCatalog(conf: SparkConf, hadoopConf: Configurat
       // format always set `locationUri` to the actual data location and should NOT be hacked as
       // following.)
       tableDefinition.storage.locationUri.isEmpty) {
+=======
+    requireDbMatches(db, tableDefinition)
+
+    if (
+    // If this is an external data source table...
+      tableDefinition.properties.contains("spark.sql.sources.provider") &&
+        tableDefinition.tableType == CatalogTableType.EXTERNAL &&
+        // ... that is not persisted as Hive compatible format (external tables in Hive compatible
+        // format always set `locationUri` to the actual data location and should NOT be hacked as
+        // following.)
+        tableDefinition.storage.locationUri.isEmpty
+    ) {
+>>>>>>> tuning_adaptive
       // !! HACK ALERT !!
       //
       // Due to a restriction of Hive metastore, here we have to set `locationUri` to a temporary

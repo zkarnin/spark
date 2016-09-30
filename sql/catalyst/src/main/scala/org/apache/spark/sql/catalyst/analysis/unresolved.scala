@@ -401,6 +401,7 @@ case class GetColumnByOrdinal(ordinal: Int, dataType: DataType) extends LeafExpr
   override def nullable: Boolean = throw new UnresolvedException(this, "nullable")
   override lazy val resolved = false
 }
+<<<<<<< HEAD
 
 /**
  * Represents unresolved ordinal used in order by or group by.
@@ -419,3 +420,5 @@ case class UnresolvedOrdinal(ordinal: Int)
   override def nullable: Boolean = throw new UnresolvedException(this, "nullable")
   override lazy val resolved = false
 }
+=======
+>>>>>>> tuning_adaptive

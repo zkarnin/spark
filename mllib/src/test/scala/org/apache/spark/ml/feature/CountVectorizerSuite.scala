@@ -77,10 +77,17 @@ class CountVectorizerSuite extends SparkFunSuite with MLlibTestSparkContext
 
   test("CountVectorizer vocabSize and minDF") {
     val df = spark.createDataFrame(Seq(
+<<<<<<< HEAD
       (0, split("a b c d"), Vectors.sparse(2, Seq((0, 1.0), (1, 1.0)))),
       (1, split("a b c"), Vectors.sparse(2, Seq((0, 1.0), (1, 1.0)))),
       (2, split("a b"), Vectors.sparse(2, Seq((0, 1.0), (1, 1.0)))),
       (3, split("a"), Vectors.sparse(2, Seq((0, 1.0)))))
+=======
+      (0, split("a b c d"), Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
+      (1, split("a b c"), Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
+      (2, split("a b"), Vectors.sparse(3, Seq((0, 1.0), (1, 1.0)))),
+      (3, split("a"), Vectors.sparse(3, Seq((0, 1.0)))))
+>>>>>>> tuning_adaptive
     ).toDF("id", "words", "expected")
     val cvModel = new CountVectorizer()
       .setInputCol("words")

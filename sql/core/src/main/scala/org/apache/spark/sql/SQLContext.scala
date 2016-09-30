@@ -752,16 +752,32 @@ class SQLContext private[sql](val sparkSession: SparkSession)
   /**
    * @deprecated As of 1.3.0, replaced by `createDataFrame()`.
    */
+<<<<<<< HEAD
   @deprecated("Use createDataFrame instead.", "1.3.0")
   def applySchema(rowRDD: RDD[Row], schema: StructType): DataFrame = {
     createDataFrame(rowRDD, schema)
+=======
+  // TODO: Remove this function (would require updating PySpark).
+  private[sql] def parseDataType(dataTypeString: String): DataType = {
+    DataType.fromJson(dataTypeString)
+>>>>>>> tuning_adaptive
   }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  // Deprecated methods
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
 
   /**
    * @deprecated As of 1.3.0, replaced by `createDataFrame()`.
    */
   @deprecated("Use createDataFrame instead.", "1.3.0")
+<<<<<<< HEAD
   def applySchema(rowRDD: JavaRDD[Row], schema: StructType): DataFrame = {
+=======
+  def applySchema(rowRDD: RDD[Row], schema: StructType): DataFrame = {
+>>>>>>> tuning_adaptive
     createDataFrame(rowRDD, schema)
   }
 
@@ -769,6 +785,21 @@ class SQLContext private[sql](val sparkSession: SparkSession)
    * @deprecated As of 1.3.0, replaced by `createDataFrame()`.
    */
   @deprecated("Use createDataFrame instead.", "1.3.0")
+<<<<<<< HEAD
+  def applySchema(rdd: RDD[_], beanClass: Class[_]): DataFrame = {
+    createDataFrame(rdd, beanClass)
+=======
+  def applySchema(rowRDD: JavaRDD[Row], schema: StructType): DataFrame = {
+    createDataFrame(rowRDD, schema)
+>>>>>>> tuning_adaptive
+  }
+
+  /**
+   * @deprecated As of 1.3.0, replaced by `createDataFrame()`.
+   */
+  @deprecated("Use createDataFrame instead.", "1.3.0")
+<<<<<<< HEAD
+=======
   def applySchema(rdd: RDD[_], beanClass: Class[_]): DataFrame = {
     createDataFrame(rdd, beanClass)
   }
@@ -777,6 +808,7 @@ class SQLContext private[sql](val sparkSession: SparkSession)
    * @deprecated As of 1.3.0, replaced by `createDataFrame()`.
    */
   @deprecated("Use createDataFrame instead.", "1.3.0")
+>>>>>>> tuning_adaptive
   def applySchema(rdd: JavaRDD[_], beanClass: Class[_]): DataFrame = {
     createDataFrame(rdd, beanClass)
   }
@@ -830,6 +862,7 @@ class SQLContext private[sql](val sparkSession: SparkSession)
   def jsonFile(path: String, samplingRatio: Double): DataFrame = {
     read.option("samplingRatio", samplingRatio.toString).json(path)
   }
+<<<<<<< HEAD
 
   /**
    * Loads an RDD[String] storing JSON objects (one object per record), returning the result as a
@@ -978,6 +1011,156 @@ class SQLContext private[sql](val sparkSession: SparkSession)
   }
 
   /**
+=======
+
+  /**
+   * Loads an RDD[String] storing JSON objects (one object per record), returning the result as a
+   * [[DataFrame]].
+   * It goes through the entire dataset once to determine the schema.
+   *
+   * @group specificdata
+   * @deprecated As of 1.4.0, replaced by `read().json()`.
+   */
+  @deprecated("Use read.json() instead.", "1.4.0")
+  def jsonRDD(json: RDD[String]): DataFrame = read.json(json)
+
+  /**
+   * Loads an RDD[String] storing JSON objects (one object per record), returning the result as a
+   * [[DataFrame]].
+   * It goes through the entire dataset once to determine the schema.
+   *
+   * @group specificdata
+   * @deprecated As of 1.4.0, replaced by `read().json()`.
+   */
+  @deprecated("Use read.json() instead.", "1.4.0")
+  def jsonRDD(json: JavaRDD[String]): DataFrame = read.json(json)
+
+  /**
+   * Loads an RDD[String] storing JSON objects (one object per record) and applies the given schema,
+   * returning the result as a [[DataFrame]].
+   *
+   * @group specificdata
+   * @deprecated As of 1.4.0, replaced by `read().json()`.
+   */
+  @deprecated("Use read.json() instead.", "1.4.0")
+  def jsonRDD(json: RDD[String], schema: StructType): DataFrame = {
+    read.schema(schema).json(json)
+  }
+
+  /**
+   * Loads an JavaRDD<String> storing JSON objects (one object per record) and applies the given
+   * schema, returning the result as a [[DataFrame]].
+   *
+   * @group specificdata
+   * @deprecated As of 1.4.0, replaced by `read().json()`.
+   */
+  @deprecated("Use read.json() instead.", "1.4.0")
+  def jsonRDD(json: JavaRDD[String], schema: StructType): DataFrame = {
+    read.schema(schema).json(json)
+  }
+
+  /**
+   * Loads an RDD[String] storing JSON objects (one object per record) inferring the
+   * schema, returning the result as a [[DataFrame]].
+   *
+   * @group specificdata
+   * @deprecated As of 1.4.0, replaced by `read().json()`.
+   */
+  @deprecated("Use read.json() instead.", "1.4.0")
+  def jsonRDD(json: RDD[String], samplingRatio: Double): DataFrame = {
+    read.option("samplingRatio", samplingRatio.toString).json(json)
+  }
+
+  /**
+   * Loads a JavaRDD[String] storing JSON objects (one object per record) inferring the
+   * schema, returning the result as a [[DataFrame]].
+   *
+   * @group specificdata
+   * @deprecated As of 1.4.0, replaced by `read().json()`.
+   */
+  @deprecated("Use read.json() instead.", "1.4.0")
+  def jsonRDD(json: JavaRDD[String], samplingRatio: Double): DataFrame = {
+    read.option("samplingRatio", samplingRatio.toString).json(json)
+  }
+
+  /**
+   * Returns the dataset stored at path as a DataFrame,
+   * using the default data source configured by spark.sql.sources.default.
+   *
+   * @group genericdata
+   * @deprecated As of 1.4.0, replaced by `read().load(path)`.
+   */
+  @deprecated("Use read.load(path) instead.", "1.4.0")
+  def load(path: String): DataFrame = {
+    read.load(path)
+  }
+
+  /**
+   * Returns the dataset stored at path as a DataFrame, using the given data source.
+   *
+   * @group genericdata
+   * @deprecated As of 1.4.0, replaced by `read().format(source).load(path)`.
+   */
+  @deprecated("Use read.format(source).load(path) instead.", "1.4.0")
+  def load(path: String, source: String): DataFrame = {
+    read.format(source).load(path)
+  }
+
+  /**
+   * (Java-specific) Returns the dataset specified by the given data source and
+   * a set of options as a DataFrame.
+   *
+   * @group genericdata
+   * @deprecated As of 1.4.0, replaced by `read().format(source).options(options).load()`.
+   */
+  @deprecated("Use read.format(source).options(options).load() instead.", "1.4.0")
+  def load(source: String, options: java.util.Map[String, String]): DataFrame = {
+    read.options(options).format(source).load()
+  }
+
+  /**
+   * (Scala-specific) Returns the dataset specified by the given data source and
+   * a set of options as a DataFrame.
+   *
+   * @group genericdata
+   * @deprecated As of 1.4.0, replaced by `read().format(source).options(options).load()`.
+   */
+  @deprecated("Use read.format(source).options(options).load() instead.", "1.4.0")
+  def load(source: String, options: Map[String, String]): DataFrame = {
+    read.options(options).format(source).load()
+  }
+
+  /**
+   * (Java-specific) Returns the dataset specified by the given data source and
+   * a set of options as a DataFrame, using the given schema as the schema of the DataFrame.
+   *
+   * @group genericdata
+   * @deprecated As of 1.4.0, replaced by
+   *            `read().format(source).schema(schema).options(options).load()`.
+   */
+  @deprecated("Use read.format(source).schema(schema).options(options).load() instead.", "1.4.0")
+  def load(
+      source: String,
+      schema: StructType,
+      options: java.util.Map[String, String]): DataFrame = {
+    read.format(source).schema(schema).options(options).load()
+  }
+
+  /**
+   * (Scala-specific) Returns the dataset specified by the given data source and
+   * a set of options as a DataFrame, using the given schema as the schema of the DataFrame.
+   *
+   * @group genericdata
+   * @deprecated As of 1.4.0, replaced by
+   *            `read().format(source).schema(schema).options(options).load()`.
+   */
+  @deprecated("Use read.format(source).schema(schema).options(options).load() instead.", "1.4.0")
+  def load(source: String, schema: StructType, options: Map[String, String]): DataFrame = {
+    read.format(source).schema(schema).options(options).load()
+  }
+
+  /**
+>>>>>>> tuning_adaptive
    * Construct a [[DataFrame]] representing the database table accessible via JDBC URL
    * url named table.
    *

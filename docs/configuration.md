@@ -427,6 +427,7 @@ Apart from these, the following properties are also available, and may be useful
     with <code>spark.jars.packages</code>.
   </td>
 </tr>
+<<<<<<< HEAD
 <tr>
   <td><code>spark.pyspark.driver.python</code></td>
   <td></td>
@@ -442,6 +443,8 @@ Apart from these, the following properties are also available, and may be useful
     Python binary executable to use for PySpark in both driver and executors.
   </td>
 </tr>
+=======
+>>>>>>> tuning_adaptive
 </table>
 
 #### Shuffle Behavior
@@ -658,6 +661,7 @@ Apart from these, the following properties are also available, and may be useful
   </td>
 </tr>
 <tr>
+<<<<<<< HEAD
   <td><code>spark.ui.reverseProxy</code></td>
   <td>false</td>
   <td>
@@ -672,6 +676,8 @@ Apart from these, the following properties are also available, and may be useful
   </td>
 </tr>
 <tr>
+=======
+>>>>>>> tuning_adaptive
   <td><code>spark.worker.ui.retainedExecutors</code></td>
   <td>1000</td>
   <td>

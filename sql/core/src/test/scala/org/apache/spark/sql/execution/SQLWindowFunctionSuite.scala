@@ -361,8 +361,12 @@ class SQLWindowFunctionSuite extends QueryTest with SharedSQLContext {
         |with
         | v0 as (select 0 as key, 1 as value),
         | v1 as (select key, count(value) over (partition by key) cnt_val from v0),
+<<<<<<< HEAD:sql/core/src/test/scala/org/apache/spark/sql/execution/SQLWindowFunctionSuite.scala
         | v2 as (select v1.key, v1_lag.cnt_val from v1 cross join v1 v1_lag
         |        where v1.key = v1_lag.key)
+=======
+        | v2 as (select v1.key, v1_lag.cnt_val from v1, v1 v1_lag where v1.key = v1_lag.key)
+>>>>>>> tuning_adaptive:sql/core/src/test/scala/org/apache/spark/sql/execution/SQLWindowFunctionSuite.scala
         | select key, cnt_val from v2 order by key limit 1
       """.stripMargin), Row(0, 1))
   }

@@ -241,13 +241,22 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
   }
 
   test("string parse_url function") {
+<<<<<<< HEAD
 
     def testUrl(url: String, expected: Row) {
       checkAnswer(Seq[String]((url)).toDF("url").selectExpr(
+=======
+    val df = Seq[String](("http://userinfo@spark.apache.org/path?query=1#Ref"))
+      .toDF("url")
+
+    checkAnswer(
+      df.selectExpr(
+>>>>>>> tuning_adaptive
         "parse_url(url, 'HOST')", "parse_url(url, 'PATH')",
         "parse_url(url, 'QUERY')", "parse_url(url, 'REF')",
         "parse_url(url, 'PROTOCOL')", "parse_url(url, 'FILE')",
         "parse_url(url, 'AUTHORITY')", "parse_url(url, 'USERINFO')",
+<<<<<<< HEAD
         "parse_url(url, 'QUERY', 'query')"), expected)
     }
 
@@ -283,6 +292,11 @@ class StringFunctionsSuite extends QueryTest with SharedSQLContext {
       "inva lid://user:pass@host/file;param?query;p2",
       Row(null, null, null, null, null, null, null, null, null))
 
+=======
+        "parse_url(url, 'QUERY', 'query')"),
+      Row("spark.apache.org", "/path", "query=1", "Ref",
+        "http", "/path?query=1", "userinfo@spark.apache.org", "userinfo", "1"))
+>>>>>>> tuning_adaptive
   }
 
   test("string repeat function") {

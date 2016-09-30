@@ -106,14 +106,22 @@ class AggregateBenchmark extends BenchmarkBase {
 
     benchmark.addCase(s"codegen = T hashmap = F", numIters = 3) { iter =>
       sparkSession.conf.set("spark.sql.codegen.wholeStage", "true")
+<<<<<<< HEAD
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.twolevel.enable", "false")
+=======
+      sparkSession.conf.set("spark.sql.codegen.aggregate.map.columns.max", "0")
+>>>>>>> tuning_adaptive
       f()
     }
 
     benchmark.addCase(s"codegen = T hashmap = T", numIters = 5) { iter =>
       sparkSession.conf.set("spark.sql.codegen.wholeStage", "true")
+<<<<<<< HEAD
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.twolevel.enable", "true")
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.vectorized.enable", "true")
+=======
+      sparkSession.conf.set("spark.sql.codegen.aggregate.map.columns.max", "3")
+>>>>>>> tuning_adaptive
       f()
     }
 
@@ -147,14 +155,22 @@ class AggregateBenchmark extends BenchmarkBase {
 
     benchmark.addCase(s"codegen = T hashmap = F", numIters = 3) { iter =>
       sparkSession.conf.set("spark.sql.codegen.wholeStage", value = true)
+<<<<<<< HEAD
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.twolevel.enable", "false")
+=======
+      sparkSession.conf.set("spark.sql.codegen.aggregate.map.columns.max", 0)
+>>>>>>> tuning_adaptive
       f()
     }
 
     benchmark.addCase(s"codegen = T hashmap = T", numIters = 5) { iter =>
       sparkSession.conf.set("spark.sql.codegen.wholeStage", value = true)
+<<<<<<< HEAD
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.twolevel.enable", "true")
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.vectorized.enable", "true")
+=======
+      sparkSession.conf.set("spark.sql.codegen.aggregate.map.columns.max", 3)
+>>>>>>> tuning_adaptive
       f()
     }
 
@@ -186,14 +202,22 @@ class AggregateBenchmark extends BenchmarkBase {
 
     benchmark.addCase(s"codegen = T hashmap = F", numIters = 3) { iter =>
       sparkSession.conf.set("spark.sql.codegen.wholeStage", "true")
+<<<<<<< HEAD
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.twolevel.enable", "false")
+=======
+      sparkSession.conf.set("spark.sql.codegen.aggregate.map.columns.max", "0")
+>>>>>>> tuning_adaptive
       f()
     }
 
     benchmark.addCase(s"codegen = T hashmap = T", numIters = 5) { iter =>
       sparkSession.conf.set("spark.sql.codegen.wholeStage", "true")
+<<<<<<< HEAD
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.twolevel.enable", "true")
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.vectorized.enable", "true")
+=======
+      sparkSession.conf.set("spark.sql.codegen.aggregate.map.columns.max", "3")
+>>>>>>> tuning_adaptive
       f()
     }
 
@@ -224,14 +248,22 @@ class AggregateBenchmark extends BenchmarkBase {
 
     benchmark.addCase(s"codegen = T hashmap = F") { iter =>
       sparkSession.conf.set("spark.sql.codegen.wholeStage", "true")
+<<<<<<< HEAD
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.twolevel.enable", "false")
+=======
+      sparkSession.conf.set("spark.sql.codegen.aggregate.map.columns.max", "0")
+>>>>>>> tuning_adaptive
       f()
     }
 
     benchmark.addCase(s"codegen = T hashmap = T") { iter =>
       sparkSession.conf.set("spark.sql.codegen.wholeStage", "true")
+<<<<<<< HEAD
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.twolevel.enable", "true")
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.vectorized.enable", "true")
+=======
+      sparkSession.conf.set("spark.sql.codegen.aggregate.map.columns.max", "3")
+>>>>>>> tuning_adaptive
       f()
     }
 
@@ -272,14 +304,22 @@ class AggregateBenchmark extends BenchmarkBase {
 
     benchmark.addCase(s"codegen = T hashmap = F") { iter =>
       sparkSession.conf.set("spark.sql.codegen.wholeStage", "true")
+<<<<<<< HEAD
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.twolevel.enable", "false")
+=======
+      sparkSession.conf.set("spark.sql.codegen.aggregate.map.columns.max", "0")
+>>>>>>> tuning_adaptive
       f()
     }
 
     benchmark.addCase(s"codegen = T hashmap = T") { iter =>
       sparkSession.conf.set("spark.sql.codegen.wholeStage", "true")
+<<<<<<< HEAD
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.twolevel.enable", "true")
       sparkSession.conf.set("spark.sql.codegen.aggregate.map.vectorized.enable", "true")
+=======
+      sparkSession.conf.set("spark.sql.codegen.aggregate.map.columns.max", "10")
+>>>>>>> tuning_adaptive
       f()
     }
 

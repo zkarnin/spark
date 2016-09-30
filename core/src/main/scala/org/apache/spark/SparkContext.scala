@@ -56,6 +56,10 @@ import org.apache.spark.rdd._
 import org.apache.spark.rpc.RpcEndpointRef
 import org.apache.spark.scheduler._
 import org.apache.spark.scheduler.cluster.{CoarseGrainedSchedulerBackend, StandaloneSchedulerBackend}
+<<<<<<< HEAD
+=======
+import org.apache.spark.scheduler.cluster.mesos.{MesosCoarseGrainedSchedulerBackend, MesosFineGrainedSchedulerBackend}
+>>>>>>> tuning_adaptive
 import org.apache.spark.scheduler.local.LocalSchedulerBackend
 import org.apache.spark.storage._
 import org.apache.spark.storage.BlockManagerMessages.TriggerThreadDump
@@ -354,7 +358,11 @@ class SparkContext(config: SparkConf) extends Logging with ExecutorAllocationCli
    * Valid log levels include: ALL, DEBUG, ERROR, FATAL, INFO, OFF, TRACE, WARN
    */
   def setLogLevel(logLevel: String) {
+<<<<<<< HEAD
     // let's allow lowercase or mixed case too
+=======
+    // let's allow lowcase or mixed case too
+>>>>>>> tuning_adaptive
     val upperCased = logLevel.toUpperCase(Locale.ENGLISH)
     require(SparkContext.VALID_LOG_LEVELS.contains(upperCased),
       s"Supplied level $logLevel did not match one of:" +
@@ -2290,6 +2298,9 @@ object SparkContext extends Logging {
           logWarning("Using an existing SparkContext; some configuration may not take effect.")
         }
       }
+      if (config.getAll.nonEmpty) {
+        logWarning("Use an existing SparkContext, some configuration may not take effect.")
+      }
       activeContext.get()
     }
   }
@@ -2518,6 +2529,21 @@ object SparkContext extends Logging {
         }
         (backend, scheduler)
 
+<<<<<<< HEAD
+=======
+      case MESOS_REGEX(mesosUrl) =>
+        MesosNativeLibrary.load()
+        val scheduler = new TaskSchedulerImpl(sc)
+        val coarseGrained = sc.conf.getBoolean("spark.mesos.coarse", defaultValue = true)
+        val backend = if (coarseGrained) {
+          new MesosCoarseGrainedSchedulerBackend(scheduler, sc, mesosUrl, sc.env.securityManager)
+        } else {
+          new MesosFineGrainedSchedulerBackend(scheduler, sc, mesosUrl)
+        }
+        scheduler.initialize(backend)
+        (backend, scheduler)
+
+>>>>>>> tuning_adaptive
       case masterUrl =>
         val cm = getClusterManager(masterUrl) match {
           case Some(clusterMgr) => clusterMgr

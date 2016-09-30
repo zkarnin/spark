@@ -45,7 +45,11 @@ import org.apache.spark.sql.catalyst.catalog.CatalogTypes.TablePartitionSpec
 import org.apache.spark.sql.catalyst.expressions.Expression
 import org.apache.spark.sql.catalyst.parser.{CatalystSqlParser, ParseException}
 import org.apache.spark.sql.execution.QueryExecutionException
+<<<<<<< HEAD
 import org.apache.spark.sql.types.{StructField, StructType}
+=======
+import org.apache.spark.sql.execution.command.DDLUtils
+>>>>>>> tuning_adaptive
 import org.apache.spark.util.{CircularBuffer, Utils}
 
 /**
@@ -345,10 +349,13 @@ private[hive] class HiveClientImpl(
 
   override def listDatabases(pattern: String): Seq[String] = withHiveState {
     client.getDatabasesByPattern(pattern).asScala
+<<<<<<< HEAD
   }
 
   override def tableExists(dbName: String, tableName: String): Boolean = withHiveState {
     Option(client.getTable(dbName, tableName, false /* do not throw exception */)).nonEmpty
+=======
+>>>>>>> tuning_adaptive
   }
 
   override def getTableOption(
@@ -359,7 +366,11 @@ private[hive] class HiveClientImpl(
       // Note: Hive separates partition columns and the schema, but for us the
       // partition columns are part of the schema
       val partCols = h.getPartCols.asScala.map(fromHiveColumn)
+<<<<<<< HEAD
       val schema = StructType(h.getCols.asScala.map(fromHiveColumn) ++ partCols)
+=======
+      val schema = h.getCols.asScala.map(fromHiveColumn) ++ partCols
+>>>>>>> tuning_adaptive
 
       // Skew spec, storage handler, and bucketing info can't be mapped to CatalogTable (yet)
       val unsupportedFeatures = ArrayBuffer.empty[String]
@@ -389,19 +400,42 @@ private[hive] class HiveClientImpl(
         },
         schema = schema,
         partitionColumnNames = partCols.map(_.name),
+<<<<<<< HEAD
         // We can not populate bucketing information for Hive tables as Spark SQL has a different
         // implementation of hash function from Hive.
         bucketSpec = None,
+=======
+        sortColumnNames = Seq(), // TODO: populate this
+        bucketColumnNames = h.getBucketCols.asScala,
+        numBuckets = h.getNumBuckets,
+>>>>>>> tuning_adaptive
         owner = h.getOwner,
         createTime = h.getTTable.getCreateTime.toLong * 1000,
         lastAccessTime = h.getLastAccessTime.toLong * 1000,
         storage = CatalogStorageFormat(
-          locationUri = shim.getDataLocation(h),
+          locationUri = shim.getDataLocation(h).filterNot { _ =>
+            // SPARK-15269: Persisted data source tables always store the location URI as a SerDe
+            // property named "path" instead of standard Hive `dataLocation`, because Hive only
+            // allows directory paths as location URIs while Spark SQL data source tables also
+            // allows file paths. So the standard Hive `dataLocation` is meaningless for Spark SQL
+            // data source tables.
+            DDLUtils.isDatasourceTable(properties) &&
+              h.getTableType == HiveTableType.EXTERNAL_TABLE &&
+              // Spark SQL may also save external data source in Hive compatible format when
+              // possible, so that these tables can be directly accessed by Hive. For these tables,
+              // `dataLocation` is still necessary. Here we also check for input format class
+              // because only these Hive compatible tables set this field.
+              h.getInputFormatClass == null
+          },
           inputFormat = Option(h.getInputFormatClass).map(_.getName),
           outputFormat = Option(h.getOutputFormatClass).map(_.getName),
           serde = Option(h.getSerializationLib),
           compressed = h.getTTable.getSd.isCompressed,
+<<<<<<< HEAD
           properties = Option(h.getTTable.getSd.getSerdeInfo.getParameters)
+=======
+          serdeProperties = Option(h.getTTable.getSd.getSerdeInfo.getParameters)
+>>>>>>> tuning_adaptive
             .map(_.asScala.toMap).orNull
         ),
         // For EXTERNAL_TABLE, the table properties has a particular field "EXTERNAL". This is added
@@ -467,7 +501,11 @@ private[hive] class HiveClientImpl(
     matchingParts.foreach { partition =>
       try {
         val deleteData = true
+<<<<<<< HEAD
         shim.dropPartition(client, db, table, partition, deleteData, purge)
+=======
+        client.dropPartition(db, table, partition, deleteData)
+>>>>>>> tuning_adaptive
       } catch {
         case e: Exception =>
           val remainingParts = matchingParts.toBuffer -- droppedParts
@@ -737,8 +775,13 @@ private[hive] class HiveClientImpl(
     Utils.classForName(name)
       .asInstanceOf[Class[_ <: org.apache.hadoop.hive.ql.io.HiveOutputFormat[_, _]]]
 
+<<<<<<< HEAD
   private def toHiveColumn(c: StructField): FieldSchema = {
     new FieldSchema(c.name, c.dataType.catalogString, c.getComment().orNull)
+=======
+  private def toHiveColumn(c: CatalogColumn): FieldSchema = {
+    new FieldSchema(c.name, c.dataType, c.comment.orNull)
+>>>>>>> tuning_adaptive
   }
 
   private def fromHiveColumn(hc: FieldSchema): StructField = {
@@ -817,7 +860,11 @@ private[hive] class HiveClientImpl(
     p.storage.inputFormat.foreach(storageDesc.setInputFormat)
     p.storage.outputFormat.foreach(storageDesc.setOutputFormat)
     p.storage.serde.foreach(serdeInfo.setSerializationLib)
+<<<<<<< HEAD
     serdeInfo.setParameters(p.storage.properties.asJava)
+=======
+    serdeInfo.setParameters(p.storage.serdeProperties.asJava)
+>>>>>>> tuning_adaptive
     storageDesc.setSerdeInfo(serdeInfo)
     tpart.setDbName(ht.getDbName)
     tpart.setTableName(ht.getTableName)
@@ -836,7 +883,11 @@ private[hive] class HiveClientImpl(
         outputFormat = Option(apiPartition.getSd.getOutputFormat),
         serde = Option(apiPartition.getSd.getSerdeInfo.getSerializationLib),
         compressed = apiPartition.getSd.isCompressed,
+<<<<<<< HEAD
         properties = Option(apiPartition.getSd.getSerdeInfo.getParameters)
+=======
+        serdeProperties = Option(apiPartition.getSd.getSerdeInfo.getParameters)
+>>>>>>> tuning_adaptive
           .map(_.asScala.toMap).orNull),
         parameters =
           if (hp.getParameters() != null) hp.getParameters().asScala.toMap else Map.empty)

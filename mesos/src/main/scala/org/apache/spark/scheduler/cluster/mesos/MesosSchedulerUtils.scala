@@ -377,6 +377,7 @@ trait MesosSchedulerUtils extends Logging {
     sc.conf.getTimeAsSeconds("spark.mesos.rejectOfferDurationForReachedMaxCores", "120s")
   }
 
+<<<<<<< HEAD:mesos/src/main/scala/org/apache/spark/scheduler/cluster/mesos/MesosSchedulerUtils.scala
   /**
    * Checks executor ports if they are within some range of the offered list of ports ranges,
    *
@@ -511,4 +512,6 @@ trait MesosSchedulerUtils extends Logging {
     case TaskState.KILLED => MesosTaskState.TASK_KILLED
     case TaskState.LOST => MesosTaskState.TASK_LOST
   }
+=======
+>>>>>>> tuning_adaptive:core/src/main/scala/org/apache/spark/scheduler/cluster/mesos/MesosSchedulerUtils.scala
 }

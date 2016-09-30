@@ -18,7 +18,11 @@
 context("broadcast variables")
 
 # JavaSparkContext handle
+<<<<<<< HEAD
 sparkSession <- sparkR.session(enableHiveSupport = FALSE)
+=======
+sparkSession <- sparkR.session()
+>>>>>>> tuning_adaptive
 sc <- callJStatic("org.apache.spark.sql.api.r.SQLUtils", "getJavaSparkContext", sparkSession)
 
 # Partitioned data

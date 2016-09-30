@@ -22,8 +22,11 @@ import org.apache.spark.sql.SparkSession;
 // $example on$
 import java.util.Arrays;
 import java.util.List;
+<<<<<<< HEAD
 
 import scala.collection.mutable.WrappedArray;
+=======
+>>>>>>> tuning_adaptive
 
 import org.apache.spark.ml.feature.RegexTokenizer;
 import org.apache.spark.ml.feature.Tokenizer;
@@ -86,7 +89,10 @@ public class JavaTokenizerExample {
     regexTokenized.select("sentence", "words")
         .withColumn("tokens", callUDF("countTokens", col("words"))).show(false);
     // $example off$
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     spark.stop();
   }
 }

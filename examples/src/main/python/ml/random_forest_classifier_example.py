@@ -31,7 +31,11 @@ from pyspark.sql import SparkSession
 if __name__ == "__main__":
     spark = SparkSession\
         .builder\
+<<<<<<< HEAD
         .appName("RandomForestClassifierExample")\
+=======
+        .appName("random_forest_classifier_example")\
+>>>>>>> tuning_adaptive
         .getOrCreate()
 
     # $example on$
@@ -52,10 +56,13 @@ if __name__ == "__main__":
 
     # Train a RandomForest model.
     rf = RandomForestClassifier(labelCol="indexedLabel", featuresCol="indexedFeatures", numTrees=10)
+<<<<<<< HEAD
 
     # Convert indexed labels back to original labels.
     labelConverter = IndexToString(inputCol="prediction", outputCol="predictedLabel",
                                    labels=labelIndexer.labels)
+=======
+>>>>>>> tuning_adaptive
 
     # Chain indexers and forest in a Pipeline
     pipeline = Pipeline(stages=[labelIndexer, featureIndexer, rf, labelConverter])

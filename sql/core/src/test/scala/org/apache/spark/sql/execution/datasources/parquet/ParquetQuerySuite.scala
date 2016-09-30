@@ -54,7 +54,11 @@ class ParquetQuerySuite extends QueryTest with ParquetTest with SharedSQLContext
       checkAnswer(spark.table("t"), (data ++ data).map(Row.fromTuple))
     }
     spark.sessionState.catalog.dropTable(
+<<<<<<< HEAD
       TableIdentifier("tmp"), ignoreIfNotExists = true, purge = false)
+=======
+      TableIdentifier("tmp"), ignoreIfNotExists = true)
+>>>>>>> tuning_adaptive
   }
 
   test("overwriting") {
@@ -63,9 +67,43 @@ class ParquetQuerySuite extends QueryTest with ParquetTest with SharedSQLContext
     withParquetTable(data, "t") {
       sql("INSERT OVERWRITE TABLE t SELECT * FROM tmp")
       checkAnswer(spark.table("t"), data.map(Row.fromTuple))
+<<<<<<< HEAD
     }
     spark.sessionState.catalog.dropTable(
       TableIdentifier("tmp"), ignoreIfNotExists = true, purge = false)
+  }
+
+  test("SPARK-15678: not use cache on overwrite") {
+    withTempDir { dir =>
+      val path = dir.toString
+      spark.range(1000).write.mode("overwrite").parquet(path)
+      val df = spark.read.parquet(path).cache()
+      assert(df.count() == 1000)
+      spark.range(10).write.mode("overwrite").parquet(path)
+      assert(df.count() == 1000)
+      spark.catalog.refreshByPath(path)
+      assert(df.count() == 10)
+      assert(spark.read.parquet(path).count() == 10)
+    }
+  }
+
+  test("SPARK-15678: not use cache on append") {
+    withTempDir { dir =>
+      val path = dir.toString
+      spark.range(1000).write.mode("append").parquet(path)
+      val df = spark.read.parquet(path).cache()
+      assert(df.count() == 1000)
+      spark.range(10).write.mode("append").parquet(path)
+      assert(df.count() == 1000)
+      spark.catalog.refreshByPath(path)
+      assert(df.count() == 1010)
+      assert(spark.read.parquet(path).count() == 1010)
+    }
+=======
+    }
+    spark.sessionState.catalog.dropTable(
+      TableIdentifier("tmp"), ignoreIfNotExists = true)
+>>>>>>> tuning_adaptive
   }
 
   test("SPARK-15678: not use cache on overwrite") {
@@ -624,8 +662,13 @@ class ParquetQuerySuite extends QueryTest with ParquetTest with SharedSQLContext
 
         // donot return batch, because whole stage codegen is disabled for wide table (>200 columns)
         val df2 = spark.read.parquet(path)
+<<<<<<< HEAD
         val fileScan2 = df2.queryExecution.sparkPlan.find(_.isInstanceOf[FileSourceScanExec]).get
         assert(!fileScan2.asInstanceOf[FileSourceScanExec].supportsBatch)
+=======
+        assert(df2.queryExecution.sparkPlan.find(_.isInstanceOf[BatchedDataSourceScanExec]).isEmpty,
+          "Should not return batch")
+>>>>>>> tuning_adaptive
         checkAnswer(df2, df)
 
         // return batch
@@ -668,6 +711,7 @@ class ParquetQuerySuite extends QueryTest with ParquetTest with SharedSQLContext
     }
   }
 
+<<<<<<< HEAD
   test("SPARK-16344: array of struct with a single field named 'element'") {
     withTempPath { dir =>
       val path = dir.getCanonicalPath
@@ -680,6 +724,8 @@ class ParquetQuerySuite extends QueryTest with ParquetTest with SharedSQLContext
     }
   }
 
+=======
+>>>>>>> tuning_adaptive
   test("SPARK-16632: read Parquet int32 as ByteType and ShortType") {
     withSQLConf(SQLConf.PARQUET_VECTORIZED_READER_ENABLED.key -> "true") {
       withTempPath { dir =>

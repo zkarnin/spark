@@ -119,12 +119,16 @@ class CSVFileFormat extends TextBasedFileFormat with DataSourceRegister {
 
       CSVRelation.dropHeaderLine(file, lineIterator, csvOptions)
 
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/csv/CSVFileFormat.scala
       val csvParser = new CsvReader(csvOptions)
       val tokenizedIterator = lineIterator.filter { line =>
         line.trim.nonEmpty && !line.startsWith(commentPrefix)
       }.map { line =>
         csvParser.parseLine(line)
       }
+=======
+      val tokenizedIterator = new BulkCsvReader(lineIterator, csvOptions, headers)
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/csv/CSVFileFormat.scala
       val parser = CSVRelation.csvParser(dataSchema, requiredSchema.fieldNames, csvOptions)
       var numMalformedRecords = 0
       tokenizedIterator.flatMap { recordTokens =>
@@ -187,6 +191,7 @@ class CSVFileFormat extends TextBasedFileFormat with DataSourceRegister {
 
   private def verifySchema(schema: StructType): Unit = {
     def verifyType(dataType: DataType): Unit = dataType match {
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/csv/CSVFileFormat.scala
         case ByteType | ShortType | IntegerType | LongType | FloatType |
              DoubleType | BooleanType | _: DecimalType | TimestampType |
              DateType | StringType =>
@@ -196,6 +201,17 @@ class CSVFileFormat extends TextBasedFileFormat with DataSourceRegister {
         case _ =>
           throw new UnsupportedOperationException(
             s"CSV data source does not support ${dataType.simpleString} data type.")
+=======
+      case ByteType | ShortType | IntegerType | LongType | FloatType |
+           DoubleType | BooleanType | _: DecimalType | TimestampType |
+           DateType | StringType =>
+
+      case udt: UserDefinedType[_] => verifyType(udt.sqlType)
+
+      case _ =>
+        throw new UnsupportedOperationException(
+          s"CSV data source does not support ${dataType.simpleString} data type.")
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/csv/CSVFileFormat.scala
     }
 
     schema.foreach(field => verifyType(field.dataType))

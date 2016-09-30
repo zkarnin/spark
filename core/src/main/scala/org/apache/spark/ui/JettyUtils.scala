@@ -25,8 +25,11 @@ import scala.collection.mutable.ArrayBuffer
 import scala.language.implicitConversions
 import scala.xml.Node
 
+<<<<<<< HEAD
 import org.eclipse.jetty.client.api.Response
 import org.eclipse.jetty.proxy.ProxyServlet
+=======
+>>>>>>> tuning_adaptive
 import org.eclipse.jetty.server.{Request, Server, ServerConnector}
 import org.eclipse.jetty.server.handler._
 import org.eclipse.jetty.servlet._

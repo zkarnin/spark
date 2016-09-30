@@ -60,7 +60,11 @@ object DataFrameExample {
     }
   }
 
+<<<<<<< HEAD
   def run(params: Params): Unit = {
+=======
+  def run(params: Params) {
+>>>>>>> tuning_adaptive
     val spark = SparkSession
       .builder
       .appName(s"DataFrameExample with $params")

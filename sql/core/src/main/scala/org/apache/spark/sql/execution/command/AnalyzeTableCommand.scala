@@ -21,18 +21,28 @@ import scala.util.control.NonFatal
 
 import org.apache.hadoop.fs.{FileSystem, Path}
 
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/command/AnalyzeTableCommand.scala
 import org.apache.spark.sql.{AnalysisException, Dataset, Row, SparkSession}
 import org.apache.spark.sql.catalyst.analysis.EliminateSubqueryAliases
 import org.apache.spark.sql.catalyst.catalog.{CatalogRelation, CatalogTable}
 import org.apache.spark.sql.catalyst.plans.logical.Statistics
 import org.apache.spark.sql.execution.datasources.LogicalRelation
+=======
+import org.apache.spark.sql.{AnalysisException, Row, SparkSession}
+import org.apache.spark.sql.catalyst.analysis.EliminateSubqueryAliases
+import org.apache.spark.sql.catalyst.catalog.{CatalogRelation, CatalogTable, SimpleCatalogRelation}
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/command/AnalyzeTableCommand.scala
 
 
 /**
  * Analyzes the given table in the current database to generate statistics, which will be
  * used in query optimizations.
  */
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/command/AnalyzeTableCommand.scala
 case class AnalyzeTableCommand(tableName: String, noscan: Boolean = true) extends RunnableCommand {
+=======
+case class AnalyzeTableCommand(tableName: String) extends RunnableCommand {
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/command/AnalyzeTableCommand.scala
 
   override def run(sparkSession: SparkSession): Seq[Row] = {
     val sessionState = sparkSession.sessionState
@@ -40,7 +50,7 @@ case class AnalyzeTableCommand(tableName: String, noscan: Boolean = true) extend
     val relation = EliminateSubqueryAliases(sessionState.catalog.lookupRelation(tableIdent))
 
     relation match {
-      case relation: CatalogRelation =>
+      case relation: CatalogRelation if !relation.isInstanceOf[SimpleCatalogRelation] =>
         val catalogTable: CatalogTable = relation.catalogTable
         // This method is mainly based on
         // org.apache.hadoop.hive.ql.stats.StatsUtils.getFileSizeForTable(HiveConf, Table)
@@ -85,6 +95,7 @@ case class AnalyzeTableCommand(tableName: String, noscan: Boolean = true) extend
             }
           }.getOrElse(0L)
 
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/command/AnalyzeTableCommand.scala
         updateTableStats(catalogTable, newTotalSize)
 
       // data source tables have been converted into LogicalRelations
@@ -94,6 +105,21 @@ case class AnalyzeTableCommand(tableName: String, noscan: Boolean = true) extend
       case otherRelation =>
         throw new AnalysisException(s"ANALYZE TABLE is not supported for " +
           s"${otherRelation.nodeName}.")
+=======
+        // Update the Hive metastore if the total size of the table is different than the size
+        // recorded in the Hive metastore.
+        // This logic is based on org.apache.hadoop.hive.ql.exec.StatsTask.aggregateStats().
+        if (newTotalSize > 0 && newTotalSize != oldTotalSize) {
+          sessionState.catalog.alterTable(
+            catalogTable.copy(
+              properties = relation.catalogTable.properties +
+                (AnalyzeTableCommand.TOTAL_SIZE_FIELD -> newTotalSize.toString)))
+        }
+
+      case otherRelation =>
+        throw new AnalysisException(s"ANALYZE TABLE is only supported for Hive tables, " +
+          s"but '${tableIdent.unquotedString}' is a ${otherRelation.nodeName}.")
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/command/AnalyzeTableCommand.scala
     }
 
     def updateTableStats(catalogTable: CatalogTable, newTotalSize: Long): Unit = {
@@ -129,3 +155,10 @@ case class AnalyzeTableCommand(tableName: String, noscan: Boolean = true) extend
     Seq.empty[Row]
   }
 }
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/command/AnalyzeTableCommand.scala
+=======
+
+object AnalyzeTableCommand {
+  val TOTAL_SIZE_FIELD = "totalSize"
+}
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/command/AnalyzeTableCommand.scala

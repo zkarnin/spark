@@ -34,16 +34,22 @@ import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst._
 import org.apache.spark.sql.catalyst.analysis._
+import org.apache.spark.sql.catalyst.catalog._
 import org.apache.spark.sql.catalyst.encoders._
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate._
+import org.apache.spark.sql.catalyst.expressions.objects.Invoke
 import org.apache.spark.sql.catalyst.optimizer.CombineUnions
 import org.apache.spark.sql.catalyst.plans._
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.util.usePrettyExpression
 import org.apache.spark.sql.execution.{FileRelation, LogicalRDD, QueryExecution, SQLExecution}
 import org.apache.spark.sql.execution.command.{CreateViewCommand, ExplainCommand}
+<<<<<<< HEAD
 import org.apache.spark.sql.execution.datasources.LogicalRelation
+=======
+import org.apache.spark.sql.execution.datasources.{CreateTableUsingAsSelect, LogicalRelation}
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.execution.datasources.json.JacksonGenerator
 import org.apache.spark.sql.execution.python.EvaluatePython
 import org.apache.spark.sql.streaming.{DataStreamWriter, StreamingQuery}
@@ -247,8 +253,12 @@ class Dataset[T] private[sql](
     val data = takeResult.take(numRows)
 
     // For array values, replace Seq and Array with square brackets
+<<<<<<< HEAD
     // For cells that are beyond `truncate` characters, replace it with the
     // first `truncate-3` and "..."
+=======
+    // For cells that are beyond 20 characters, replace it with the first 17 and "..."
+>>>>>>> tuning_adaptive
     val rows: Seq[Seq[String]] = schema.fieldNames.toSeq +: data.map { row =>
       row.toSeq.map { cell =>
         val str = cell match {
@@ -1071,6 +1081,7 @@ class Dataset[T] private[sql](
    * @since 1.6.0
    */
   @Experimental
+<<<<<<< HEAD
   def select[U1](c1: TypedColumn[T, U1]): Dataset[U1] = {
     implicit val encoder = c1.encoder
     val project = Project(c1.withInputType(exprEnc, logicalPlan.output).named :: Nil,
@@ -1082,6 +1093,17 @@ class Dataset[T] private[sql](
       // Flattens inner fields of U1
       new Dataset[Tuple1[U1]](sparkSession, project, ExpressionEncoder.tuple(encoder)).map(_._1)
     }
+=======
+  def select[U1: Encoder](c1: TypedColumn[T, U1]): Dataset[U1] = {
+    new Dataset[U1](
+      sparkSession,
+      Project(
+        c1.withInputType(
+          exprEnc.deserializer,
+          logicalPlan.output).named :: Nil,
+        logicalPlan),
+      implicitly[Encoder[U1]])
+>>>>>>> tuning_adaptive
   }
 
   /**
@@ -1092,7 +1114,11 @@ class Dataset[T] private[sql](
   protected def selectUntyped(columns: TypedColumn[_, _]*): Dataset[_] = {
     val encoders = columns.map(_.encoder)
     val namedColumns =
+<<<<<<< HEAD
       columns.map(_.withInputType(exprEnc, logicalPlan.output).named)
+=======
+      columns.map(_.withInputType(exprEnc.deserializer, logicalPlan.output).named)
+>>>>>>> tuning_adaptive
     val execution = new QueryExecution(sparkSession, Project(namedColumns, logicalPlan))
     new Dataset(sparkSession, execution, ExpressionEncoder.tuple(encoders))
   }
@@ -1917,9 +1943,14 @@ class Dataset[T] private[sql](
   }
 
   /**
+<<<<<<< HEAD
    * Computes statistics for numeric and string columns, including count, mean, stddev, min, and
    * max. If no columns are given, this function computes statistics for all numerical or string
    * columns.
+=======
+   * Computes statistics for numeric columns, including count, mean, stddev, min, and max.
+   * If no columns are given, this function computes statistics for all numerical columns.
+>>>>>>> tuning_adaptive
    *
    * This function is meant for exploratory data analysis, as we make no guarantee about the
    * backward compatibility of the schema of the resulting Dataset. If you want to
@@ -2029,7 +2060,15 @@ class Dataset[T] private[sql](
    */
   @Experimental
   def filter(func: T => Boolean): Dataset[T] = {
+<<<<<<< HEAD
     withTypedPlan(TypedFilter(func, logicalPlan))
+=======
+    val deserializer = UnresolvedDeserializer(encoderFor[T].deserializer)
+    val function = Literal.create(func, ObjectType(classOf[T => Boolean]))
+    val condition = Invoke(function, "apply", BooleanType, deserializer :: Nil)
+    val filter = Filter(condition, logicalPlan)
+    withTypedPlan(filter)
+>>>>>>> tuning_adaptive
   }
 
   /**
@@ -2042,7 +2081,15 @@ class Dataset[T] private[sql](
    */
   @Experimental
   def filter(func: FilterFunction[T]): Dataset[T] = {
+<<<<<<< HEAD
     withTypedPlan(TypedFilter(func, logicalPlan))
+=======
+    val deserializer = UnresolvedDeserializer(encoderFor[T].deserializer)
+    val function = Literal.create(func, ObjectType(classOf[FilterFunction[T]]))
+    val condition = Invoke(function, "call", BooleanType, deserializer :: Nil)
+    val filter = Filter(condition, logicalPlan)
+    withTypedPlan(filter)
+>>>>>>> tuning_adaptive
   }
 
   /**
@@ -2443,7 +2490,17 @@ class Dataset[T] private[sql](
    */
   @throws[AnalysisException]
   def createTempView(viewName: String): Unit = withPlan {
+<<<<<<< HEAD
     createViewCommand(viewName, replace = false)
+=======
+    val tableDesc = CatalogTable(
+      identifier = sparkSession.sessionState.sqlParser.parseTableIdentifier(viewName),
+      tableType = CatalogTableType.VIEW,
+      schema = Seq.empty[CatalogColumn],
+      storage = CatalogStorageFormat.empty)
+    CreateViewCommand(tableDesc, logicalPlan, allowExisting = false, replace = false,
+      isTemporary = true)
+>>>>>>> tuning_adaptive
   }
 
   /**
@@ -2454,6 +2511,7 @@ class Dataset[T] private[sql](
    * @since 2.0.0
    */
   def createOrReplaceTempView(viewName: String): Unit = withPlan {
+<<<<<<< HEAD
     createViewCommand(viewName, replace = true)
   }
 
@@ -2467,6 +2525,14 @@ class Dataset[T] private[sql](
       child = logicalPlan,
       allowExisting = false,
       replace = replace,
+=======
+    val tableDesc = CatalogTable(
+      identifier = sparkSession.sessionState.sqlParser.parseTableIdentifier(viewName),
+      tableType = CatalogTableType.VIEW,
+      schema = Seq.empty[CatalogColumn],
+      storage = CatalogStorageFormat.empty)
+    CreateViewCommand(tableDesc, logicalPlan, allowExisting = false, replace = true,
+>>>>>>> tuning_adaptive
       isTemporary = true)
   }
 

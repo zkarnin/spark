@@ -1641,6 +1641,7 @@ test_that("showDF()", {
                     "|  30|   Andy|\n",
                     "|  19| Justin|\n",
                     "+----+-------+\n", sep = "")
+<<<<<<< HEAD
   expected2 <- paste("+---+----+\n",
                      "|age|name|\n",
                      "+---+----+\n",
@@ -1650,6 +1651,9 @@ test_that("showDF()", {
                      "+---+----+\n", sep = "")
   expect_output(showDF(df), expected)
   expect_output(showDF(df, truncate = 3), expected2)
+=======
+  expect_output(showDF(df), expected)
+>>>>>>> tuning_adaptive
 })
 
 test_that("isLocal()", {
@@ -1845,11 +1849,19 @@ test_that("describe() and summarize() on a DataFrame", {
   expect_equal(collect(stats)[2, "age"], "24.5")
   expect_equal(collect(stats)[3, "age"], "7.7781745930520225")
   stats <- describe(df)
+<<<<<<< HEAD
   expect_equal(collect(stats)[4, "summary"], "min")
   expect_equal(collect(stats)[5, "age"], "30")
 
   stats2 <- summary(df)
   expect_equal(collect(stats2)[4, "summary"], "min")
+=======
+  expect_equal(collect(stats)[4, "name"], NULL)
+  expect_equal(collect(stats)[5, "age"], "30")
+
+  stats2 <- summary(df)
+  expect_equal(collect(stats2)[4, "name"], NULL)
+>>>>>>> tuning_adaptive
   expect_equal(collect(stats2)[5, "age"], "30")
 
   # SPARK-16425: SparkR summary() fails on column of type logical

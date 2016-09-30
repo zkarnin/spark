@@ -50,7 +50,11 @@ To create a Spark distribution like those distributed by the
 to be runnable, use `./dev/make-distribution.sh` in the project root directory. It can be configured
 with Maven profile settings and so on like the direct Maven build. Example:
 
+<<<<<<< HEAD
     ./dev/make-distribution.sh --name custom-spark --tgz -Psparkr -Phadoop-2.4 -Phive -Phive-thriftserver -Pmesos -Pyarn
+=======
+    ./dev/make-distribution.sh --name custom-spark --tgz -Psparkr -Phadoop-2.4 -Phive -Phive-thriftserver -Pyarn
+>>>>>>> tuning_adaptive
 
 For more information on usage, run `./dev/make-distribution.sh --help`
 
@@ -102,6 +106,7 @@ By default Spark will build with Hive 1.2.1 bindings.
 
     # Apache Hadoop 2.4.X with Hive 1.2.1 support
     ./build/mvn -Pyarn -Phadoop-2.4 -Dhadoop.version=2.4.0 -Phive -Phive-thriftserver -DskipTests clean package
+<<<<<<< HEAD
 
 ## Packaging without Hadoop Dependencies for YARN
 
@@ -115,6 +120,17 @@ like ZooKeeper and Hadoop itself.
 ## Building with Mesos support
 
     ./build/mvn -Pmesos -DskipTests clean package
+=======
+
+## Packaging without Hadoop Dependencies for YARN
+
+The assembly directory produced by `mvn package` will, by default, include all of Spark's 
+dependencies, including Hadoop and some of its ecosystem projects. On YARN deployments, this 
+causes multiple versions of these to appear on executor classpaths: the version packaged in 
+the Spark assembly and the version on each node, included with `yarn.application.classpath`.
+The `hadoop-provided` profile builds the assembly without including Hadoop-ecosystem projects, 
+like ZooKeeper and Hadoop itself.
+>>>>>>> tuning_adaptive
 
 ## Building for Scala 2.10
 To produce a Spark package compiled with Scala 2.10, use the `-Dscala-2.10` property:
@@ -267,17 +283,28 @@ The run-tests script also can be limited to a specific Python version or a speci
 
 ## Running R Tests
 
+<<<<<<< HEAD
 To run the SparkR tests you will need to install the R package `testthat`
 (run `install.packages(testthat)` from R shell).  You can run just the SparkR tests using
+=======
+To run the SparkR tests you will need to install the R package `testthat` 
+(run `install.packages(testthat)` from R shell).  You can run just the SparkR tests using 
+>>>>>>> tuning_adaptive
 the command:
 
     ./R/run-tests.sh
 
 ## Running Docker-based Integration Test Suites
 
+<<<<<<< HEAD
 In order to run Docker integration tests, you have to install the `docker` engine on your box.
 The instructions for installation can be found at [the Docker site](https://docs.docker.com/engine/installation/).
 Once installed, the `docker` service needs to be started, if not already running.
+=======
+In order to run Docker integration tests, you have to install the `docker` engine on your box. 
+The instructions for installation can be found at [the Docker site](https://docs.docker.com/engine/installation/). 
+Once installed, the `docker` service needs to be started, if not already running. 
+>>>>>>> tuning_adaptive
 On Linux, this can be done by `sudo service docker start`.
 
     ./build/mvn install -DskipTests

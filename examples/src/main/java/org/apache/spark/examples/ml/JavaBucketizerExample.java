@@ -44,12 +44,19 @@ public class JavaBucketizerExample {
     double[] splits = {Double.NEGATIVE_INFINITY, -0.5, 0.0, 0.5, Double.POSITIVE_INFINITY};
 
     List<Row> data = Arrays.asList(
+<<<<<<< HEAD
       RowFactory.create(-999.9),
       RowFactory.create(-0.5),
       RowFactory.create(-0.3),
       RowFactory.create(0.0),
       RowFactory.create(0.2),
       RowFactory.create(999.9)
+=======
+      RowFactory.create(-0.5),
+      RowFactory.create(-0.3),
+      RowFactory.create(0.0),
+      RowFactory.create(0.2)
+>>>>>>> tuning_adaptive
     );
     StructType schema = new StructType(new StructField[]{
       new StructField("features", DataTypes.DoubleType, false, Metadata.empty())
@@ -67,7 +74,10 @@ public class JavaBucketizerExample {
     System.out.println("Bucketizer output with " + (bucketizer.getSplits().length-1) + " buckets");
     bucketedData.show();
     // $example off$
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     spark.stop();
   }
 }

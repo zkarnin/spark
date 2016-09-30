@@ -43,6 +43,7 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
           }
         @transient val sc = {
           val _sc = spark.sparkContext
+<<<<<<< HEAD
           if (_sc.getConf.getBoolean("spark.ui.reverseProxy", false)) {
             val proxyUrl = _sc.getConf.get("spark.ui.reverseProxyUrl", null)
             if (proxyUrl != null) {
@@ -55,6 +56,9 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
               webUrl => println(s"Spark context Web UI available at ${webUrl}")
             }
           }
+=======
+          _sc.uiWebUrl.foreach(webUrl => println(s"Spark context Web UI available at ${webUrl}"))
+>>>>>>> tuning_adaptive
           println("Spark context available as 'sc' " +
             s"(master = ${_sc.master}, app id = ${_sc.applicationId}).")
           println("Spark session available as 'spark'.")

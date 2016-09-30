@@ -53,6 +53,7 @@ class SQLViewSuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
       sql("CREATE TEMPORARY VIEW temp_jtv3 AS SELECT * FROM jt WHERE id > 3")
       sql("CREATE VIEW jtv3 AS SELECT * FROM temp_jtv3 WHERE id < 6")
       checkAnswer(sql("select count(*) FROM jtv3"), Row(2))
+<<<<<<< HEAD
     }
   }
 
@@ -123,6 +124,8 @@ class SQLViewSuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
         sql(s"TRUNCATE TABLE $viewName")
       }.getMessage
       assert(e.contains(s"Operation not allowed: TRUNCATE TABLE on views: `$viewName`"))
+=======
+>>>>>>> tuning_adaptive
     }
   }
 
@@ -213,17 +216,63 @@ class SQLViewSuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
     }
   }
 
+  test("correctly parse CREATE TEMPORARY VIEW statement") {
+    withView("testView") {
+      sql(
+        """CREATE TEMPORARY VIEW
+          |testView (c1 COMMENT 'blabla', c2 COMMENT 'blabla')
+          |TBLPROPERTIES ('a' = 'b')
+          |AS SELECT * FROM jt
+          |""".stripMargin)
+      checkAnswer(sql("SELECT c1, c2 FROM testView ORDER BY c1"), (1 to 9).map(i => Row(i, i)))
+    }
+  }
+
+  test("should NOT allow CREATE TEMPORARY VIEW when TEMPORARY VIEW with same name exists") {
+    withView("testView") {
+      sql("CREATE TEMPORARY VIEW testView AS SELECT id FROM jt")
+
+      val e = intercept[AnalysisException] {
+        sql("CREATE TEMPORARY VIEW testView AS SELECT id FROM jt")
+      }
+
+      assert(e.message.contains("Temporary table") && e.message.contains("already exists"))
+    }
+  }
+
+  test("should allow CREATE TEMPORARY VIEW when a permanent VIEW with same name exists") {
+    withView("testView", "default.testView") {
+      sql("CREATE VIEW testView AS SELECT id FROM jt")
+      sql("CREATE TEMPORARY VIEW testView AS SELECT id FROM jt")
+    }
+  }
+
+  test("should allow CREATE permanent VIEW when a TEMPORARY VIEW with same name exists") {
+    withView("testView", "default.testView") {
+      sql("CREATE TEMPORARY VIEW testView AS SELECT id FROM jt")
+      sql("CREATE VIEW testView AS SELECT id FROM jt")
+    }
+  }
+
   test("correctly handle CREATE VIEW IF NOT EXISTS") {
+<<<<<<< HEAD
     withTable("jt2") {
       withView("testView") {
         sql("CREATE VIEW testView AS SELECT id FROM jt")
+=======
+    withSQLConf(SQLConf.NATIVE_VIEW.key -> "true") {
+      withTable("jt2") {
+        withView("testView") {
+          sql("CREATE VIEW testView AS SELECT id FROM jt")
+>>>>>>> tuning_adaptive
 
-        val df = (1 until 10).map(i => i -> i).toDF("i", "j")
-        df.write.format("json").saveAsTable("jt2")
-        sql("CREATE VIEW IF NOT EXISTS testView AS SELECT * FROM jt2")
+          val df = (1 until 10).map(i => i -> i).toDF("i", "j")
+          df.write.format("json").saveAsTable("jt2")
+          sql("CREATE VIEW IF NOT EXISTS testView AS SELECT * FROM jt2")
 
-        // make sure our view doesn't change.
-        checkAnswer(sql("SELECT * FROM testView ORDER BY id"), (1 to 9).map(i => Row(i)))
+          // make sure our view doesn't change.
+          checkAnswer(sql("SELECT * FROM testView ORDER BY id"), (1 to 9).map(i => Row(i)))
+        }
       }
     }
   }
@@ -233,6 +282,102 @@ class SQLViewSuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
       withView("testView") {
         sql("CREATE OR REPLACE TEMPORARY VIEW testView AS SELECT id FROM jt")
         checkAnswer(sql("SELECT * FROM testView ORDER BY id"), (1 to 9).map(i => Row(i)))
+<<<<<<< HEAD
+=======
+
+        sql("CREATE OR REPLACE TEMPORARY VIEW testView AS SELECT id AS i, id AS j FROM jt")
+        // make sure the view has been changed.
+        checkAnswer(sql("SELECT * FROM testView ORDER BY i"), (1 to 9).map(i => Row(i, i)))
+>>>>>>> tuning_adaptive
+      }
+    }
+  }
+
+<<<<<<< HEAD
+  test(s"correctly handle CREATE OR REPLACE TEMPORARY VIEW") {
+    withTable("jt2") {
+      withView("testView") {
+        sql("CREATE OR REPLACE TEMPORARY VIEW testView AS SELECT id FROM jt")
+        checkAnswer(sql("SELECT * FROM testView ORDER BY id"), (1 to 9).map(i => Row(i)))
+=======
+  test("should not allow ALTER VIEW AS when the view does not exist") {
+    intercept[NoSuchTableException](
+      sql("ALTER VIEW testView AS SELECT 1, 2")
+    )
+
+    intercept[NoSuchTableException](
+      sql("ALTER VIEW default.testView AS SELECT 1, 2")
+    )
+  }
+
+  test("ALTER VIEW AS should try to alter temp view first if view name has no database part") {
+    withView("test_view") {
+      withTempView("test_view") {
+        sql("CREATE VIEW test_view AS SELECT 1 AS a, 2 AS b")
+        sql("CREATE TEMP VIEW test_view AS SELECT 1 AS a, 2 AS b")
+
+        sql("ALTER VIEW test_view AS SELECT 3 AS i, 4 AS j")
+
+        // The temporary view should be updated.
+        checkAnswer(spark.table("test_view"), Row(3, 4))
+
+        // The permanent view should stay same.
+        checkAnswer(spark.table("default.test_view"), Row(1, 2))
+      }
+    }
+  }
+
+  test("ALTER VIEW AS should alter permanent view if view name has database part") {
+    withView("test_view") {
+      withTempView("test_view") {
+        sql("CREATE VIEW test_view AS SELECT 1 AS a, 2 AS b")
+        sql("CREATE TEMP VIEW test_view AS SELECT 1 AS a, 2 AS b")
+
+        sql("ALTER VIEW default.test_view AS SELECT 3 AS i, 4 AS j")
+
+        // The temporary view should stay same.
+        checkAnswer(spark.table("test_view"), Row(1, 2))
+
+        // The permanent view should be updated.
+        checkAnswer(spark.table("default.test_view"), Row(3, 4))
+      }
+    }
+  }
+
+  test("ALTER VIEW AS should keep the previous table properties, comment, create_time, etc.") {
+    withView("test_view") {
+      sql(
+        """
+          |CREATE VIEW test_view
+          |COMMENT 'test'
+          |TBLPROPERTIES ('key' = 'a')
+          |AS SELECT 1 AS a, 2 AS b
+        """.stripMargin)
+
+      val catalog = spark.sessionState.catalog
+      val viewMeta = catalog.getTableMetadata(TableIdentifier("test_view"))
+      assert(viewMeta.comment == Some("test"))
+      assert(viewMeta.properties("key") == "a")
+
+      sql("ALTER VIEW test_view AS SELECT 3 AS i, 4 AS j")
+      val updatedViewMeta = catalog.getTableMetadata(TableIdentifier("test_view"))
+      assert(updatedViewMeta.comment == Some("test"))
+      assert(updatedViewMeta.properties("key") == "a")
+      assert(updatedViewMeta.createTime == viewMeta.createTime)
+      // The view should be updated.
+      checkAnswer(spark.table("test_view"), Row(3, 4))
+    }
+  }
+
+  Seq(true, false).foreach { enabled =>
+    val prefix = (if (enabled) "With" else "Without") + " canonical native view: "
+    test(s"$prefix correctly handle CREATE OR REPLACE VIEW") {
+      withSQLConf(
+        SQLConf.NATIVE_VIEW.key -> "true", SQLConf.CANONICAL_NATIVE_VIEW.key -> enabled.toString) {
+        withTable("jt2") {
+          sql("CREATE OR REPLACE VIEW testView AS SELECT id FROM jt")
+          checkAnswer(sql("SELECT * FROM testView ORDER BY id"), (1 to 9).map(i => Row(i)))
+>>>>>>> tuning_adaptive
 
         sql("CREATE OR REPLACE TEMPORARY VIEW testView AS SELECT id AS i, id AS j FROM jt")
         // make sure the view has been changed.
@@ -246,6 +391,7 @@ class SQLViewSuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
       sql("CREATE OR REPLACE VIEW testView AS SELECT id FROM jt")
       checkAnswer(sql("SELECT * FROM testView ORDER BY id"), (1 to 9).map(i => Row(i)))
 
+<<<<<<< HEAD
       val df = (1 until 10).map(i => i -> i).toDF("i", "j")
       df.write.format("json").saveAsTable("jt2")
       sql("CREATE OR REPLACE VIEW testView AS SELECT * FROM jt2")
@@ -256,6 +402,14 @@ class SQLViewSuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
 
       val e = intercept[AnalysisException] {
         sql("CREATE OR REPLACE VIEW IF NOT EXISTS testView AS SELECT id FROM jt")
+=======
+          val e = intercept[AnalysisException] {
+            sql("CREATE OR REPLACE VIEW IF NOT EXISTS testView AS SELECT id FROM jt")
+          }
+          assert(e.message.contains(
+            "CREATE VIEW with both IF NOT EXISTS and REPLACE is not allowed"))
+        }
+>>>>>>> tuning_adaptive
       }
       assert(e.message.contains(
         "CREATE VIEW with both IF NOT EXISTS and REPLACE is not allowed"))
@@ -389,18 +543,31 @@ class SQLViewSuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
   }
 
   test("Using view after adding more columns") {
+<<<<<<< HEAD
     withTable("add_col") {
       spark.range(10).write.saveAsTable("add_col")
       withView("v") {
         sql("CREATE VIEW v AS SELECT * FROM add_col")
         spark.range(10).select('id, 'id as 'a).write.mode("overwrite").saveAsTable("add_col")
         checkAnswer(sql("SELECT * FROM v"), spark.range(10).toDF())
+=======
+    withSQLConf(
+      SQLConf.NATIVE_VIEW.key -> "true", SQLConf.CANONICAL_NATIVE_VIEW.key -> "true") {
+      withTable("add_col") {
+        spark.range(10).write.saveAsTable("add_col")
+        withView("v") {
+          sql("CREATE VIEW v AS SELECT * FROM add_col")
+          spark.range(10).select('id, 'id as 'a).write.mode("overwrite").saveAsTable("add_col")
+          checkAnswer(sql("SELECT * FROM v"), spark.range(10).toDF())
+        }
+>>>>>>> tuning_adaptive
       }
     }
   }
 
   test("create hive view for joined tables") {
     // make sure the new flag can handle some complex cases like join and schema change.
+<<<<<<< HEAD
     withTable("jt1", "jt2") {
       spark.range(1, 10).toDF("id1").write.format("json").saveAsTable("jt1")
       spark.range(1, 10).toDF("id2").write.format("json").saveAsTable("jt2")
@@ -423,10 +590,39 @@ class SQLViewSuite extends QueryTest with SQLTestUtils with TestHiveSingleton {
         checkAnswer(
           sql("select * from t_part"),
           sql("select * from v_part"))
+=======
+    withSQLConf(SQLConf.NATIVE_VIEW.key -> "true") {
+      withTable("jt1", "jt2") {
+        spark.range(1, 10).toDF("id1").write.format("json").saveAsTable("jt1")
+        spark.range(1, 10).toDF("id2").write.format("json").saveAsTable("jt2")
+        sql("CREATE VIEW testView AS SELECT * FROM jt1 JOIN jt2 ON id1 == id2")
+        checkAnswer(sql("SELECT * FROM testView ORDER BY id1"), (1 to 9).map(i => Row(i, i)))
+
+        val df = (1 until 10).map(i => i -> i).toDF("id1", "newCol")
+        df.write.format("json").mode(SaveMode.Overwrite).saveAsTable("jt1")
+        checkAnswer(sql("SELECT * FROM testView ORDER BY id1"), (1 to 9).map(i => Row(i, i)))
+
+        sql("DROP VIEW testView")
+>>>>>>> tuning_adaptive
       }
     }
   }
 
+<<<<<<< HEAD
+=======
+  test("SPARK-14933 - create view from hive parquet tabale") {
+    withTable("t_part") {
+      withView("v_part") {
+        spark.sql("create table t_part stored as parquet as select 1 as a, 2 as b")
+        spark.sql("create view v_part as select * from t_part")
+        checkAnswer(
+          sql("select * from t_part"),
+          sql("select * from v_part"))
+      }
+    }
+  }
+
+>>>>>>> tuning_adaptive
   test("SPARK-14933 - create view from hive orc tabale") {
     withTable("t_orc") {
       withView("v_orc") {

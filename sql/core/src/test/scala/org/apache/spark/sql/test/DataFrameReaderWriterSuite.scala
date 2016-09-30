@@ -23,7 +23,11 @@ import org.scalatest.BeforeAndAfter
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.sources._
+<<<<<<< HEAD
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+=======
+import org.apache.spark.sql.types.{StringType, StructField, StructType}
+>>>>>>> tuning_adaptive
 import org.apache.spark.util.Utils
 
 
@@ -424,6 +428,7 @@ class DataFrameReaderWriterSuite extends QueryTest with SharedSQLContext with Be
     spark.range(10).write.orc(dir)
   }
 
+<<<<<<< HEAD
   test("column nullability and comment - write and then read") {
     import testImplicits._
 
@@ -449,6 +454,8 @@ class DataFrameReaderWriterSuite extends QueryTest with SharedSQLContext with Be
     }
   }
 
+=======
+>>>>>>> tuning_adaptive
   test("SPARK-17230: write out results of decimal calculation") {
     val df = spark.range(99, 101)
       .selectExpr("id", "cast(id as long) * cast('1.0' as decimal(38, 18)) as num")

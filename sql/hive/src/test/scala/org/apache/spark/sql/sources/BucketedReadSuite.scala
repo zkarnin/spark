@@ -412,16 +412,35 @@ class BucketedReadSuite extends QueryTest with SQLTestUtils with TestHiveSinglet
     withTable("bucketed_table") {
       df1.write.format("parquet").bucketBy(8, "i").saveAsTable("bucketed_table")
       val tableDir = new File(hiveContext
+<<<<<<< HEAD
         .sparkSession.getWarehousePath, "bucketed_table")
+=======
+        .sparkSession.warehousePath, "bucketed_table")
+>>>>>>> tuning_adaptive
       Utils.deleteRecursively(tableDir)
       df1.write.parquet(tableDir.getAbsolutePath)
 
       val agged = spark.table("bucketed_table").groupBy("i").count()
+<<<<<<< HEAD
       val error = intercept[Exception] {
+=======
+      val error = intercept[RuntimeException] {
+>>>>>>> tuning_adaptive
         agged.count()
       }
 
       assert(error.getCause().toString contains "Invalid bucket file")
+    }
+  }
+
+  test("disable bucketing when the output doesn't contain all bucketing columns") {
+    withTable("bucketed_table") {
+      df1.write.format("parquet").bucketBy(8, "i").saveAsTable("bucketed_table")
+
+      checkAnswer(hiveContext.table("bucketed_table").select("j"), df1.select("j"))
+
+      checkAnswer(hiveContext.table("bucketed_table").groupBy("j").agg(max("k")),
+        df1.groupBy("j").agg(max("k")))
     }
   }
 

@@ -23,11 +23,17 @@ import scala.collection.JavaConverters._
 
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.analysis.UnresolvedRelation
+<<<<<<< HEAD
 import org.apache.spark.sql.catalyst.catalog.{BucketSpec, CatalogStorageFormat, CatalogTable, CatalogTableType}
 import org.apache.spark.sql.catalyst.plans.logical.InsertIntoTable
 import org.apache.spark.sql.execution.datasources.{CaseInsensitiveMap, CreateTable, DataSource, HadoopFsRelation}
 import org.apache.spark.sql.execution.datasources.jdbc.{JDBCOptions, JdbcUtils}
 import org.apache.spark.sql.types.StructType
+=======
+import org.apache.spark.sql.catalyst.plans.logical.{InsertIntoTable, Project}
+import org.apache.spark.sql.execution.datasources.{BucketSpec, CreateTableUsingAsSelect, DataSource, HadoopFsRelation}
+import org.apache.spark.sql.execution.datasources.jdbc.JdbcUtils
+>>>>>>> tuning_adaptive
 
 /**
  * Interface used to write a [[Dataset]] to external storage systems (e.g. file systems,
@@ -368,6 +374,7 @@ final class DataFrameWriter[T] private[sql](ds: Dataset[T]) {
         throw new AnalysisException(s"Table $tableIdent already exists.")
 
       case _ =>
+<<<<<<< HEAD
         val tableType = if (new CaseInsensitiveMap(extraOptions.toMap).contains("path")) {
           CatalogTableType.EXTERNAL
         } else {
@@ -384,6 +391,17 @@ final class DataFrameWriter[T] private[sql](ds: Dataset[T]) {
           bucketSpec = getBucketSpec
         )
         val cmd = CreateTable(tableDesc, mode, Some(df.logicalPlan))
+=======
+        val cmd =
+          CreateTableUsingAsSelect(
+            tableIdent,
+            source,
+            partitioningColumns.map(_.toArray).getOrElse(Array.empty[String]),
+            getBucketSpec,
+            mode,
+            extraOptions.toMap,
+            df.logicalPlan)
+>>>>>>> tuning_adaptive
         df.sparkSession.sessionState.executePlan(cmd).toRdd
     }
   }
@@ -410,23 +428,30 @@ final class DataFrameWriter[T] private[sql](ds: Dataset[T]) {
    * @param connectionProperties JDBC database connection arguments, a list of arbitrary string
    *                             tag/value. Normally at least a "user" and "password" property
    *                             should be included. "batchsize" can be used to control the
+<<<<<<< HEAD
    *                             number of rows per insert. "isolationLevel" can be one of
    *                             "NONE", "READ_COMMITTED", "READ_UNCOMMITTED", "REPEATABLE_READ",
    *                             or "SERIALIZABLE", corresponding to standard transaction
    *                             isolation levels defined by JDBC's Connection object, with default
    *                             of "READ_UNCOMMITTED".
+=======
+   *                             number of rows per insert.
+>>>>>>> tuning_adaptive
    * @since 1.4.0
    */
   def jdbc(url: String, table: String, connectionProperties: Properties): Unit = {
     assertNotPartitioned("jdbc")
     assertNotBucketed("jdbc")
 
+<<<<<<< HEAD
     // to add required options like URL and dbtable
     val params = extraOptions.toMap ++ Map("url" -> url, "dbtable" -> table)
     val jdbcOptions = new JDBCOptions(params)
     val jdbcUrl = jdbcOptions.url
     val jdbcTable = jdbcOptions.table
 
+=======
+>>>>>>> tuning_adaptive
     val props = new Properties()
     extraOptions.foreach { case (key, value) =>
       props.put(key, value)

@@ -25,6 +25,10 @@ import java.util.concurrent.TimeoutException
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
+<<<<<<< HEAD
+=======
+import scala.language.postfixOps
+>>>>>>> tuning_adaptive
 import scala.util.control.NonFatal
 
 import kafka.admin.AdminUtils
@@ -278,3 +282,7 @@ private[kafka010] class KafkaTestUtils extends Logging {
     }
   }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> tuning_adaptive

@@ -92,8 +92,12 @@ case class CreateHiveTableAsSelectCommand(
       } catch {
         case NonFatal(e) =>
           // drop the created table.
+<<<<<<< HEAD:sql/hive/src/main/scala/org/apache/spark/sql/hive/execution/CreateHiveTableAsSelectCommand.scala
           sparkSession.sessionState.catalog.dropTable(tableIdentifier, ignoreIfNotExists = true,
             purge = false)
+=======
+          sparkSession.sessionState.catalog.dropTable(tableIdentifier, ignoreIfNotExists = true)
+>>>>>>> tuning_adaptive:sql/hive/src/main/scala/org/apache/spark/sql/hive/execution/CreateHiveTableAsSelectCommand.scala
           throw e
       }
     }

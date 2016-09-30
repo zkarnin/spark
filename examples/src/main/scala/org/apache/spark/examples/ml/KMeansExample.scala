@@ -34,6 +34,10 @@ import org.apache.spark.sql.SparkSession
 object KMeansExample {
 
   def main(args: Array[String]): Unit = {
+<<<<<<< HEAD
+=======
+    // Creates a SparkSession.
+>>>>>>> tuning_adaptive
     val spark = SparkSession
       .builder
       .appName(s"${this.getClass.getSimpleName}")

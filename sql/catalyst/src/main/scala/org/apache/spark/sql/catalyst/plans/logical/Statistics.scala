@@ -34,6 +34,7 @@ package org.apache.spark.sql.catalyst.plans.logical
  * @param rowCount Estimated number of rows.
  * @param isBroadcastable If true, output is small enough to be used in a broadcast join.
  */
+<<<<<<< HEAD
 case class Statistics(
     sizeInBytes: BigInt,
     rowCount: Option[BigInt] = None,
@@ -47,3 +48,6 @@ case class Statistics(
     output.filter(_.nonEmpty).mkString("Statistics(", ", ", ")")
   }
 }
+=======
+private[sql] case class Statistics(sizeInBytes: BigInt, isBroadcastable: Boolean = false)
+>>>>>>> tuning_adaptive

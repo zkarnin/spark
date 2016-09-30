@@ -22,7 +22,10 @@ import java.nio.file.attribute.PosixFilePermission._
 import java.util.EnumSet
 
 import scala.annotation.tailrec
+<<<<<<< HEAD
 import scala.concurrent.duration._
+=======
+>>>>>>> tuning_adaptive
 import scala.language.postfixOps
 
 import org.apache.hadoop.fs.Path

@@ -183,18 +183,29 @@ private class DefaultPartitionCoalescer(val balanceSlack: Double = 0.10)
 
     getAllPrefLocs(prev)
 
+<<<<<<< HEAD
     // gets all the preferred locations of the previous RDD and splits them into partitions
     // with preferred locations and ones without
     def getAllPrefLocs(prev: RDD[_]): Unit = {
+=======
+    // gets all the preffered locations of the previous RDD and splits them into partitions
+    // with preferred locations and ones without
+    def getAllPrefLocs(prev: RDD[_]) {
+>>>>>>> tuning_adaptive
       val tmpPartsWithLocs = mutable.LinkedHashMap[Partition, Seq[String]]()
       // first get the locations for each partition, only do this once since it can be expensive
       prev.partitions.foreach(p => {
           val locs = currPrefLocs(p, prev)
+<<<<<<< HEAD
           if (locs.nonEmpty) {
+=======
+          if (locs.size > 0) {
+>>>>>>> tuning_adaptive
             tmpPartsWithLocs.put(p, locs)
           } else {
             partsWithoutLocs += p
           }
+<<<<<<< HEAD
         }
       )
       // convert it into an array of host to partition
@@ -205,6 +216,18 @@ private class DefaultPartitionCoalescer(val balanceSlack: Double = 0.10)
           if (locs.size > x) partsWithLocs += ((locs(x), p))
         }
       }
+=======
+        }
+      )
+      // convert it into an array of host to partition
+      (0 to 2).map(x =>
+        tmpPartsWithLocs.foreach(parts => {
+          val p = parts._1
+          val locs = parts._2
+          if (locs.size > x) partsWithLocs += ((locs(x), p))
+        } )
+      )
+>>>>>>> tuning_adaptive
     }
   }
 

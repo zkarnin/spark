@@ -111,9 +111,15 @@ case class SortAggregateExec(
   private def toString(verbose: Boolean): String = {
     val allAggregateExpressions = aggregateExpressions
 
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/aggregate/SortAggregateExec.scala
     val keyString = Utils.truncatedString(groupingExpressions, "[", ", ", "]")
     val functionString = Utils.truncatedString(allAggregateExpressions, "[", ", ", "]")
     val outputString = Utils.truncatedString(output, "[", ", ", "]")
+=======
+    val keyString = Utils.truncatedString(groupingExpressions, "[", ",", "]")
+    val functionString = Utils.truncatedString(allAggregateExpressions, "[", ",", "]")
+    val outputString = Utils.truncatedString(output, "[", ",", "]")
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/aggregate/SortAggregateExec.scala
     if (verbose) {
       s"SortAggregate(key=$keyString, functions=$functionString, output=$outputString)"
     } else {

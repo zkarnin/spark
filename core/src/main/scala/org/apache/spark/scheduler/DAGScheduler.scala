@@ -294,6 +294,7 @@ class DAGScheduler(
         stage
 
       case None =>
+<<<<<<< HEAD
         // Create stages for all missing ancestor shuffle dependencies.
         getMissingAncestorShuffleDependencies(shuffleDep.rdd).foreach { dep =>
           // Even though getMissingAncestorShuffleDependencies only returns shuffle dependencies
@@ -303,6 +304,12 @@ class DAGScheduler(
           // SPARK-13902 for more information.
           if (!shuffleIdToMapStage.contains(dep.shuffleId)) {
             createShuffleMapStage(dep, firstJobId)
+=======
+        // We are going to register ancestor shuffle dependencies
+        getAncestorShuffleDependencies(shuffleDep.rdd).foreach { dep =>
+          if (!shuffleToMapStage.contains(dep.shuffleId)) {
+            shuffleToMapStage(dep.shuffleId) = newOrUsedShuffleStage(dep, firstJobId)
+>>>>>>> tuning_adaptive
           }
         }
         // Finally, create a stage for the given shuffle dependency.

@@ -110,6 +110,7 @@ object SQLConf {
     .doc("Configures the maximum size in bytes for a table that will be broadcast to all worker " +
       "nodes when performing a join.  By setting this value to -1 broadcasting can be disabled. " +
       "Note that currently statistics are only supported for Hive Metastore tables where the " +
+<<<<<<< HEAD
       "command<code>ANALYZE TABLE &lt;tableName&gt; COMPUTE STATISTICS noscan</code> has been " +
       "run, and file-based data source tables where the statistics are computed directly on " +
       "the files of data.")
@@ -124,6 +125,12 @@ object SQLConf {
     .intConf
     .createWithDefault(4)
 
+=======
+      "command<code>ANALYZE TABLE &lt;tableName&gt; COMPUTE STATISTICS noscan</code> has been run.")
+    .longConf
+    .createWithDefault(10L * 1024 * 1024)
+
+>>>>>>> tuning_adaptive
   val ENABLE_FALL_BACK_TO_HDFS_FOR_STATS =
     SQLConfigBuilder("spark.sql.statistics.fallBackToHdfs")
     .doc("If the table statistics are not available from table metadata enable fall back to hdfs." +
@@ -362,8 +369,12 @@ object SQLConf {
     .createWithDefault(true)
 
   val CROSS_JOINS_ENABLED = SQLConfigBuilder("spark.sql.crossJoin.enabled")
+<<<<<<< HEAD
     .doc("When false, we will throw an error if a query contains a cartesian product without " +
         "explicit CROSS JOIN syntax.")
+=======
+    .doc("When false, we will throw an error if a query contains a cross join")
+>>>>>>> tuning_adaptive
     .booleanConf
     .createWithDefault(false)
 
@@ -630,6 +641,8 @@ private[sql] class SQLConf extends Serializable with CatalystConf with Logging {
 
   def optimizerMetadataOnly: Boolean = getConf(OPTIMIZER_METADATA_ONLY)
 
+  def gatherFastStats: Boolean = getConf(GATHER_FASTSTAT)
+
   def wholeStageEnabled: Boolean = getConf(WHOLESTAGE_CODEGEN_ENABLED)
 
   def wholeStageMaxNumFields: Int = getConf(WHOLESTAGE_MAX_NUM_FIELDS)
@@ -647,8 +660,11 @@ private[sql] class SQLConf extends Serializable with CatalystConf with Logging {
 
   def autoBroadcastJoinThreshold: Long = getConf(AUTO_BROADCASTJOIN_THRESHOLD)
 
+<<<<<<< HEAD
   def limitScaleUpFactor: Int = getConf(LIMIT_SCALE_UP_FACTOR)
 
+=======
+>>>>>>> tuning_adaptive
   def fallBackToHdfsForStatsEnabled: Boolean = getConf(ENABLE_FALL_BACK_TO_HDFS_FOR_STATS)
 
   def preferSortMergeJoin: Boolean = getConf(PREFER_SORTMERGEJOIN)
@@ -684,6 +700,8 @@ private[sql] class SQLConf extends Serializable with CatalystConf with Logging {
 
   def bucketingEnabled: Boolean = getConf(SQLConf.BUCKETING_ENABLED)
 
+  def crossJoinEnabled: Boolean = getConf(SQLConf.CROSS_JOINS_ENABLED)
+
   // Do not use a value larger than 4000 as the default value of this property.
   // See the comments of SCHEMA_STRING_LENGTH_THRESHOLD above for more information.
   def schemaStringLengthThreshold: Int = getConf(SCHEMA_STRING_LENGTH_THRESHOLD)
@@ -703,8 +721,15 @@ private[sql] class SQLConf extends Serializable with CatalystConf with Logging {
 
   def variableSubstituteDepth: Int = getConf(VARIABLE_SUBSTITUTE_DEPTH)
 
+<<<<<<< HEAD
   def warehousePath: String = new Path(getConf(WAREHOUSE_PATH)).toString
 
+=======
+  def warehousePath: String = {
+    new Path(getConf(WAREHOUSE_PATH).replace("${system:user.dir}",
+      System.getProperty("user.dir"))).toString
+  }
+>>>>>>> tuning_adaptive
   override def orderByOrdinal: Boolean = getConf(ORDER_BY_ORDINAL)
 
   override def groupByOrdinal: Boolean = getConf(GROUP_BY_ORDINAL)
@@ -773,7 +798,11 @@ private[sql] class SQLConf extends Serializable with CatalystConf with Logging {
    */
   def getConf[T](entry: OptionalConfigEntry[T]): Option[T] = {
     require(sqlConfEntries.get(entry.key) == entry, s"$entry is not registered")
+<<<<<<< HEAD
     entry.readFrom(reader)
+=======
+    Option(settings.get(entry.key)).map(entry.rawValueConverter)
+>>>>>>> tuning_adaptive
   }
 
   /**

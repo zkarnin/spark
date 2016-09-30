@@ -31,6 +31,10 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{AnalysisException, Row, SparkSession}
 import org.apache.spark.sql.catalyst.InternalRow
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/json/JsonFileFormat.scala
+=======
+import org.apache.spark.sql.execution.command.CreateDataSourceTableUtils
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/json/JsonFileFormat.scala
 import org.apache.spark.sql.execution.datasources._
 import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types.StructType
@@ -105,8 +109,17 @@ class JsonFileFormat extends TextBasedFileFormat with DataSourceRegister {
 
     (file: PartitionedFile) => {
       val lines = new HadoopFileLinesReader(file, broadcastedHadoopConf.value.value).map(_.toString)
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/json/JsonFileFormat.scala
       val parser = new JacksonParser(requiredSchema, columnNameOfCorruptRecord, parsedOptions)
       lines.flatMap(parser.parse)
+=======
+
+      JacksonParser.parseJson(
+        lines,
+        requiredSchema,
+        columnNameOfCorruptRecord,
+        parsedOptions)
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/json/JsonFileFormat.scala
     }
   }
 
@@ -164,7 +177,11 @@ private[json] class JsonOutputWriter(
     new TextOutputFormat[NullWritable, Text]() {
       override def getDefaultWorkFile(context: TaskAttemptContext, extension: String): Path = {
         val configuration = context.getConfiguration
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/json/JsonFileFormat.scala
         val uniqueWriteJobId = configuration.get(WriterContainer.DATASOURCE_WRITEJOBUUID)
+=======
+        val uniqueWriteJobId = configuration.get(CreateDataSourceTableUtils.DATASOURCE_WRITEJOBUUID)
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/json/JsonFileFormat.scala
         val taskAttemptId = context.getTaskAttemptID
         val split = taskAttemptId.getTaskID.getId
         val bucketString = bucketId.map(BucketingUtils.bucketIdToString).getOrElse("")
@@ -176,7 +193,11 @@ private[json] class JsonOutputWriter(
   override def write(row: Row): Unit = throw new UnsupportedOperationException("call writeInternal")
 
   override protected[sql] def writeInternal(row: InternalRow): Unit = {
+<<<<<<< HEAD:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/json/JsonFileFormat.scala
     gen.write(row)
+=======
+    JacksonGenerator(dataSchema, gen, options)(row)
+>>>>>>> tuning_adaptive:sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/json/JsonFileFormat.scala
     gen.flush()
 
     result.set(writer.toString)

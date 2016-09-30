@@ -24,7 +24,11 @@ import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.dsl.plans._
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate.{AggregateExpression, Complete, Count, Max}
+<<<<<<< HEAD
 import org.apache.spark.sql.catalyst.plans.{Cross, Inner, LeftOuter, RightOuter}
+=======
+import org.apache.spark.sql.catalyst.plans.{Inner, LeftOuter, RightOuter}
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.util.{ArrayBasedMapData, GenericArrayData, MapData}
 import org.apache.spark.sql.types._
@@ -547,6 +551,7 @@ class AnalysisErrorSuite extends AnalysisTest {
       Exists(Union(LocalRelation(b), Filter(EqualTo(OuterReference(a), c), LocalRelation(c)))),
       LocalRelation(a))
     assertAnalysisError(plan3, "Accessing outer query column is not allowed in" :: Nil)
+<<<<<<< HEAD
 
     val plan4 = Filter(
       Exists(
@@ -564,5 +569,7 @@ class AnalysisErrorSuite extends AnalysisTest {
       LocalRelation(a))
     assertAnalysisError(plan5,
                         "Accessing outer query column is not allowed in a TABLESAMPLE" :: Nil)
+=======
+>>>>>>> tuning_adaptive
   }
 }

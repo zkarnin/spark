@@ -735,9 +735,13 @@ public class JavaDatasetSuite implements Serializable {
       .add("c", BinaryType)
       .add("d", createArrayType(StringType))
       .add("e", createArrayType(StringType))
+<<<<<<< HEAD
       .add("f", createArrayType(LongType))
       .add("g", createMapType(IntegerType, StringType))
       .add("h",createMapType(createArrayType(LongType), createMapType(StringType, StringType)));
+=======
+      .add("f", createArrayType(LongType));
+>>>>>>> tuning_adaptive
     Dataset<SimpleJavaBean> ds3 = spark.createDataFrame(Arrays.asList(row1, row2), schema)
       .as(Encoders.bean(SimpleJavaBean.class));
     Assert.assertEquals(data, ds3.collectAsList());

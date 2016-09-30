@@ -85,11 +85,14 @@ public class YarnShuffleService extends AuxiliaryService {
   private static final String RECOVERY_FILE_NAME = "registeredExecutors.ldb";
   private static final String SECRETS_RECOVERY_FILE_NAME = "sparkShuffleRecovery.ldb";
 
+<<<<<<< HEAD
   // Whether failure during service initialization should stop the NM.
   @VisibleForTesting
   static final String STOP_ON_FAILURE_KEY = "spark.yarn.shuffle.stopOnFailure";
   private static final boolean DEFAULT_STOP_ON_FAILURE = false;
 
+=======
+>>>>>>> tuning_adaptive
   // just for testing when you want to find an open port
   @VisibleForTesting
   static int boundPort = -1;
@@ -112,10 +115,13 @@ public class YarnShuffleService extends AuxiliaryService {
 
   private Configuration _conf = null;
 
+<<<<<<< HEAD
   // The recovery path used to shuffle service recovery
   @VisibleForTesting
   Path _recoveryPath = null;
 
+=======
+>>>>>>> tuning_adaptive
   // Handles registering executors and opening shuffle blocks
   @VisibleForTesting
   ExternalShuffleBlockHandler blockHandler;
@@ -149,10 +155,15 @@ public class YarnShuffleService extends AuxiliaryService {
    * Start the shuffle server with the given configuration.
    */
   @Override
+<<<<<<< HEAD
   protected void serviceInit(Configuration conf) throws Exception {
     _conf = conf;
 
     boolean stopOnFailure = conf.getBoolean(STOP_ON_FAILURE_KEY, DEFAULT_STOP_ON_FAILURE);
+=======
+  protected void serviceInit(Configuration conf) {
+     _conf = conf;
+>>>>>>> tuning_adaptive
 
     try {
       // In case this NM was killed while there were running spark applications, we need to restore
@@ -160,6 +171,7 @@ public class YarnShuffleService extends AuxiliaryService {
       // If we don't find one, then we choose a file to use to save the state next time.  Even if
       // an application was stopped while the NM was down, we expect yarn to call stopApplication()
       // when it comes back
+<<<<<<< HEAD
       registeredExecutorFile = initRecoveryDb(RECOVERY_FILE_NAME);
 
       TransportConf transportConf = new TransportConf("shuffle", new HadoopConfigProvider(conf));
@@ -169,6 +181,17 @@ public class YarnShuffleService extends AuxiliaryService {
       // special RPC handler that filters out unauthenticated fetch requests
       List<TransportServerBootstrap> bootstraps = Lists.newArrayList();
       boolean authEnabled = conf.getBoolean(SPARK_AUTHENTICATE_KEY, DEFAULT_SPARK_AUTHENTICATE);
+=======
+      registeredExecutorFile = findRecoveryDb(RECOVERY_FILE_NAME);
+
+      TransportConf transportConf = new TransportConf("shuffle", new HadoopConfigProvider(conf));
+        blockHandler = new ExternalShuffleBlockHandler(transportConf, registeredExecutorFile);
+
+      // If authentication is enabled, set up the shuffle server to use a
+      // special RPC handler that filters out unauthenticated fetch requests
+      boolean authEnabled = conf.getBoolean(SPARK_AUTHENTICATE_KEY, DEFAULT_SPARK_AUTHENTICATE);
+      List<TransportServerBootstrap> bootstraps = Lists.newArrayList();
+>>>>>>> tuning_adaptive
       if (authEnabled) {
         createSecretManager();
         bootstraps.add(new SaslServerBootstrap(transportConf, secretManager));
@@ -193,6 +216,7 @@ public class YarnShuffleService extends AuxiliaryService {
       }
     }
   }
+<<<<<<< HEAD
 
   private void createSecretManager() throws IOException {
     secretManager = new ShuffleSecretManager();
@@ -202,6 +226,17 @@ public class YarnShuffleService extends AuxiliaryService {
     FileSystem fs = FileSystem.getLocal(_conf);
     fs.mkdirs(new Path(secretsFile.getPath()), new FsPermission((short)0700));
 
+=======
+
+  private void createSecretManager() throws IOException {
+    secretManager = new ShuffleSecretManager();
+    secretsFile = findRecoveryDb(SECRETS_RECOVERY_FILE_NAME);
+ 
+    // Make sure this is protected in case its not in the NM recovery dir
+    FileSystem fs = FileSystem.getLocal(_conf);
+    fs.mkdirs(new Path(secretsFile.getPath()), new FsPermission((short)0700));
+
+>>>>>>> tuning_adaptive
     db = LevelDBProvider.initLevelDB(secretsFile, CURRENT_VERSION, mapper);
     logger.info("Recovery location is: " + secretsFile.getPath());
     if (db != null) {
@@ -221,6 +256,7 @@ public class YarnShuffleService extends AuxiliaryService {
       }
     }
   }
+<<<<<<< HEAD
 
   private static String parseDbAppKey(String s) throws IOException {
     if (!s.startsWith(APP_CREDS_KEY_PREFIX)) {
@@ -231,6 +267,18 @@ public class YarnShuffleService extends AuxiliaryService {
     return parsed.appId;
   }
 
+=======
+
+  private static String parseDbAppKey(String s) throws IOException {
+    if (!s.startsWith(APP_CREDS_KEY_PREFIX)) {
+      throw new IllegalArgumentException("expected a string starting with " + APP_CREDS_KEY_PREFIX);
+    }
+    String json = s.substring(APP_CREDS_KEY_PREFIX.length() + 1);
+    AppId parsed = mapper.readValue(json, AppId.class);
+    return parsed.appId;
+  }
+
+>>>>>>> tuning_adaptive
   private static byte[] dbAppKey(AppId appExecId) throws IOException {
     // we stick a common prefix on all the keys so we can find them in the DB
     String appExecJson = mapper.writeValueAsString(appExecId);
@@ -292,6 +340,20 @@ public class YarnShuffleService extends AuxiliaryService {
     logger.info("Stopping container {}", containerId);
   }
 
+<<<<<<< HEAD
+=======
+  private File findRecoveryDb(String fileName) {
+    String[] localDirs = _conf.getTrimmedStrings("yarn.nodemanager.local-dirs");
+    for (String dir: localDirs) {
+      File f = new File(new Path(dir).toUri().getPath(), fileName);
+      if (f.exists()) {
+        return f;
+      }
+    }
+    return new File(new Path(localDirs[0]).toUri().getPath(), fileName);
+  }
+
+>>>>>>> tuning_adaptive
   /**
    * Close the shuffle server to clean up any associated state.
    */
@@ -319,6 +381,7 @@ public class YarnShuffleService extends AuxiliaryService {
   }
 
   /**
+<<<<<<< HEAD
    * Set the recovery path for shuffle service recovery when NM is restarted. The method will be
    * overrode and called when Hadoop version is 2.5+ and NM recovery is enabled, otherwise we
    * have to manually call this to set our own recovery path.
@@ -384,6 +447,8 @@ public class YarnShuffleService extends AuxiliaryService {
   }
 
   /**
+=======
+>>>>>>> tuning_adaptive
    * Simply encodes an application ID.
    */
   public static class AppId {

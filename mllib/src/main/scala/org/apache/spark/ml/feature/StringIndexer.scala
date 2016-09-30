@@ -185,8 +185,6 @@ class StringIndexerModel (
 //    case _ => label => true
 //  }
 
-
-
   @Since("1.4.0")
   override def transformSchema(schema: StructType): StructType = {
     if (schema.fieldNames.contains($(inputCol))) {
@@ -196,6 +194,7 @@ class StringIndexerModel (
       schema
     }
   }
+
 
   def setOutputCol(value: String): this.type = set(outputCol, value)
 

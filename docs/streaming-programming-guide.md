@@ -1610,7 +1610,11 @@ words.foreachRDD(
 
       // Do word count on table using SQL and print it
       DataFrame wordCountsDataFrame =
+<<<<<<< HEAD
         spark.sql("select word, count(*) as total from words group by word");
+=======
+          spark.sql("select word, count(*) as total from words group by word");
+>>>>>>> tuning_adaptive
       wordCountsDataFrame.show();
       return null;
     }
@@ -1625,12 +1629,21 @@ See the full [source code]({{site.SPARK_GITHUB_URL}}/blob/v{{site.SPARK_VERSION_
 
 # Lazily instantiated global instance of SparkSession
 def getSparkSessionInstance(sparkConf):
+<<<<<<< HEAD
     if ("sparkSessionSingletonInstance" not in globals()):
         globals()["sparkSessionSingletonInstance"] = SparkSession \
             .builder \
             .config(conf=sparkConf) \
             .getOrCreate()
     return globals()["sparkSessionSingletonInstance"]
+=======
+    if ('sparkSessionSingletonInstance' not in globals()):
+        globals()['sparkSessionSingletonInstance'] = SparkSession\
+            .builder\
+            .config(conf=sparkConf)\
+            .getOrCreate()
+    return globals()['sparkSessionSingletonInstance']
+>>>>>>> tuning_adaptive
 
 ...
 

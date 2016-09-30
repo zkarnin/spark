@@ -524,11 +524,19 @@ token for the cluster's HDFS filesystem, and potentially for HBase and Hive.
 
 An HBase token will be obtained if HBase is in on classpath, the HBase configuration declares
 the application is secure (i.e. `hbase-site.xml` sets `hbase.security.authentication` to `kerberos`),
+<<<<<<< HEAD
 and `spark.yarn.security.credentials.hbase.enabled` is not set to `false`.
 
 Similarly, a Hive token will be obtained if Hive is on the classpath, its configuration
 includes a URI of the metadata store in `"hive.metastore.uris`, and
 `spark.yarn.security.credentials.hive.enabled` is not set to `false`.
+=======
+and `spark.yarn.security.tokens.hbase.enabled` is not set to `false`.
+
+Similarly, a Hive token will be obtained if Hive is on the classpath, its configuration
+includes a URI of the metadata store in `"hive.metastore.uris`, and
+`spark.yarn.security.tokens.hive.enabled` is not set to `false`.
+>>>>>>> tuning_adaptive
 
 If an application needs to interact with other secure HDFS clusters, then
 the tokens needed to access these clusters must be explicitly requested at
@@ -538,6 +546,7 @@ launch time. This is done by listing them in the `spark.yarn.access.namenodes` p
 spark.yarn.access.namenodes hdfs://ireland.example.org:8020/,hdfs://frankfurt.example.org:8020/
 ```
 
+<<<<<<< HEAD
 Spark supports integrating with other security-aware services through Java Services mechanism (see
 `java.util.ServiceLoader`). To do that, implementations of `org.apache.spark.deploy.yarn.security.ServiceCredentialProvider`
 should be available to Spark by listing their names in the corresponding file in the jar's
@@ -576,6 +585,8 @@ The following extra configuration options are available when the shuffle service
 </tr>
 </table>
 
+=======
+>>>>>>> tuning_adaptive
 ## Launching your application with Apache Oozie
 
 Apache Oozie can launch Spark applications as part of a workflow.

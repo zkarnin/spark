@@ -59,7 +59,10 @@ public class JavaVectorAssemblerExample {
         "'features'");
     output.select("features", "clicked").show(false);
     // $example off$
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     spark.stop();
   }
 }

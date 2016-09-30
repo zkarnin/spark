@@ -225,8 +225,13 @@ class JoinSuite extends QueryTest with SharedSQLContext {
             Row(2, 2, 1, null) ::
             Row(2, 2, 2, 2) :: Nil)
       }
+<<<<<<< HEAD
       assert(e.getMessage.contains("Detected cartesian product for INNER join " +
         "between logical plans"))
+=======
+      assert(e.getMessage.contains("Cartesian joins could be prohibitively expensive and are " +
+        "disabled by default"))
+>>>>>>> tuning_adaptive
     }
   }
 

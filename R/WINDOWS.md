@@ -13,6 +13,7 @@ include Rtools and R in `PATH`.
 directory in Maven in `PATH`.
 
 4. Set `MAVEN_OPTS` as described in [Building Spark](http://spark.apache.org/docs/latest/building-spark.html).
+<<<<<<< HEAD
 
 5. Open a command shell (`cmd`) in the Spark directory and build Spark with [Maven](http://spark.apache.org/docs/latest/building-spark.html#building-with-buildmvn) and include the `-Psparkr` profile to build the R package. For example to use the default Hadoop versions you can run
 
@@ -21,6 +22,9 @@ directory in Maven in `PATH`.
     ```
 
     `.\build\mvn` is a shell script so `mvn.cmd` should be used directly on Windows.
+=======
+5. Open a command shell (`cmd`) in the Spark directory and run `mvn -DskipTests -Psparkr package`
+>>>>>>> tuning_adaptive
 
 ##  Unit tests
 

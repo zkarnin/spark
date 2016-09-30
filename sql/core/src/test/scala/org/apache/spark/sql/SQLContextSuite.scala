@@ -95,7 +95,11 @@ class SQLContextSuite extends SparkFunSuite with SharedSparkContext {
       Row("listtablessuitetable", true) :: Nil)
 
     sqlContext.sessionState.catalog.dropTable(
+<<<<<<< HEAD
       TableIdentifier("listtablessuitetable"), ignoreIfNotExists = true, purge = false)
+=======
+      TableIdentifier("listtablessuitetable"), ignoreIfNotExists = true)
+>>>>>>> tuning_adaptive
     assert(sqlContext.tables().filter("tableName = 'listtablessuitetable'").count() === 0)
   }
 
@@ -112,7 +116,11 @@ class SQLContextSuite extends SparkFunSuite with SharedSparkContext {
         .collect().toSeq == Row("listtablessuitetable", true) :: Nil)
 
     sqlContext.sessionState.catalog.dropTable(
+<<<<<<< HEAD
       TableIdentifier("listtablessuitetable"), ignoreIfNotExists = true, purge = false)
+=======
+      TableIdentifier("listtablessuitetable"), ignoreIfNotExists = true)
+>>>>>>> tuning_adaptive
     assert(sqlContext.tables().filter("tableName = 'listtablessuitetable'").count() === 0)
   }
 

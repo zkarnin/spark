@@ -24,7 +24,11 @@ import scala.collection.mutable
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 
+<<<<<<< HEAD
 import org.apache.spark.{SparkConf, SparkException}
+=======
+import org.apache.spark.SparkException
+>>>>>>> tuning_adaptive
 import org.apache.spark.sql.AnalysisException
 import org.apache.spark.sql.catalyst.{FunctionIdentifier, TableIdentifier}
 import org.apache.spark.sql.catalyst.analysis._
@@ -39,11 +43,15 @@ import org.apache.spark.sql.catalyst.util.StringUtils
  *
  * All public methods should be synchronized for thread-safety.
  */
+<<<<<<< HEAD
 class InMemoryCatalog(
     conf: SparkConf = new SparkConf,
     hadoopConfig: Configuration = new Configuration)
   extends ExternalCatalog {
 
+=======
+class InMemoryCatalog(hadoopConfig: Configuration = new Configuration) extends ExternalCatalog {
+>>>>>>> tuning_adaptive
   import CatalogTypes.TablePartitionSpec
 
   private class TableDesc(var table: CatalogTable) {
@@ -305,6 +313,7 @@ class InMemoryCatalog(
       partition: TablePartitionSpec,
       isOverwrite: Boolean,
       holdDDLTime: Boolean,
+<<<<<<< HEAD
       inheritTableSpecs: Boolean): Unit = {
     throw new UnsupportedOperationException("loadPartition is not implemented.")
   }
@@ -318,6 +327,11 @@ class InMemoryCatalog(
       numDP: Int,
       holdDDLTime: Boolean): Unit = {
     throw new UnsupportedOperationException("loadDynamicPartitions is not implemented.")
+=======
+      inheritTableSpecs: Boolean,
+      isSkewedStoreAsSubdir: Boolean): Unit = {
+    throw new UnsupportedOperationException("loadPartition is not implemented.")
+>>>>>>> tuning_adaptive
   }
 
   // --------------------------------------------------------------------------
@@ -372,8 +386,34 @@ class InMemoryCatalog(
       val missingSpecs = partSpecs.collect { case s if !existingParts.contains(s) => s }
       if (missingSpecs.nonEmpty) {
         throw new NoSuchPartitionsException(db = db, table = table, specs = missingSpecs)
+<<<<<<< HEAD
       }
     }
+
+    val tableDir = new Path(catalog(db).db.locationUri, table)
+    val partitionColumnNames = getTable(db, table).partitionColumnNames
+    // TODO: we should follow hive to roll back if one partition path failed to delete.
+    partSpecs.foreach { p =>
+      // If location is set, the partition is using an external partition location and we don't
+      // need to handle its directory.
+      if (existingParts.contains(p) && existingParts(p).storage.locationUri.isEmpty) {
+        val partitionPath = partitionColumnNames.flatMap { col =>
+          p.get(col).map(col + "=" + _)
+        }.mkString("/")
+        try {
+          val fs = tableDir.getFileSystem(hadoopConfig)
+          fs.delete(new Path(tableDir, partitionPath), true)
+        } catch {
+          case e: IOException =>
+            throw new SparkException(s"Unable to delete partition path $partitionPath", e)
+        }
+=======
+>>>>>>> tuning_adaptive
+      }
+      existingParts.remove(p)
+    }
+<<<<<<< HEAD
+=======
 
     val tableDir = new Path(catalog(db).db.locationUri, table)
     val partitionColumnNames = getTable(db, table).partitionColumnNames
@@ -395,6 +435,7 @@ class InMemoryCatalog(
       }
       existingParts.remove(p)
     }
+>>>>>>> tuning_adaptive
   }
 
   override def renamePartitions(

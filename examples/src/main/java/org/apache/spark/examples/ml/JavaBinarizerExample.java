@@ -51,7 +51,10 @@ public class JavaBinarizerExample {
       new StructField("feature", DataTypes.DoubleType, false, Metadata.empty())
     });
     Dataset<Row> continuousDataFrame = spark.createDataFrame(data, schema);
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     Binarizer binarizer = new Binarizer()
       .setInputCol("feature")
       .setOutputCol("binarized_feature")
@@ -62,7 +65,10 @@ public class JavaBinarizerExample {
     System.out.println("Binarizer output with Threshold = " + binarizer.getThreshold());
     binarizedDataFrame.show();
     // $example off$
+<<<<<<< HEAD
 
+=======
+>>>>>>> tuning_adaptive
     spark.stop();
   }
 }

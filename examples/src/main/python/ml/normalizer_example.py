@@ -30,11 +30,15 @@ if __name__ == "__main__":
         .getOrCreate()
 
     # $example on$
+<<<<<<< HEAD
     dataFrame = spark.createDataFrame([
         (0, Vectors.dense([1.0, 0.5, -1.0]),),
         (1, Vectors.dense([2.0, 1.0, 1.0]),),
         (2, Vectors.dense([4.0, 10.0, 2.0]),)
     ], ["id", "features"])
+=======
+    dataFrame = spark.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
+>>>>>>> tuning_adaptive
 
     # Normalize each Vector using $L^1$ norm.
     normalizer = Normalizer(inputCol="features", outputCol="normFeatures", p=1.0)

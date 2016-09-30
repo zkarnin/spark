@@ -19,6 +19,31 @@ var appLimit = -1;
 
 function setAppLimit(val) {
     appLimit = val;
+<<<<<<< HEAD
+=======
+}
+
+// this function works exactly the same as UIUtils.formatDuration
+function formatDuration(milliseconds) {
+  if (milliseconds < 100) {
+    return milliseconds + " ms";
+  }
+  var seconds = milliseconds * 1.0 / 1000;
+  if (seconds < 1) {
+    return seconds.toFixed(1) + " s";
+  }
+  if (seconds < 60) {
+    return seconds.toFixed(0) + " s";
+  }
+  var minutes = seconds / 60;
+  if (minutes < 10) {
+    return minutes.toFixed(1) + " min";
+  } else if (minutes < 60) {
+    return minutes.toFixed(0) + " min";
+  }
+  var hours = minutes / 60;
+  return hours.toFixed(1) + " h";
+>>>>>>> tuning_adaptive
 }
 
 function makeIdNumeric(id) {

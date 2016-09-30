@@ -127,10 +127,16 @@ object Checkpoint extends Logging {
         logWarning(s"Listing $path returned null")
         Seq.empty
       }
+<<<<<<< HEAD
     } catch {
       case _: FileNotFoundException =>
         logWarning(s"Checkpoint directory $path does not exist")
         Seq.empty
+=======
+    } else {
+      logWarning(s"Checkpoint directory $path does not exist")
+      Seq.empty
+>>>>>>> tuning_adaptive
     }
   }
 

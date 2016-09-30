@@ -31,7 +31,11 @@ from pyspark.sql import SparkSession
 if __name__ == "__main__":
     spark = SparkSession\
         .builder\
+<<<<<<< HEAD
         .appName("GradientBoostedTreeRegressorExample")\
+=======
+        .appName("gradient_boosted_tree_regressor_example")\
+>>>>>>> tuning_adaptive
         .getOrCreate()
 
     # $example on$

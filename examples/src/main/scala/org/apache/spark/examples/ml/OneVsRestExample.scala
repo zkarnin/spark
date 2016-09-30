@@ -69,7 +69,11 @@ object OneVsRestExample {
 
     // compute the classification error on test data.
     val accuracy = evaluator.evaluate(predictions)
+<<<<<<< HEAD
     println(s"Test Error = ${1 - accuracy}")
+=======
+    println(s"Test Error : ${1 - accuracy}")
+>>>>>>> tuning_adaptive
     // $example off$
 
     spark.stop()
